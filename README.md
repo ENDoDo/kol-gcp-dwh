@@ -38,6 +38,12 @@ graph TD
         D -- ソースとして参照 --> G;
     end
 
+    subgraph "データエクスポート & API連携 (Export)"
+        G -->|定期/手動実行| ExportCF{Export Cloud Functions};
+        ExportCF -->|csvエクスポート| FTP[スマート競馬 FTP Server];
+        ExportCF -->|更新通知| Bubble[Bubble API Endpoint];
+    end
+
     style GCS fill:#D5E8D4,stroke:#82B366
     style G fill:#DAE8FC,stroke:#6C8EBF
     style W fill:#FFE6CC,stroke:#D79B00
@@ -46,6 +52,7 @@ graph TD
 1.  **データ取り込み**: ユーザーがKOLデータを含むZIPファイルをGCSにアップロードすると、Cloud Functionが起動し、BigQueryの`kolbi_keiba`データセットに生データを書き込みます。
 2.  **データ変換トリガー**: BigQueryの特定のテーブル（`kol_den1`, `kol_den2`, `kol_ket`, `kol_sei1`, `kol_sei2`）が更新されると、Cloud Logging Sinkがそれを検知し、Pub/Sub経由でEventarcに通知します。EventarcはCloud Workflowsを起動します。
 3.  **データ変換**: Cloud WorkflowsはDataformのワークフローを開始します。Dataformは`kolbi_keiba`の生データを参照して、`kolbi_analysis.race`を含むプロジェクト内のすべてのテーブルを生成・更新します。
+4.  **データエクスポート**: `export_schedules`, `export_races`, `export_race_uma_details` 等のCloud Functionsが、変換済みデータをFTPサーバーへCSVとしてアップロードし、同時にBubbleアプリのAPIエンドポイントへ更新通知（CSV URLの送信）を行います。
 
 ## 技術スタック
 
@@ -122,7 +129,15 @@ DataformがGitHubリポジトリにアクセスするために、認証用のト
 2.  GCPコンソールでSecret Managerに移動し、`github-token` という名前のシークレットを作成します。
 3.  作成したシークレットに、GitHubのPATをシークレットの値として追加します。
 
-### 4. インフラのデプロイ
+### 4. Bubble API / FTP 連携設定
+
+以下のシークレットも同様にSecret Managerに設定する必要があります。
+
+-   `kol_ftp_bubble_username`: FTPユーザー名
+-   `kol_ftp_bubble_password`: FTPパスワード
+-   `kol_bubble_workflow_api_key`: Bubble API Bearer Token
+
+### 5. インフラのデプロイ
 
 本プロジェクトでは Terraform Workspace を使用して環境（Staging / Production）を管理しています。
 
