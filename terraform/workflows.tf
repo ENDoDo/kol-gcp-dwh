@@ -112,11 +112,19 @@ main:
           auth:
             type: OIDC
         result: exportRacesResult
+    - callExportRaceUmaDetailsFunction:
+        call: http.post
+        args:
+          url: "${google_cloudfunctions2_function.export_race_uma_details.service_config[0].uri}"
+          auth:
+            type: OIDC
+        result: exportRaceUmaDetailsResult
     - returnResult:
         return:
           dataform: $${dataformStatus.body}
           exportSchedule: $${exportScheduleResult.body}
           exportRaces: $${exportRacesResult.body}
+          exportRaceUmaDetails: $${exportRaceUmaDetailsResult.body}
 EOF
 }
 
@@ -195,10 +203,18 @@ main:
           auth:
             type: OIDC
         result: exportRacesResult
+    - callExportRaceUmaDetailsFunction:
+        call: http.post
+        args:
+          url: "${google_cloudfunctions2_function.export_race_uma_details.service_config[0].uri}"
+          auth:
+            type: OIDC
+        result: exportRaceUmaDetailsResult
     - returnResult:
         return:
           dataform: $${dataformStatus.body}
           exportSchedule: $${exportScheduleResult.body}
           exportRaces: $${exportRacesResult.body}
+          exportRaceUmaDetails: $${exportRaceUmaDetailsResult.body}
 EOF
 }
