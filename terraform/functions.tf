@@ -167,6 +167,9 @@ resource "google_cloudfunctions2_function" "export_race_uma_details" {
       SECRET_USER = "projects/56638639323/secrets/kol_ftp_bubble_username"
       SECRET_PASS = "projects/56638639323/secrets/kol_ftp_bubble_password"
       FTP_DIRECTORY = terraform.workspace == "prd" ? "/production" : "/development"
+      BUBBLE_API_URL = "https://member.kol-bi.jp/version-test/api/1.1/wf/import_race_uma_detail"
+      BUBBLE_API_KEY_SECRET_ID = "projects/56638639323/secrets/kol_bubble_workflow_api_key"
+      CSV_BASE_URL = "https://kol-bi.jp/umasiri.dev"
     }
     service_account_email = google_service_account.export_race_uma_details_sa.email
   }

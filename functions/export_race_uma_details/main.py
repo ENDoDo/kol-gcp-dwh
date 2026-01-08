@@ -9,6 +9,7 @@ import functions_framework
 from google.cloud import bigquery
 from google.cloud import secretmanager
 import datetime
+import requests
 
 # ログ設定
 logging.basicConfig(level=logging.INFO)
@@ -21,6 +22,9 @@ SECRET_USER = os.environ.get("SECRET_USER") # ユーザー名のシークレッ�
 SECRET_PASS = os.environ.get("SECRET_PASS") # パスワードのシークレットリソースID
 STATE_TABLE_NAME = "race_uma_details_export_state"
 FTP_HOST = "smartkb.mixh.jp"
+BUBBLE_API_URL = os.environ.get("BUBBLE_API_URL")
+BUBBLE_API_KEY_SECRET_ID = os.environ.get("BUBBLE_API_KEY_SECRET_ID")
+CSV_BASE_URL = os.environ.get("CSV_BASE_URL", "https://kol-bi.jp/umasiri.dev")
 
 def get_secret(secret_id):
     """Secret Managerからシークレット値を取得する"""
@@ -185,6 +189,36 @@ def export_race_uma_details(request):
                     bio = io.BytesIO(csv_content)
                     ftp.storbinary(f"STOR {filename}", bio)
                     logger.info(f"{filename} のアップロード完了")
+
+                    # Bubble APIへの通知
+                    if BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
+                        try:
+                            # FTPディレクトリの考慮
+                            if ftp_directory:
+                                dir_path = ftp_directory.strip("/")
+                                csv_url = f"{CSV_BASE_URL}/{dir_path}/{filename}"
+                            else:
+                                csv_url = f"{CSV_BASE_URL}/{filename}"
+
+                            logger.info(f"通知対象CSV URL: {csv_url}")
+                            api_key = get_secret(BUBBLE_API_KEY_SECRET_ID)
+                            headers = {
+                                "Content-Type": "application/json",
+                                "Authorization": f"Bearer {api_key}"
+                            }
+                            payload = {
+                                "csv_url": csv_url
+                            }
+                            response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
+                            response.raise_for_status()
+                            logger.info(f"Bubble APIへの通知に成功しました ({filename}): {response.json()}")
+                        except Exception as e:
+                            logger.error(f"Bubble APIへの通知に失敗しました ({filename}): {e}")
+                            # 続行する
+                    else:
+                        # 毎回ログが出るとうるさいので、part_numが1のときだけ出すなどの制御も考えられるが
+                        # ここではupload_chunkの呼び出し頻度依存。infoログなので出しておく。
+                        logger.info("Bubble API設定がされていないため、通知をスキップします。")
             except Exception as e:
                 logger.error(f"FTPアップロードエラー: {filename}, {e}")
                 # 再送ロジックを入れるか、ここではエラーとして処理を継続するか
