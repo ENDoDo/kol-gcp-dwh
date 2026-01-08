@@ -102,6 +102,7 @@ main:
         call: http.post
         args:
           url: "${google_cloudfunctions2_function.export_schedules.service_config[0].uri}"
+          timeout: 600
           auth:
             type: OIDC
         result: exportScheduleResult
@@ -109,6 +110,7 @@ main:
         call: http.post
         args:
           url: "${google_cloudfunctions2_function.export_races.service_config[0].uri}"
+          timeout: 600
           auth:
             type: OIDC
         result: exportRacesResult
@@ -116,6 +118,7 @@ main:
         call: http.post
         args:
           url: "${google_cloudfunctions2_function.export_race_uma_details.service_config[0].uri}"
+          timeout: 3660
           auth:
             type: OIDC
         result: exportRaceUmaDetailsResult
@@ -193,6 +196,7 @@ main:
         call: http.post
         args:
           url: "${google_cloudfunctions2_function.export_schedules.service_config[0].uri}"
+          timeout: 600
           auth:
             type: OIDC
         result: exportScheduleResult
@@ -200,6 +204,7 @@ main:
         call: http.post
         args:
           url: "${google_cloudfunctions2_function.export_races.service_config[0].uri}"
+          timeout: 600
           auth:
             type: OIDC
         result: exportRacesResult
@@ -207,6 +212,7 @@ main:
         call: http.post
         args:
           url: "${google_cloudfunctions2_function.export_race_uma_details.service_config[0].uri}"
+          timeout: 3660
           auth:
             type: OIDC
         result: exportRaceUmaDetailsResult
