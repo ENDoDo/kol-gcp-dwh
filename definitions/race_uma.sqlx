@@ -1370,7 +1370,8 @@ SELECT
     WHEN z.chokyo_awase LIKE '%同入%' OR z.chokyo_awase LIKE '%内併走%' OR z.chokyo_awase LIKE '%外併走%' THEN '併せ同入'
     WHEN z.chokyo_awase LIKE '%遅れ%' THEN '併せ遅れ'
     WHEN z.chokyo_awase LIKE '%先着%' THEN '併せ先着'
-    ELSE '単走'
+    WHEN z.chokyo_awase LIKE '%単走%' THEN '単走'
+    ELSE NULL
   END AS chokyo_awase_kubun,
   z.chokyo_awase_flag,
   CASE z.chokyo_awase_flag
