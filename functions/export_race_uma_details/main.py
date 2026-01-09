@@ -148,7 +148,7 @@ def export_race_uma_details(request):
             "created", "modified"
         ]
 
-        def upload_chunk(chunk, current_part_num):
+        def upload_chunk(ftp_conn, chunk, current_part_num):
             """チャンクデータをFTPにアップロードする内部関数"""
             if not chunk:
                 return
@@ -170,55 +170,50 @@ def export_race_uma_details(request):
 
             logger.info(f"FTPへアップロード中... ({filename}, {len(chunk)} rows)")
             try:
-                with ftplib.FTP(FTP_HOST) as ftp:
-                    ftp.login(user=ftp_user, passwd=ftp_pass)
-                    csv_buffer = io.StringIO()
-                    writer = csv.DictWriter(csv_buffer, fieldnames=fieldnames)
-                    writer.writeheader()
-                    writer.writerows(chunk)
-                    # ディレクトリ移動
-                    ftp_directory = os.environ.get("FTP_DIRECTORY")
-                    if ftp_directory:
-                        try:
-                            ftp.cwd(ftp_directory)
-                        except ftplib.error_perm:
-                            logger.info(f"ディレクトリ {ftp_directory} が存在しないため作成します。")
-                            ftp.mkd(ftp_directory)
-                            ftp.cwd(ftp_directory)
-                    csv_content = csv_buffer.getvalue().encode('utf-8')
-                    bio = io.BytesIO(csv_content)
-                    ftp.storbinary(f"STOR {filename}", bio)
-                    logger.info(f"{filename} のアップロード完了")
+                # FTP接続は外部から渡される ftp_conn を使用する
 
-                    # Bubble APIへの通知
-                    if BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
-                        try:
-                            # FTPディレクトリの考慮
-                            if ftp_directory:
-                                dir_path = ftp_directory.strip("/")
-                                csv_url = f"{CSV_BASE_URL}/{dir_path}/{filename}"
-                            else:
-                                csv_url = f"{CSV_BASE_URL}/{filename}"
+                csv_buffer = io.StringIO()
+                writer = csv.DictWriter(csv_buffer, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(chunk)
 
-                            logger.info(f"通知対象CSV URL: {csv_url}")
-                            api_key = get_secret(BUBBLE_API_KEY_SECRET_ID)
-                            headers = {
-                                "Content-Type": "application/json",
-                                "Authorization": f"Bearer {api_key}"
-                            }
-                            payload = {
-                                "csv_url": csv_url
-                            }
-                            response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
-                            response.raise_for_status()
-                            logger.info(f"Bubble APIへの通知に成功しました ({filename}): {response.json()}")
-                        except Exception as e:
-                            logger.error(f"Bubble APIへの通知に失敗しました ({filename}): {e}")
-                            # 続行する
-                    else:
-                        # 毎回ログが出るとうるさいので、part_numが1のときだけ出すなどの制御も考えられるが
-                        # ここではupload_chunkの呼び出し頻度依存。infoログなので出しておく。
-                        logger.info("Bubble API設定がされていないため、通知をスキップします。")
+                # ディレクトリは事前に移動済みと仮定
+
+                csv_content = csv_buffer.getvalue().encode('utf-8')
+                bio = io.BytesIO(csv_content)
+                ftp_conn.storbinary(f"STOR {filename}", bio)
+                logger.info(f"{filename} のアップロード完了")
+
+                # Bubble APIへの通知
+                if BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
+                    try:
+                        ftp_directory = os.environ.get("FTP_DIRECTORY")
+                        # FTPディレクトリの考慮
+                        if ftp_directory:
+                            dir_path = ftp_directory.strip("/")
+                            csv_url = f"{CSV_BASE_URL}/{dir_path}/{filename}"
+                        else:
+                            csv_url = f"{CSV_BASE_URL}/{filename}"
+
+                        logger.info(f"通知対象CSV URL: {csv_url}")
+                        api_key = get_secret(BUBBLE_API_KEY_SECRET_ID)
+                        headers = {
+                            "Content-Type": "application/json",
+                            "Authorization": f"Bearer {api_key}"
+                        }
+                        payload = {
+                            "csv_url": csv_url
+                        }
+                        response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
+                        response.raise_for_status()
+                        logger.info(f"Bubble APIへの通知に成功しました ({filename}): {response.json()}")
+                    except Exception as e:
+                        logger.error(f"Bubble APIへの通知に失敗しました ({filename}): {e}")
+                        # 続行する
+                else:
+                    # 毎回ログが出るとうるさいので、part_numが1のときだけ出すなどの制御も考えられるが
+                    # ここではupload_chunkの呼び出し頻度依存。infoログなので出しておく。
+                    logger.info("Bubble API設定がされていないため、通知をスキップします。")
             except Exception as e:
                 logger.error(f"FTPアップロードエラー: {filename}, {e}")
                 # 再送ロジックを入れるか、ここではエラーとして処理を継続するか
@@ -227,33 +222,48 @@ def export_race_uma_details(request):
 
         processed_count = 0
 
-        # イテレータを回してストリーミング処理
-        for row in rows_iterator:
-            # Rowデータを辞書化
-            row_data = {field: row[field] for field in fieldnames}
+        # FTP接続の再利用
+        logger.info(f"FTP接続を開始します: {FTP_HOST}")
+        with ftplib.FTP(FTP_HOST) as ftp_conn:
+            ftp_conn.login(user=ftp_user, passwd=ftp_pass)
 
-            # ハッシュ
-            current_hash = row["current_hash"]
+            # ディレクトリ移動確認 (接続直後に1回だけ実行)
+            ftp_directory = os.environ.get("FTP_DIRECTORY")
+            if ftp_directory:
+                try:
+                    ftp_conn.cwd(ftp_directory)
+                except ftplib.error_perm:
+                    logger.info(f"ディレクトリ {ftp_directory} が存在しないため作成します。")
+                    ftp_conn.mkd(ftp_directory)
+                    ftp_conn.cwd(ftp_directory)
 
-            # バッファに追加
-            updates_chunk.append(row_data)
-            # 状態更新用
-            state_updates.append({
-                "race_code_uma_jvd": row_data["race_code_uma_jvd"],
-                "content_hash": current_hash
-            })
+            # イテレータを回してストリーミング処理
+            for row in rows_iterator:
+                # Rowデータを辞書化
+                row_data = {field: row[field] for field in fieldnames}
 
-            # チャンクサイズに達したらアップロード
-            if len(updates_chunk) >= CHUNK_SIZE:
-                upload_chunk(updates_chunk, part_num)
+                # ハッシュ
+                current_hash = row["current_hash"]
+
+                # バッファに追加
+                updates_chunk.append(row_data)
+                # 状態更新用
+                state_updates.append({
+                    "race_code_uma_jvd": row_data["race_code_uma_jvd"],
+                    "content_hash": current_hash
+                })
+
+                # チャンクサイズに達したらアップロード
+                if len(updates_chunk) >= CHUNK_SIZE:
+                    upload_chunk(ftp_conn, updates_chunk, part_num)
+                    processed_count += len(updates_chunk)
+                    updates_chunk = [] # バッファクリア
+                    part_num += 1
+
+            # 残りのチャンクがあればアップロード
+            if updates_chunk:
+                upload_chunk(ftp_conn, updates_chunk, part_num)
                 processed_count += len(updates_chunk)
-                updates_chunk = [] # バッファクリア
-                part_num += 1
-
-        # 残りのチャンクがあればアップロード
-        if updates_chunk:
-            upload_chunk(updates_chunk, part_num)
-            processed_count += len(updates_chunk)
 
         logger.info(f"合計 {processed_count} 件をエクスポートしました。")
 

@@ -118,7 +118,7 @@ main:
         call: http.post
         args:
           url: "${google_cloudfunctions2_function.export_race_uma_details.service_config[0].uri}"
-          timeout: 3660
+          timeout: 1800
           auth:
             type: OIDC
         result: exportRaceUmaDetailsResult
@@ -212,7 +212,7 @@ main:
         call: http.post
         args:
           url: "${google_cloudfunctions2_function.export_race_uma_details.service_config[0].uri}"
-          timeout: 3660
+          timeout: 1800
           auth:
             type: OIDC
         result: exportRaceUmaDetailsResult
