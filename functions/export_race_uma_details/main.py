@@ -184,36 +184,34 @@ def export_race_uma_details(request):
                 ftp_conn.storbinary(f"STOR {filename}", bio)
                 logger.info(f"{filename} のアップロード完了")
 
-                # Bubble APIへの通知
-                if BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
-                    try:
-                        ftp_directory = os.environ.get("FTP_DIRECTORY")
-                        # FTPディレクトリの考慮
-                        if ftp_directory:
-                            dir_path = ftp_directory.strip("/")
-                            csv_url = f"{CSV_BASE_URL}/{dir_path}/{filename}"
-                        else:
-                            csv_url = f"{CSV_BASE_URL}/{filename}"
+                # Bubble APIへの通知 (一時停止中)
+                # if BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
+                #     ftp_directory = os.environ.get("FTP_DIRECTORY")
+                #     # FTPディレクトリの考慮
+                #     if ftp_directory:
+                #         dir_path = ftp_directory.strip("/")
+                #         csv_url = f"{CSV_BASE_URL}/{dir_path}/{filename}"
+                #     else:
+                #         csv_url = f"{CSV_BASE_URL}/{filename}"
 
-                        logger.info(f"通知対象CSV URL: {csv_url}")
-                        api_key = get_secret(BUBBLE_API_KEY_SECRET_ID)
-                        headers = {
-                            "Content-Type": "application/json",
-                            "Authorization": f"Bearer {api_key}"
-                        }
-                        payload = {
-                            "csv_url": csv_url
-                        }
-                        response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
-                        response.raise_for_status()
-                        logger.info(f"Bubble APIへの通知に成功しました ({filename}): {response.json()}")
-                    except Exception as e:
-                        logger.error(f"Bubble APIへの通知に失敗しました ({filename}): {e}")
-                        # 続行する
-                else:
-                    # 毎回ログが出るとうるさいので、part_numが1のときだけ出すなどの制御も考えられるが
-                    # ここではupload_chunkの呼び出し頻度依存。infoログなので出しておく。
-                    logger.info("Bubble API設定がされていないため、通知をスキップします。")
+                #     logger.info(f"通知対象CSV URL: {csv_url}")
+                #     api_key = get_secret(BUBBLE_API_KEY_SECRET_ID)
+                #     headers = {
+                #         "Content-Type": "application/json",
+                #         "Authorization": f"Bearer {api_key}"
+                #     }
+                #     payload = {
+                #         "csv_url": csv_url
+                #     }
+                #     try:
+                #         response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
+                #         response.raise_for_status()
+                #         logger.info(f"Bubble APIへの通知に成功しました ({filename}): {response.json()}")
+                #     except Exception as e:
+                #         logger.error(f"Bubble APIへの通知に失敗しました ({filename}): {e}")
+                #         raise
+
+                logger.info(f"Bubble APIへの通知はスキップされました（CSVアップロードのみ実行）: {filename}")
             except Exception as e:
                 logger.error(f"FTPアップロードエラー: {filename}, {e}")
                 # 再送ロジックを入れるか、ここではエラーとして処理を継続するか

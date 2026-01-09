@@ -157,7 +157,8 @@ resource "google_cloudfunctions2_function" "export_race_uma_details" {
   }
 
   service_config {
-    max_instance_count = 1
+    max_instance_count = 5
+    max_instance_request_concurrency = 10
     available_memory   = "8192M" # メモリ不足解消のため増強
     available_cpu      = "4"     # 4GB以上のメモリには2CPU以上が必要、8GBなら4CPU推奨
     timeout_seconds    = 3600
