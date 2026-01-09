@@ -266,6 +266,7 @@ def export_race_uma_details(request):
         logger.info(f"合計 {processed_count} 件をエクスポートしました。")
 
         if processed_count == 0:
+             logger.info("更新対象のレコードはありませんでした。")
              return "更新はありませんでした。", 200
 
         # 7. 状態管理テーブルの更新 (state_updatesはメモリに残っている前提)
