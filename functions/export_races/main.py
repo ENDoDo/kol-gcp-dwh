@@ -37,7 +37,7 @@ def ensure_state_table(bq_client, dataset_id, table_name):
     """状態管理テーブルが存在することを確認し、なければ作成する"""
     table_ref = f"{PROJECT_ID}.{dataset_id}.{table_name}"
     schema = [
-        bigquery.SchemaField("race_code_jvd", "STRING", mode="REQUIRED"),
+        bigquery.SchemaField("race_code_kol", "STRING", mode="REQUIRED"),
         bigquery.SchemaField("content_hash", "STRING", mode="REQUIRED"),
         bigquery.SchemaField("exported_at", "TIMESTAMP", mode="REQUIRED"),
     ]
@@ -81,7 +81,7 @@ def export_races(request):
             ),
             State AS (
                 SELECT
-                    race_code_jvd,
+                    race_code_kol,
                     content_hash
                 FROM `{PROJECT_ID}.{DATASET_ID}.{STATE_TABLE_NAME}`
             )
@@ -89,7 +89,7 @@ def export_races(request):
                 c.*,
                 s.content_hash as old_hash
             FROM CurrentRaces c
-            LEFT JOIN State s ON c.race_code_jvd = s.race_code_jvd
+            LEFT JOIN State s ON c.race_code_kol = s.race_code_kol
             ORDER BY c.hasso_date
         """
 
@@ -136,7 +136,7 @@ def export_races(request):
             if old_hash is None or current_hash != old_hash:
                 updates.append(row_data)
                 state_updates.append({
-                    "race_code_jvd": row_data["race_code_jvd"],
+                    "race_code_kol": row_data["race_code_kol"],
                     "content_hash": current_hash
                 })
 
@@ -258,7 +258,7 @@ def export_races(request):
             # 挿入用データの準備
             rows_to_insert = [
                 {
-                    "race_code_jvd": u["race_code_jvd"],
+                    "race_code_kol": u["race_code_kol"],
                     "content_hash": u["content_hash"],
                     "exported_at": datetime.datetime.now().isoformat()
                 }
@@ -269,7 +269,7 @@ def export_races(request):
             job_config = bigquery.LoadJobConfig(
                 write_disposition="WRITE_TRUNCATE",
                 schema=[
-                    bigquery.SchemaField("race_code_jvd", "STRING"),
+                    bigquery.SchemaField("race_code_kol", "STRING"),
                     bigquery.SchemaField("content_hash", "STRING"),
                     bigquery.SchemaField("exported_at", "TIMESTAMP"),
                 ]
@@ -282,13 +282,14 @@ def export_races(request):
             merge_query = f"""
                 MERGE `{PROJECT_ID}.{DATASET_ID}.{STATE_TABLE_NAME}` T
                 USING `{temp_table_id}` S
-                ON T.race_code_jvd = S.race_code_jvd
+                ON T.race_code_kol = S.race_code_kol
                 WHEN MATCHED THEN
                   UPDATE SET content_hash = S.content_hash, exported_at = S.exported_at
                 WHEN NOT MATCHED THEN
-                  INSERT (race_code_jvd, content_hash, exported_at)
-                  VALUES (race_code_jvd, content_hash, exported_at)
+                  INSERT (race_code_kol, content_hash, exported_at)
+                  VALUES (race_code_kol, content_hash, exported_at)
             """
+
             bq_client.query(merge_query).result()
             logger.info("状態管理テーブルが更新されました。")
 

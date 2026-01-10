@@ -37,7 +37,7 @@ def ensure_state_table(bq_client, dataset_id, table_name):
     """状態管理テーブルが存在することを確認し、なければ作成する"""
     table_ref = f"{PROJECT_ID}.{dataset_id}.{table_name}"
     schema = [
-        bigquery.SchemaField("race_code_uma_jvd", "STRING", mode="REQUIRED"),
+        bigquery.SchemaField("race_code_uma_kol", "STRING", mode="REQUIRED"),
         bigquery.SchemaField("content_hash", "STRING", mode="REQUIRED"),
         bigquery.SchemaField("exported_at", "TIMESTAMP", mode="REQUIRED"),
     ]
@@ -80,14 +80,14 @@ def export_race_uma_details(request):
             ),
             State AS (
                 SELECT
-                    race_code_uma_jvd,
+                    race_code_uma_kol,
                     content_hash
                 FROM `{PROJECT_ID}.{DATASET_ID}.{STATE_TABLE_NAME}`
             )
             SELECT
                 s.*
             FROM SourceWithHash s
-            LEFT JOIN State st ON s.race_code_uma_jvd = st.race_code_uma_jvd
+            LEFT JOIN State st ON s.race_code_uma_kol = st.race_code_uma_kol
             WHERE
                 st.content_hash IS NULL
                 OR st.content_hash != s.current_hash
@@ -248,7 +248,7 @@ def export_race_uma_details(request):
                 updates_chunk.append(row_data)
                 # 状態更新用
                 state_updates.append({
-                    "race_code_uma_jvd": row_data["race_code_uma_jvd"],
+                    "race_code_uma_kol": row_data["race_code_uma_kol"],
                     "content_hash": current_hash
                 })
 
@@ -280,7 +280,7 @@ def export_race_uma_details(request):
             # 挿入用データの準備
             rows_to_insert = [
                 {
-                    "race_code_uma_jvd": u["race_code_uma_jvd"],
+                    "race_code_uma_kol": u["race_code_uma_kol"],
                     "content_hash": u["content_hash"],
                     "exported_at": datetime.datetime.now().isoformat()
                 }
@@ -291,7 +291,7 @@ def export_race_uma_details(request):
             job_config = bigquery.LoadJobConfig(
                 write_disposition="WRITE_TRUNCATE",
                 schema=[
-                    bigquery.SchemaField("race_code_uma_jvd", "STRING"),
+                    bigquery.SchemaField("race_code_uma_kol", "STRING"),
                     bigquery.SchemaField("content_hash", "STRING"),
                     bigquery.SchemaField("exported_at", "TIMESTAMP"),
                 ]
@@ -307,12 +307,12 @@ def export_race_uma_details(request):
             merge_query = f"""
                 MERGE `{PROJECT_ID}.{DATASET_ID}.{STATE_TABLE_NAME}` T
                 USING `{temp_table_id}` S
-                ON T.race_code_uma_jvd = S.race_code_uma_jvd
+                ON T.race_code_uma_kol = S.race_code_uma_kol
                 WHEN MATCHED THEN
                   UPDATE SET content_hash = S.content_hash, exported_at = S.exported_at
                 WHEN NOT MATCHED THEN
-                  INSERT (race_code_uma_jvd, content_hash, exported_at)
-                  VALUES (race_code_uma_jvd, content_hash, exported_at)
+                  INSERT (race_code_uma_kol, content_hash, exported_at)
+                  VALUES (race_code_uma_kol, content_hash, exported_at)
             """
             bq_client.query(merge_query).result()
             logger.info("状態管理テーブルが更新されました。")
