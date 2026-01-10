@@ -98,6 +98,7 @@ resource "google_secret_manager_secret_version" "dataform_git_token_version" {
 # --- Dataform Repository and Configurations ---
 # --- Dataform Repository and Configurations (Staging) ---
 resource "google_dataform_repository" "repository_stg" {
+  count    = terraform.workspace != "prd" ? 1 : 0
   provider = google-beta.beta
   project  = var.project_id
   region   = var.region
@@ -116,10 +117,11 @@ resource "google_dataform_repository" "repository_stg" {
 }
 
 resource "google_dataform_repository_release_config" "release_config_stg" {
-  provider = google-beta.beta
-  project    = google_dataform_repository.repository_stg.project
-  region     = google_dataform_repository.repository_stg.region
-  repository = google_dataform_repository.repository_stg.name
+  count      = terraform.workspace != "prd" ? 1 : 0
+  provider   = google-beta.beta
+  project    = google_dataform_repository.repository_stg[0].project
+  region     = google_dataform_repository.repository_stg[0].region
+  repository = google_dataform_repository.repository_stg[0].name
   name          = "production-release-stg"
   git_commitish = "main"
 
@@ -133,12 +135,13 @@ resource "google_dataform_repository_release_config" "release_config_stg" {
 }
 
 resource "google_dataform_repository_workflow_config" "workflow_stg" {
-  provider = google-beta.beta
-  project    = google_dataform_repository.repository_stg.project
-  region     = google_dataform_repository.repository_stg.region
-  repository = google_dataform_repository.repository_stg.name
+  count      = terraform.workspace != "prd" ? 1 : 0
+  provider   = google-beta.beta
+  project    = google_dataform_repository.repository_stg[0].project
+  region     = google_dataform_repository.repository_stg[0].region
+  repository = google_dataform_repository.repository_stg[0].name
   name           = "daily-race-table-update-stg"
-  release_config = google_dataform_repository_release_config.release_config_stg.id
+  release_config = google_dataform_repository_release_config.release_config_stg[0].id
 
   invocation_config {
     included_targets {
@@ -174,6 +177,7 @@ resource "google_dataform_repository_workflow_config" "workflow_stg" {
 
 # --- Dataform Repository and Configurations (Production) ---
 resource "google_dataform_repository" "repository_prd" {
+  count    = terraform.workspace == "prd" ? 1 : 0
   provider = google-beta.beta
   project  = var.project_id
   region   = var.region
@@ -192,10 +196,11 @@ resource "google_dataform_repository" "repository_prd" {
 }
 
 resource "google_dataform_repository_release_config" "release_config_prd" {
-  provider = google-beta.beta
-  project    = google_dataform_repository.repository_prd.project
-  region     = google_dataform_repository.repository_prd.region
-  repository = google_dataform_repository.repository_prd.name
+  count      = terraform.workspace == "prd" ? 1 : 0
+  provider   = google-beta.beta
+  project    = google_dataform_repository.repository_prd[0].project
+  region     = google_dataform_repository.repository_prd[0].region
+  repository = google_dataform_repository.repository_prd[0].name
   name          = "production-release"
   git_commitish = "main"
 
@@ -209,12 +214,13 @@ resource "google_dataform_repository_release_config" "release_config_prd" {
 }
 
 resource "google_dataform_repository_workflow_config" "workflow_prd" {
-  provider = google-beta.beta
-  project    = google_dataform_repository.repository_prd.project
-  region     = google_dataform_repository.repository_prd.region
-  repository = google_dataform_repository.repository_prd.name
+  count      = terraform.workspace == "prd" ? 1 : 0
+  provider   = google-beta.beta
+  project    = google_dataform_repository.repository_prd[0].project
+  region     = google_dataform_repository.repository_prd[0].region
+  repository = google_dataform_repository.repository_prd[0].name
   name           = "daily-race-table-update"
-  release_config = google_dataform_repository_release_config.release_config_prd.id
+  release_config = google_dataform_repository_release_config.release_config_prd[0].id
 
   invocation_config {
     included_targets {
@@ -262,5 +268,5 @@ resource "google_service_account_iam_member" "dataform_agent_impersonator" {
 # --- Outputs ---
 output "dataform_repository_url" {
   description = "URL of the created Dataform repository."
-  value       = "https://console.cloud.google.com/bigquery/dataform/locations/${var.region}/repositories/${terraform.workspace == "prd" ? google_dataform_repository.repository_prd.name : google_dataform_repository.repository_stg.name}?project=${var.project_id}"
+  value       = "https://console.cloud.google.com/bigquery/dataform/locations/${var.region}/repositories/${terraform.workspace == "prd" ? google_dataform_repository.repository_prd[0].name : google_dataform_repository.repository_stg[0].name}?project=${var.project_id}"
 }

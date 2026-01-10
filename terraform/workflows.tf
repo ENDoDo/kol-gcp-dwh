@@ -40,7 +40,7 @@ main:
     - init:
         assign:
           - is_paused: false  # 停止したい時はここを true に、再開時は false にする
-          - repository: "projects/${var.project_id}/locations/${var.region}/repositories/${google_dataform_repository.repository_stg.name}"
+          - repository: "projects/${var.project_id}/locations/${var.region}/repositories/${google_dataform_repository.repository_stg[0].name}"
           - workspace: "${var.dataform_workspace_id}"
     - check_paused:
         switch:
@@ -147,7 +147,7 @@ main:
   steps:
     - init:
         assign:
-          - repository: "projects/${var.project_id}/locations/${var.region}/repositories/${google_dataform_repository.repository_prd.name}"
+          - repository: "projects/${var.project_id}/locations/${var.region}/repositories/${google_dataform_repository.repository_prd[0].name}"
           - workspace: "${var.dataform_workspace_id}"
     - createCompilationResult:
         call: http.post
