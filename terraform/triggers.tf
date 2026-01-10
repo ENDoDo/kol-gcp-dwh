@@ -74,7 +74,7 @@ resource "google_eventarc_trigger" "workflow_trigger" {
   }
 
   destination {
-    workflow = terraform.workspace == "prd" ? google_workflows_workflow.dataform_trigger_workflow_prd.id : google_workflows_workflow.dataform_trigger_workflow_stg.id
+    workflow = terraform.workspace == "prd" ? google_workflows_workflow.dataform_trigger_workflow_prd[0].id : google_workflows_workflow.dataform_trigger_workflow_stg[0].id
   }
 
   depends_on = [

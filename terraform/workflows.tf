@@ -25,7 +25,8 @@ resource "google_project_iam_member" "workflows_log_writer" {
 
 # --- Cloud Workflow ---
 resource "google_workflows_workflow" "dataform_trigger_workflow_stg" {
-  depends_on = [google_project_service.workflows]
+  count           = terraform.workspace != "prd" ? 1 : 0
+  depends_on      = [google_project_service.workflows]
   name            = "dataform-trigger-workflow-stg"
   region          = var.region
   description     = "BigQueryテーブル更新時にDataform実行をトリガーするワークフロー (Staging)"
@@ -132,7 +133,8 @@ EOF
 }
 
 resource "google_workflows_workflow" "dataform_trigger_workflow_prd" {
-  depends_on = [google_project_service.workflows]
+  count           = terraform.workspace == "prd" ? 1 : 0
+  depends_on      = [google_project_service.workflows]
   name            = "dataform-trigger-workflow"
   region          = var.region
   description     = "BigQueryテーブル更新時にDataform実行をトリガーするワークフロー (Production)"
