@@ -90,6 +90,7 @@ def export_races(request):
                 s.content_hash as old_hash
             FROM CurrentRaces c
             LEFT JOIN State s ON c.race_code_jvd = s.race_code_jvd
+            ORDER BY c.hasso_date
         """
 
         logger.info("BigQueryで変更をクエリ中...")
@@ -183,14 +184,25 @@ def export_races(request):
                         logger.warning(f"ディレクトリ {ftp_directory} への移動に失敗しました: {e}。ルートディレクトリを使用します。")
 
                 for i, chunk in enumerate(chunks):
+                    # チャンクごとの日付範囲を取得
+                    chunk_dates = []
+                    for u in chunk:
+                        dt = u["hasso_date"]
+                        if isinstance(dt, str):
+                                dt = datetime.datetime.strptime(dt, '%Y/%m/%d %H:%M:%S')
+                        chunk_dates.append(dt.strftime('%Y%m%d'))
+
+                    chunk_min_date = min(chunk_dates)
+                    chunk_max_date = max(chunk_dates)
+
                     # ファイル名の生成
                     if total_parts > 1:
                         # 分割あり: {table_name}_{from}_{to}_part{NNN}.csv
                         part_num = i + 1
-                        filename = f"{table_name}_{min_date}_{max_date}_part{part_num:03d}.csv"
+                        filename = f"{table_name}_{chunk_min_date}_{chunk_max_date}_part{part_num:03d}.csv"
                     else:
                         # 分割なし: {table_name}_{from}_{to}.csv
-                        filename = f"{table_name}_{min_date}_{max_date}.csv"
+                        filename = f"{table_name}_{chunk_min_date}_{chunk_max_date}.csv"
 
                     logger.info(f"CSVを生成中... ({filename})")
                     csv_buffer = io.StringIO()

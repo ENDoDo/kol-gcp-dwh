@@ -91,6 +91,7 @@ def export_race_uma_details(request):
             WHERE
                 st.content_hash IS NULL
                 OR st.content_hash != s.current_hash
+            ORDER BY s.hasso_date
         """
 
         logger.info("BigQueryで変更をクエリ中(SQL側でハッシュ計算)...")

@@ -96,6 +96,7 @@ def export_schedules(request):
                 s.content_hash as old_hash
             FROM CurrentSchedules c
             LEFT JOIN State s ON c.id = s.schedule_id
+            ORDER BY c.id
         """
 
         logger.info("BigQueryで変更をクエリ中...")
@@ -172,14 +173,19 @@ def export_schedules(request):
                         logger.warning(f"ディレクトリ {ftp_directory} への移動に失敗しました: {e}。ルートディレクトリを使用します。")
 
                 for i, chunk in enumerate(chunks):
+                    # チャンクごとの日付範囲を取得
+                    chunk_ids = [u["id"] for u in chunk]
+                    chunk_min_date = min(chunk_ids)
+                    chunk_max_date = max(chunk_ids)
+
                     # ファイル名の生成
                     if total_parts > 1:
                         # 分割あり: {table_name}_{from}_{to}_part{NNN}.csv
                         part_num = i + 1
-                        filename = f"{table_name}_{min_date}_{max_date}_part{part_num:03d}.csv"
+                        filename = f"{table_name}_{chunk_min_date}_{chunk_max_date}_part{part_num:03d}.csv"
                     else:
                         # 分割なし: {table_name}_{from}_{to}.csv
-                        filename = f"{table_name}_{min_date}_{max_date}.csv"
+                        filename = f"{table_name}_{chunk_min_date}_{chunk_max_date}.csv"
 
                     logger.info(f"CSVを生成中... ({filename})")
                     csv_buffer = io.StringIO()
