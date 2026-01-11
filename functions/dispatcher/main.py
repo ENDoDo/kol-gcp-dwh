@@ -3,6 +3,7 @@ import os
 import json
 import logging
 import datetime
+import time
 import functions_framework
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
@@ -39,7 +40,12 @@ def dispatch_workflow(request):
         workflow_url = f"https://workflowexecutions.googleapis.com/v1/projects/{PROJECT_ID}/locations/{REGION}/workflows/{WORKFLOW_NAME}/executions"
 
         # タスクの設定
-        task_id = "dataform-trigger-debounce-task" # 固定IDにすることで重複排除
+        # 固定IDでは削除後にTombstone期間(約1時間)再作成できないため、時間枠(Window)ベースのIDを使用する
+        # 現在時刻から DEBOUNCE_SECONDS 単位のウィンドウを計算
+        # 例: DEBOUNCE_SECONDS=300 の場合、12:00:00〜12:04:59 は同じIDになる
+        current_time = int(time.time())
+        window_index = current_time // DEBOUNCE_SECONDS
+        task_id = f"dataform-debounce-{window_index}"
         task_name = client.task_path(PROJECT_ID, REGION, QUEUE_NAME, task_id)
 
         # 実行時刻の設定 (現在時刻 + DEBOUNCE_SECONDS)
@@ -55,8 +61,9 @@ def dispatch_workflow(request):
                 "headers": {"Content-Type": "application/json"},
                 "body": json.dumps({"argument": "{}"}).encode(),
                 # OIDCトークン設定 (Workflowsの実行権限を持つSAを指定)
-                "oidc_token": {
+                "oauth_token": {
                     "service_account_email": WORKFLOW_SERVICE_ACCOUNT_EMAIL,
+                    "scope": "https://www.googleapis.com/auth/cloud-platform"
                 },
             },
             "schedule_time": timestamp
