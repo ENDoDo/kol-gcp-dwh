@@ -95,6 +95,10 @@ graph TD
 │   ├── dataform.tf
 │   ├── workflows.tf # Cloud Workflowsの定義
 │   ├── triggers.tf  # Eventarc, Pub/Sub, Logging Sinkの定義
+│   ├── dispatcher.tf # デバウンス用Dispatcher関数の定義
+│   └── ...
+├── functions/      # Cloud Functionsのソースコード
+│   ├── dispatcher/ # Dataformトリガー用Dispatcher
 │   └── ...
 ├── package.json
 ├── dataform.json
@@ -182,7 +186,7 @@ terraform apply -var-file="prd.tfvars"
 ## パイプラインの実行方法
 
 1.  **データ取り込み**: KOLデータを含む`.zip`ファイルを、Terraformが作成したGCSバケット (`kol-keiba-bucket`) にアップロードします。Cloud Functionが自動で起動し、BigQueryの`kolbi_keiba`データセットにデータが格納されます。
-2.  **データ変換**: BigQueryテーブルの更新が完了すると、自動的にDataformのワークフローが実行され、`kolbi_analysis.race`テーブルが更新されます。（スケジュール実行も設定されている場合は、指定時刻にも実行されます）
+2.  **データ変換**: BigQueryテーブルの更新が完了すると、**約5分間のデバウンス（待機・重複排除）期間**を経て、Dataformのワークフローが実行されます。これにより、複数のファイルがアップロードされた場合でも、ワークフローの実行は1回にまとめられます。
 
 ## クリーンアップ
 
