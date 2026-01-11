@@ -24,11 +24,13 @@ graph TD
         CF -.->|エラー時: 待避| Unpacked(unpacked/ ディレクトリ);
     end
 
-    subgraph "データ変換トリガー (Trigger)"
+    subgraph "データ変換トリガー (Trigger & Debounce)"
         D -- "テーブル更新検知<br>(kol_den1, kol_den2, etc.)" --> L{Cloud Logging Sink};
         L -- "ログエントリ" --> P(Pub/Sub Topic);
         P -- "メッセージ送信" --> E{Eventarc};
-        E -- "ワークフロー実行" --> W{Cloud Workflows};
+        E -- "1. トリガー" --> Dis[Dispatcher Function];
+        Dis -- "2. タスク作成 (5分後)" --> Q[Cloud Tasks Queue];
+        Q -- "3. デバウンス実行" --> W{Cloud Workflows};
     end
 
     subgraph "データ変換 (Transformation)"
@@ -47,10 +49,12 @@ graph TD
     style GCS fill:#D5E8D4,stroke:#82B366
     style G fill:#DAE8FC,stroke:#6C8EBF
     style W fill:#FFE6CC,stroke:#D79B00
+    style Dis fill:#E1D5E7,stroke:#9673A6
+    style Q fill:#E1D5E7,stroke:#9673A6
 ```
 
 1.  **データ取り込み**: ユーザーがKOLデータを含むZIPファイルをGCSにアップロードすると、Cloud Functionが起動し、BigQueryの`kolbi_keiba`データセットに生データを書き込みます。
-2.  **データ変換トリガー**: BigQueryの特定のテーブル（`kol_den1`, `kol_den2`, `kol_ket`, `kol_sei1`, `kol_sei2`）が更新されると、Cloud Logging Sinkがそれを検知し、Pub/Sub経由でEventarcに通知します。EventarcはCloud Workflowsを起動します。
+2.  **データ変換トリガー (デバウンス機能付き)**: BigQueryのテーブル更新を検知すると、Eventarcが `Dispatcher Function` を呼び出します。Dispatcherは `Cloud Tasks` に「5分後にWorkflowsを実行するタスク」を作成します。**5分以内に連続して更新があった場合、新たなタスク作成は無視され（デバウンス）、最後の1回（厳密には最初の検知から5分後）だけWorkflowsが実行されます。**
 3.  **データ変換**: Cloud WorkflowsはDataformのワークフローを開始します。Dataformは`kolbi_keiba`の生データを参照して、`kolbi_analysis.race`を含むプロジェクト内のすべてのテーブルを生成・更新します。
 4.  **データエクスポート**: `export_schedules`, `export_races`, `export_race_uma_details` 等のCloud Functionsが、変換済みデータをFTPサーバーへCSVとしてアップロードし、同時にBubbleアプリのAPIエンドポイントへ更新通知（CSV URLの送信）を行います。
 
@@ -58,6 +62,7 @@ graph TD
 
 - **クラウド**: Google Cloud Platform
   - **コンピューティング**: Cloud Functions (第2世代), Cloud Workflows
+  - **非同期処理**: Cloud Tasks (デバウンス用)
   - **ストレージ**: Cloud Storage (GCS)
   - **DWH**: BigQuery
   - **データ変換**: Dataform
