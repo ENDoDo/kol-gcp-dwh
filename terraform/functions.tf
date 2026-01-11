@@ -4,7 +4,7 @@
 
 # --- ソースコードバケット ---
 resource "google_storage_bucket" "function_source_bucket" {
-  name                        = "kol-function-source-${var.project_id}-${local.env_suffix}"
+  name                        = "kol-function-source-${var.project_id}${local.env_suffix}"
   location                    = var.region
   uniform_bucket_level_access = true
   force_destroy               = false
