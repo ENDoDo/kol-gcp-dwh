@@ -100,7 +100,7 @@ def export_race_uma_details(request):
         rows_iterator = query_job.result()
 
         updates_chunk = []
-        state_updates = []
+        state_updates = {}
         CHUNK_SIZE = 1000
         part_num = 1
 
@@ -246,11 +246,11 @@ def export_race_uma_details(request):
 
                 # バッファに追加
                 updates_chunk.append(row_data)
-                # 状態更新用
-                state_updates.append({
+                # 状態更新用 (上書きして重複排除)
+                state_updates[row_data["race_code_uma_kol"]] = {
                     "race_code_uma_kol": row_data["race_code_uma_kol"],
                     "content_hash": current_hash
-                })
+                }
 
                 # チャンクサイズに達したらアップロード
                 if len(updates_chunk) >= CHUNK_SIZE:
@@ -284,7 +284,7 @@ def export_race_uma_details(request):
                     "content_hash": u["content_hash"],
                     "exported_at": datetime.datetime.now().isoformat()
                 }
-                for u in state_updates
+                for u in state_updates.values()
             ]
 
             # 1. 一時テーブルへのロード (JSONロードは大量データに弱い場合があるが、hashとIDだけなら耐えられるか)
