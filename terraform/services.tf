@@ -25,3 +25,9 @@ resource "google_project_service" "logging" {
   service            = "logging.googleapis.com"
   disable_on_destroy = false
 }
+
+resource "google_project_service" "cloudtasks" {
+  project            = var.project_id
+  service            = "cloudtasks.googleapis.com"
+  disable_on_destroy = false
+}
