@@ -11,8 +11,10 @@ from google.cloud import secretmanager
 import datetime
 import requests
 
+import sys
+
 # ログ設定
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # 環境変数
@@ -235,6 +237,7 @@ def export_schedules(request):
                     "csv_url": csv_url
                 }
 
+                logger.info(f"Bubble APIへリクエストを送信します: URL={BUBBLE_API_URL}")
                 response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
                 response.raise_for_status()
                 logger.info(f"Bubble APIへの通知に成功しました: {response.json()}")
