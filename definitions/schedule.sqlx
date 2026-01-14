@@ -26,9 +26,9 @@ SELECT
   -- 発走月日（MMDD）
   SUBSTR(kaisai_nengappi, 5, 4) AS month_day,
   -- 期間開始日時（YYYY-MM-DD 00:00:00）
-  PARSE_DATETIME('%Y%m%d %H:%M:%S', kaisai_nengappi || ' 00:00:00') AS period1_start,
+  DATETIME_ADD(PARSE_DATETIME('%Y%m%d %H:%M:%S', kaisai_nengappi || ' 00:00:00'), INTERVAL 9 HOUR) AS period1_start,
   -- 期間終了日時（YYYY-MM-DD 23:59:59）
-  PARSE_DATETIME('%Y%m%d %H:%M:%S', kaisai_nengappi || ' 23:59:59') AS period2_end,
+  DATETIME_ADD(PARSE_DATETIME('%Y%m%d %H:%M:%S', kaisai_nengappi || ' 23:59:59'), INTERVAL 9 HOUR) AS period2_end,
   -- データ更新日時
   CURRENT_TIMESTAMP() AS modified,
   -- データ作成日時
