@@ -370,6 +370,7 @@ config {
     shirushi_hanro_1f_flag: "坂路1F最速フラグ",
     shirushi_wood_6f_flag: "ウッド6F最速フラグ",
     shirushi_wood_1f_flag: "ウッド1F最速フラグ",
+    shirushi_awase_senchaku_flag: "調教推奨印 併せ馬 先着している馬 該当馬は「はい」それ以外はnull",
     shirushi_point: "印ポイント",
     shirushi_kubun_yosou_tansho_ninkijun: "予想人気順区分",
     shirushi_kubun_rank: "人気区分内順位",
