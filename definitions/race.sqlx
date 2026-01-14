@@ -95,7 +95,7 @@ WITH
 SELECT
   d1.race_code_kol,
   d1.kaisai_nengappi || d1.keibajo_code_jvd_from_kol || d1.kaisai_kaiji || d1.kaisai_nichiji || d1.race_num AS race_code_jvd,
-  PARSE_DATETIME('%Y%m%d%H%M', d1.kaisai_nengappi || REPLACE(d1.hasso_jikoku, ':', '')) AS hasso_date,
+  DATETIME_ADD(PARSE_DATETIME('%Y%m%d%H%M', d1.kaisai_nengappi || REPLACE(d1.hasso_jikoku, ':', '')), INTERVAL 9 HOUR) AS hasso_date,
   d1.kaisai_kaiji AS kaiji,
   d1.kaisai_nichiji AS nichiji,
   d1.race_num AS race_bango,
