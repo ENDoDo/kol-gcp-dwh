@@ -116,24 +116,6 @@ config {
     chokyo_den_oikiri_yajirushi: "調教矢印",
     chokyo_den_oikiri_yajirushi_label: "調教矢印(ラベル)",
     chokyo_den_oikiri_reigai: "調教例外",
-    chokyo_den_oikiri_awase: "調教併せ",
-    chokyo_den_oikiri_awase_uma_bamei: "調教併せ馬名",
-    chokyo_den_oikiri_awase_uma_race_code_uma_kol: "調教併せ馬レースID (過去直近)",
-    chokyo_den_oikiri_awase_uma_race_code_kol: "調教併せ馬レースID",
-    chokyo_den_oikiri_awase_uma_class: "調教併せ馬クラス",
-    chokyo_den_oikiri_awase_uma_kaku_kubun: "調教併せ馬格区分 (格上/同格/格下)",
-    chokyo_den_oikiri_awase_uma_kakuue_win_flag: "調教併せ馬が格上で先着したフラグ",
-    chokyo_den_oikiri_awase_time_sa_float: "調教併せ馬とのタイム差",
-    chokyo_den_oikiri_awase_kubun: "調教併せ区分",
-    chokyo_den_oikiri_awase_flag: "調教併せフラグ",
-    chokyo_den_oikiri_awase_flag_label: "調教併せフラグ（ラベル）",
-    chokyo_den_oikiri_tanpyo: "ブックによる調教短評",
-    chokyo_den_oikiri_honsu_course: "調教本数 コース",
-    chokyo_den_oikiri_honsu_course_num: "調教本数 コース(整数)",
-    chokyo_den_oikiri_honsu_hanro: "調教本数 坂路",
-    chokyo_den_oikiri_honsu_hanro_num: "調教本数 坂路(整数)",
-    chokyo_den_oikiri_honsu_pool: "調教本数 プール",
-    chokyo_den_oikiri_honsu_pool_num: "調教本数 プール(整数)",
     // 調教1
     chokyo_den_chokyo1_flag: "調教1 調教フラグ",
     chokyo_den_chokyo1_flag_label: "調教1 chokyo_flagをもとに対応 はい/いいえ",
@@ -145,8 +127,6 @@ config {
     chokyo_den_chokyo1_course_kubun: "調教1 調教コース区分",
     chokyo_den_chokyo1_basho_course_label: "調教1 調教場所・コース",
     chokyo_den_chokyo1_babajotai: "調教1 調教馬場状態",
-    chokyo_den_oikiri_check_time_1f_flag: "追い切り 1Fの標準タイムクリア判定のフラグ",
-    chokyo_den_oikiri_check_time_4f_6f_flag: "追い切り 4F/6Fの標準タイムクリア判定のフラグ",
     chokyo_den_oikiri_5f_wood_kubun: "CW/W 5Fタイム区分",
     chokyo_den_oikiri_4f_wood_kubun: "CW/W 4Fタイム区分",
     chokyo_den_oikiri_1f_wood_kubun: "CW/W 1Fタイム区分",
@@ -1235,30 +1215,6 @@ SELECT
   END AS chokyo_den_oikiri_lap_group,
 
   CASE
-    -- 栗東坂: 1F <= 12.4
-    WHEN z.chokyo_den_oikiri_basho = '栗東' AND z.chokyo_den_oikiri_course = '坂' AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) <= 12.4 THEN 'はい'
-    -- 美南坂: 1F <= 12.5
-    WHEN z.chokyo_den_oikiri_basho = '美南' AND z.chokyo_den_oikiri_course = '坂' AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) <= 12.5 THEN 'はい'
-    -- 栗東CW: 1F <= 11.6
-    WHEN z.chokyo_den_oikiri_basho = '栗東' AND z.chokyo_den_oikiri_course = 'CW' AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) <= 11.6 THEN 'はい'
-    -- 美南W: 1F <= 11.7
-    WHEN z.chokyo_den_oikiri_basho = '美南' AND z.chokyo_den_oikiri_course = 'Ｗ' AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) <= 11.7 THEN 'はい'
-    ELSE NULL
-  END AS chokyo_den_oikiri_check_time_1f_flag,
-
-  CASE
-    -- 栗東坂: 4F <= 53.9 (坂路の4F判定には chokyo_den_oikiri_5f_d2 を使用 ※中身は実質4Fデータ)
-    WHEN z.chokyo_den_oikiri_basho = '栗東' AND z.chokyo_den_oikiri_course = '坂' AND SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) <= 53.9 THEN 'はい'
-    -- 美南坂: 4F <= 54.9
-    WHEN z.chokyo_den_oikiri_basho = '美南' AND z.chokyo_den_oikiri_course = '坂' AND SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) <= 54.9 THEN 'はい'
-    -- 栗東CW: 6F <= 82.9
-    WHEN z.chokyo_den_oikiri_basho = '栗東' AND z.chokyo_den_oikiri_course = 'CW' AND SAFE_CAST(z.chokyo_den_oikiri_6f_d2 AS FLOAT64) <= 82.9 THEN 'はい'
-    -- 美南W: 6F <= 83.9
-    WHEN z.chokyo_den_oikiri_basho = '美南' AND z.chokyo_den_oikiri_course = 'Ｗ' AND SAFE_CAST(z.chokyo_den_oikiri_6f_d2 AS FLOAT64) <= 83.9 THEN 'はい'
-    ELSE NULL
-  END AS chokyo_den_oikiri_check_time_4f_6f_flag,
-
-  CASE
     WHEN (z.chokyo_den_oikiri_basho = '栗東' AND z.chokyo_den_oikiri_course = 'CW') OR (z.chokyo_den_oikiri_basho = '美南' AND z.chokyo_den_oikiri_course = 'Ｗ') THEN
       CASE
         WHEN SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) >= 70.0 THEN '70.0～'
@@ -1364,145 +1320,6 @@ SELECT
     ELSE NULL
   END AS chokyo_den_oikiri_yajirushi_label,
   z.chokyo_den_oikiri_reigai,
-  z.chokyo_den_oikiri_awase,
-  z.chokyo_den_oikiri_awase_uma_bamei,
-  pl.race_code_uma_kol_partner AS chokyo_den_oikiri_awase_uma_race_code_uma_kol,
-  pl.race_code_kol_partner AS chokyo_den_oikiri_awase_uma_race_code_kol,
-  CASE pl.kyoso_joken_kubun
-    WHEN '00001' THEN '新馬'
-    WHEN '00002' THEN '未出走'
-    WHEN '00003' THEN '未勝利'
-    WHEN '00004' THEN 'オープン'
-    WHEN '05000' THEN '1勝クラス'
-    WHEN '10000' THEN '2勝クラス'
-    WHEN '16000' THEN '3勝クラス'
-    ELSE NULL
-  END AS chokyo_den_oikiri_awase_uma_class,
-  CASE
-    WHEN pl.kyoso_joken_kubun NOT IN ('00004', '16000', '10000', '05000', '00003', '00002', '00001') OR pl.kyoso_joken_kubun IS NULL THEN NULL
-    WHEN (
-      CASE pl.kyoso_joken_kubun
-        WHEN '00004' THEN 5
-        WHEN '16000' THEN 4
-        WHEN '10000' THEN 3
-        WHEN '05000' THEN 2
-        WHEN '00003' THEN 1
-        WHEN '00002' THEN 1
-        WHEN '00001' THEN 1
-        ELSE 0
-      END
-    ) > (
-      CASE z.kyoso_joken_kubun
-        WHEN '00004' THEN 5
-        WHEN '16000' THEN 4
-        WHEN '10000' THEN 3
-        WHEN '05000' THEN 2
-        WHEN '00003' THEN 1
-        WHEN '00002' THEN 1
-        WHEN '00001' THEN 1
-        ELSE 0
-      END
-    ) THEN '格上'
-    WHEN (
-      CASE pl.kyoso_joken_kubun
-        WHEN '00004' THEN 5
-        WHEN '16000' THEN 4
-        WHEN '10000' THEN 3
-        WHEN '05000' THEN 2
-        WHEN '00003' THEN 1
-        WHEN '00002' THEN 1
-        WHEN '00001' THEN 1
-        ELSE 0
-      END
-    ) < (
-      CASE z.kyoso_joken_kubun
-        WHEN '00004' THEN 5
-        WHEN '16000' THEN 4
-        WHEN '10000' THEN 3
-        WHEN '05000' THEN 2
-        WHEN '00003' THEN 1
-        WHEN '00002' THEN 1
-        WHEN '00001' THEN 1
-        ELSE 0
-      END
-    ) THEN '格下'
-    ELSE '同格'
-  END AS chokyo_den_oikiri_awase_uma_kaku_kubun,
-  CASE
-    WHEN (
-      CASE
-        WHEN pl.kyoso_joken_kubun NOT IN ('00004', '16000', '10000', '05000', '00003', '00002', '00001') OR pl.kyoso_joken_kubun IS NULL THEN NULL
-        WHEN (
-          CASE pl.kyoso_joken_kubun
-            WHEN '00004' THEN 5
-            WHEN '16000' THEN 4
-            WHEN '10000' THEN 3
-            WHEN '05000' THEN 2
-            WHEN '00003' THEN 1
-            WHEN '00002' THEN 1
-            WHEN '00001' THEN 1
-            ELSE 0
-          END
-        ) > (
-          CASE z.kyoso_joken_kubun
-            WHEN '00004' THEN 5
-            WHEN '16000' THEN 4
-            WHEN '10000' THEN 3
-            WHEN '05000' THEN 2
-            WHEN '00003' THEN 1
-            WHEN '00002' THEN 1
-            WHEN '00001' THEN 1
-            ELSE 0
-          END
-        ) THEN '格上'
-        WHEN (
-          CASE pl.kyoso_joken_kubun
-            WHEN '00004' THEN 5
-            WHEN '16000' THEN 4
-            WHEN '10000' THEN 3
-            WHEN '05000' THEN 2
-            WHEN '00003' THEN 1
-            WHEN '00002' THEN 1
-            WHEN '00001' THEN 1
-            ELSE 0
-          END
-        ) < (
-          CASE z.kyoso_joken_kubun
-            WHEN '00004' THEN 5
-            WHEN '16000' THEN 4
-            WHEN '10000' THEN 3
-            WHEN '05000' THEN 2
-            WHEN '00003' THEN 1
-            WHEN '00002' THEN 1
-            WHEN '00001' THEN 1
-            ELSE 0
-          END
-        ) THEN '格下'
-        ELSE '同格'
-      END
-    ) = '格上' AND z.chokyo_den_oikiri_awase LIKE '%先着%' THEN '先着'
-    ELSE NULL
-  END AS chokyo_den_oikiri_awase_uma_kakuue_win_flag,
-  SAFE_CAST(REGEXP_EXTRACT(z.chokyo_den_oikiri_awase, r'に(\d+\.\d+)秒') AS FLOAT64) AS chokyo_den_oikiri_awase_time_sa_float,
-  CASE
-    WHEN z.chokyo_den_oikiri_awase LIKE '%同入%' OR z.chokyo_den_oikiri_awase LIKE '%内併走%' OR z.chokyo_den_oikiri_awase LIKE '%外併走%' THEN '併せ同入'
-    WHEN z.chokyo_den_oikiri_awase LIKE '%遅れ%' THEN '併せ遅れ'
-    WHEN z.chokyo_den_oikiri_awase LIKE '%先着%' THEN '併せ先着'
-    ELSE '単走'
-  END AS chokyo_den_oikiri_awase_kubun,
-  z.chokyo_den_oikiri_awase_flag,
-  CASE z.chokyo_den_oikiri_awase_flag
-    WHEN '1' THEN '調教2の併せ'
-    WHEN '2' THEN '調教3の併せ'
-    ELSE NULL
-  END AS chokyo_den_oikiri_awase_flag_label,
-  z.chokyo_den_oikiri_tanpyo,
-  z.chokyo_den_oikiri_honsu_course,
-  SAFE_CAST(z.chokyo_den_oikiri_honsu_course AS INT64) AS chokyo_den_oikiri_honsu_course_num,
-  z.chokyo_den_oikiri_honsu_hanro,
-  SAFE_CAST(z.chokyo_den_oikiri_honsu_hanro AS INT64) AS chokyo_den_oikiri_honsu_hanro_num,
-  z.chokyo_den_oikiri_honsu_pool,
-  SAFE_CAST(z.chokyo_den_oikiri_honsu_pool AS INT64) AS chokyo_den_oikiri_honsu_pool_num,
 
   -- 調教 (sei2由来) -------------------------------------------------------------
   z.chokyo_sei_flag,
