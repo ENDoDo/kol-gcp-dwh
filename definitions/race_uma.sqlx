@@ -242,6 +242,76 @@ config {
     chokyo3_yajirushi: "調教3 調教矢印",
     chokyo3_yajirushi_label: "調教3 調教矢印(ラベル)",
     chokyo3_reigai: "調教3 調教例外",
+    // 調教 (sei2由来)
+    chokyo_sei_flag: "競走成績出走馬データ  追い切り 調教フラグ",
+    chokyo_sei_flag_label: "競走成績出走馬データ  追い切り chokyo_flagをもとに対応 はい/いいえ",
+    chokyo_sei_kijosha: "競走成績出走馬データ  追い切り 調教騎乗者",
+    chokyo_sei_kijosha_kubun: "競走成績出走馬データ  追い切り 調教騎乗者区分",
+    chokyo_sei_kijosha_equal_kishumei_flag: "競走成績出走馬データ  追い切り 調教騎乗騎手がレースでも騎乗フラグ",
+    chokyo_sei_nengappi: "競走成績出走馬データ  追い切り 調教年月日",
+    chokyo_sei_nengappi_label: "競走成績出走馬データ  追い切り 調教年月日 文字列 y年m月d日(曜日)",
+    chokyo_sei_nengappi_date: "競走成績出走馬データ  追い切り 調教年月日 date形式",
+    chokyo_sei_basho: "競走成績出走馬データ  追い切り 調教場所 (例)栗東/美南/美北/函館/笠松/プール",
+    chokyo_sei_course: "競走成績出走馬データ  追い切り 調教コース (例)A/B/C/CW/D/E/本/内/芝/ダ/障/牧/坂/W/DW/外",
+    chokyo_sei_course_kubun: "競走成績出走馬データ  追い切り 調教コース区分",
+    chokyo_sei_basho_course_label: "競走成績出走馬データ  追い切り 調教場所とコースを結合したラベル (例)栗東坂",
+    chokyo_sei_babajotai: "競走成績出走馬データ  追い切り 調教馬場状態 良/重/不/稍",
+    chokyo_sei_hanro_pool_kaisu_int: "競走成績出走馬データ  追い切り 坂路またはプール:chokyo_6f それ以外:null (例)1",
+    chokyo_sei_8f: "競走成績出走馬データ  追い切り 調教タイム 8F",
+    chokyo_sei_8f_float: "競走成績出走馬データ  追い切り chokyo_8f 小数点第一位まで",
+    chokyo_sei_7f: "競走成績出走馬データ  追い切り 調教タイム 7F",
+    chokyo_sei_7f_float: "競走成績出走馬データ  追い切り chokyo_7f 小数点第一位まで",
+    chokyo_sei_6f: "競走成績出走馬データ  追い切り 調教タイム 6F",
+    chokyo_sei_6f_float: "競走成績出走馬データ  追い切り chokyo_6f 小数点第一位まで",
+    chokyo_sei_5f: "競走成績出走馬データ  追い切り 調教タイム 5F",
+    chokyo_sei_5f_float: "競走成績出走馬データ  追い切り chokyo_5f 小数点第一位まで",
+    chokyo_sei_4f: "競走成績出走馬データ  追い切り 調教タイム 4F",
+    chokyo_sei_4f_float: "競走成績出走馬データ  追い切り chokyo_4f 小数点第一位まで",
+    chokyo_sei_3f: "競走成績出走馬データ  追い切り 調教タイム 3F",
+    chokyo_sei_3f_float: "競走成績出走馬データ  追い切り chokyo_3f 小数点第一位まで",
+    chokyo_sei_2f_float: "競走成績出走馬データ  追い切り 調教タイム 2F推定値 (小数点)",
+    chokyo_sei_1f: "競走成績出走馬データ  追い切り 調教タイム 1F",
+    chokyo_sei_1f_float: "競走成績出走馬データ  追い切り chokyo_1f 小数点第一位まで",
+    chokyo_sei_lap_8f: "競走成績出走馬データ  追い切り 8Fラップタイム 8f-7f",
+    chokyo_sei_lap_7f: "競走成績出走馬データ  追い切り 7Fラップタイム 7f-6f",
+    chokyo_sei_lap_6f: "競走成績出走馬データ  追い切り 6Fラップタイム 6f-5f",
+    chokyo_sei_lap_5f: "競走成績出走馬データ  追い切り 5Fラップタイム 5f-4f",
+    chokyo_sei_lap_4f: "競走成績出走馬データ  追い切り 4Fラップタイム 4f-3f",
+    chokyo_sei_lap_3f: "競走成績出走馬データ  追い切り 3Fラップタイム 3f-2f",
+    chokyo_sei_lap_2f: "競走成績出走馬データ  追い切り 2Fラップタイム 2f-1f",
+    chokyo_sei_lap_group: "競走成績出走馬データ  追い切り ラップグループ A1-B3",
+    chokyo_sei_5f_wood_kubun: "競走成績出走馬データ  追い切り ウッドコース5Fタイム区分",
+    chokyo_sei_4f_wood_kubun: "競走成績出走馬データ  追い切り ウッドコース4Fタイム区分",
+    chokyo_sei_1f_wood_kubun: "競走成績出走馬データ  追い切り ウッドコース1Fタイム区分",
+    chokyo_sei_4f_hanro_kubun: "競走成績出走馬データ  追い切り 坂路コース4Fタイム区分",
+    chokyo_sei_ichidori: "競走成績出走馬データ  追い切り 調教位置取り",
+    chokyo_sei_ichidori_label: "競走成績出走馬データ  追い切り 調教位置取り(ラベル)",
+    chokyo_sei_ichidori_furi_win_flag: "競走成績出走馬データ  追い切り 位置取り不利挽回フラグ",
+    chokyo_sei_ashiiro: "競走成績出走馬データ  追い切り 調教脚色",
+    chokyo_sei_ashiiro_label: "競走成績出走馬データ  追い切り 調教脚色(ラベル)",
+    chokyo_sei_yajirushi: "競走成績出走馬データ  追い切り 調教矢印",
+    chokyo_sei_yajirushi_label: "競走成績出走馬データ  追い切り 調教矢印(ラベル)",
+    chokyo_sei_reigai: "競走成績出走馬データ  追い切り 調教例外",
+    chokyo_sei_check_time_1f_flag: "競走成績出走馬データ  追い切り 1F標準タイムクリアフラグ",
+    chokyo_sei_check_time_4f_6f_flag: "競走成績出走馬データ  追い切り 4F/6F標準タイムクリアフラグ",
+    chokyo_sei_awase: "競走成績出走馬データ  調教併せ",
+    chokyo_sei_awase_uma_bamei: "競走成績出走馬データ  調教併せ 馬名",
+    chokyo_sei_awase_uma_race_code_uma_kol: "競走成績出走馬データ  調教併せ馬 併せ当時のKOL仕様馬毎レースID",
+    chokyo_sei_awase_uma_race_code_kol: "競走成績出走馬データ  調教併せ馬 併せ当時のKOL仕様レースID",
+    chokyo_sei_awase_uma_class: "競走成績出走馬データ  調教併せ馬 併せ当時のクラス",
+    chokyo_sei_awase_uma_kaku_kubun: "競走成績出走馬データ  調教併せ馬 格区分",
+    chokyo_sei_awase_uma_kakuue_win_flag: "競走成績出走馬データ  調教併せ馬 格上先着フラグ",
+    chokyo_sei_awase_time_sa_float: "競走成績出走馬データ  調教併せのタイム差",
+    chokyo_sei_awase_kubun: "競走成績出走馬データ  調教併せ区分",
+    chokyo_sei_awase_flag: "競走成績出走馬データ  調教併せフラグ",
+    chokyo_sei_awase_flag_label: "競走成績出走馬データ  調教併せフラグ(ラベル)",
+    chokyo_sei_tanpyo: "競走成績出走馬データ ブックによる調教短評",
+    chokyo_sei_honsu_course: "競走成績出走馬データ 前走からの調教本数でコース追いの本数",
+    chokyo_sei_honsu_course_num: "競走成績出走馬データ 前走からの調教本数でコース追いの本数 整数型",
+    chokyo_sei_honsu_hanro: "競走成績出走馬データ 前走からの調教本数で坂路追いの本数",
+    chokyo_sei_honsu_hanro_num: "競走成績出走馬データ 前走からの調教本数で坂路追いの本数 整数型",
+    chokyo_sei_honsu_pool: "競走成績出走馬データ 前走からの調教本数でプール追いの本数",
+    chokyo_sei_honsu_pool_num: "競走成績出走馬データ 前走からの調教本数でプール追いの本数 整数型",
     // スピード指数・ローテーション
     speed_sisu_last_1: "スピード指数 1走前",
     speed_sisu_last_1_float: "スピード指数 1走前(小数点)",
@@ -603,6 +673,30 @@ WITH
       d2.chokyo3_ashiiro,
       d2.chokyo3_yajirushi,
       d2.chokyo3_reigai,
+      -- 調教 (sei2由来)
+      s2.chokyo_flag AS chokyo_sei_flag,
+      s2.chokyo_kijosha AS chokyo_sei_kijosha,
+      s2.chokyo_nengappi AS chokyo_sei_nengappi,
+      s2.chokyo_basho AS chokyo_sei_basho,
+      s2.chokyo_course AS chokyo_sei_course,
+      s2.chokyo_babajotai AS chokyo_sei_babajotai,
+      s2.chokyo_8f AS chokyo_sei_8f,
+      s2.chokyo_7f AS chokyo_sei_7f,
+      s2.chokyo_6f AS chokyo_sei_6f,
+      s2.chokyo_5f AS chokyo_sei_5f,
+      s2.chokyo_4f AS chokyo_sei_4f,
+      s2.chokyo_3f AS chokyo_sei_3f,
+      s2.chokyo_1f AS chokyo_sei_1f,
+      s2.chokyo_ichidori AS chokyo_sei_ichidori,
+      s2.chokyo_ashiiro AS chokyo_sei_ashiiro,
+      s2.chokyo_yajirushi AS chokyo_sei_yajirushi,
+      s2.chokyo_reigai AS chokyo_sei_reigai,
+      s2.chokyo_awase AS chokyo_sei_awase,
+      s2.chokyo_awase_flag AS chokyo_sei_awase_flag,
+      s2.chokyo_tanpyo AS chokyo_sei_tanpyo,
+      s2.chokyo_honsu_course AS chokyo_sei_honsu_course,
+      s2.chokyo_honsu_hanro AS chokyo_sei_honsu_hanro,
+      s2.chokyo_honsu_pool AS chokyo_sei_honsu_pool,
       k.ketto1_f_hanshoku_toroku_bango,
       k.ketto1_f_bamei,
       k.ketto2_m_hanshoku_toroku_bango,
@@ -669,6 +763,12 @@ WITH
         WHEN chokyo_den_oikiri_basho = 'プール' THEN 'プール'
         ELSE 'コース'
       END AS chokyo_den_oikiri_course_kubun,
+      CASE
+        WHEN chokyo_sei_course = '坂' THEN '坂路'
+        WHEN chokyo_sei_course = 'Ｐ' OR chokyo_sei_course = 'P' THEN 'ポリトラック'
+        WHEN chokyo_sei_basho = 'プール' THEN 'プール'
+        ELSE 'コース'
+      END AS chokyo_sei_course_kubun,
 
       -- 前走データの取得ロジック
       -- PARTITION BY は race_code_uma_kol (馬毎) で行う
@@ -698,6 +798,27 @@ WITH
       ON SUBSTR(p.race_code_uma_kol, 1, 16) = d1.race_code_kol
     WHERE
       z.chokyo_den_oikiri_awase_uma_bamei IS NOT NULL AND z.chokyo_den_oikiri_awase_uma_bamei != ''
+      AND p.kaisai_nengappi < z.kaisai_nengappi
+    QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY z.race_code_uma_kol ORDER BY p.kaisai_nengappi DESC) = 1
+  ),
+
+  partner_lookup_sei AS (
+    SELECT
+      z.race_code_uma_kol,
+      p.race_code_uma_kol AS race_code_uma_kol_partner,
+      SUBSTR(p.race_code_uma_kol, 1, 16) AS race_code_kol_partner,
+      d1.kyoso_joken_kubun
+    FROM
+      with_zensou_data AS z
+    INNER JOIN
+      ${ref("kol_den2")} AS p
+      ON z.chokyo_sei_awase_uma_bamei = p.bamei
+    LEFT JOIN
+      ${ref("kol_den1")} AS d1
+      ON SUBSTR(p.race_code_uma_kol, 1, 16) = d1.race_code_kol
+    WHERE
+      z.chokyo_sei_awase_uma_bamei IS NOT NULL AND z.chokyo_sei_awase_uma_bamei != ''
       AND p.kaisai_nengappi < z.kaisai_nengappi
     QUALIFY
       ROW_NUMBER() OVER (PARTITION BY z.race_code_uma_kol ORDER BY p.kaisai_nengappi DESC) = 1
@@ -1386,7 +1507,419 @@ SELECT
   z.chokyo_den_oikiri_honsu_pool,
   SAFE_CAST(z.chokyo_den_oikiri_honsu_pool AS INT64) AS chokyo_den_oikiri_honsu_pool_num,
 
-  -- 調教1 Logic ----------------------------------------------------------------
+  -- 調教 (sei2由来) -------------------------------------------------------------
+  z.chokyo_sei_flag,
+  CASE
+    WHEN z.chokyo_sei_flag = '1' THEN 'はい'
+    ELSE 'いいえ'
+  END AS chokyo_sei_flag_label,
+  z.chokyo_sei_kijosha,
+  CASE
+    WHEN z.chokyo_sei_kijosha IS NULL THEN NULL
+    WHEN z.chokyo_sei_kijosha = '助手' THEN '助手'
+    WHEN z.chokyo_sei_kijosha = '調教師' THEN '調教師'
+    WHEN z.chokyo_sei_kijosha = '見習' THEN '見習'
+    WHEN z.chokyo_sei_kijosha = '厩舎' THEN '厩舎'
+    ELSE '騎手'
+  END AS chokyo_sei_kijosha_kubun,
+  CASE
+    WHEN TRIM(z.chokyo_sei_kijosha) = TRIM(z.kishumei_ryakusho) THEN 'はい'
+    ELSE 'いいえ'
+  END AS chokyo_sei_kijosha_equal_kishumei_flag,
+  z.chokyo_sei_nengappi,
+  FORMAT_DATE('%Y年%m月%d日', SAFE.PARSE_DATE('%Y%m%d', z.chokyo_sei_nengappi)) || '(' || CASE EXTRACT(DAYOFWEEK FROM SAFE.PARSE_DATE('%Y%m%d', z.chokyo_sei_nengappi)) WHEN 1 THEN '日' WHEN 2 THEN '月' WHEN 3 THEN '火' WHEN 4 THEN '水' WHEN 5 THEN '木' WHEN 6 THEN '金' WHEN 7 THEN '土' END || ')' AS chokyo_sei_nengappi_label,
+  SAFE.PARSE_DATE('%Y%m%d', z.chokyo_sei_nengappi) AS chokyo_sei_nengappi_date,
+  z.chokyo_sei_basho,
+  z.chokyo_sei_course,
+  CASE
+    WHEN z.chokyo_sei_course = '坂' THEN '坂路'
+    WHEN z.chokyo_sei_course = 'Ｐ' OR z.chokyo_sei_course = 'P' THEN 'ポリトラック'
+    WHEN z.chokyo_sei_basho = 'プール' THEN 'プール'
+    ELSE 'コース'
+  END AS chokyo_sei_course_kubun,
+  COALESCE(z.chokyo_sei_basho, '') || COALESCE(z.chokyo_sei_course, '') AS chokyo_sei_basho_course_label,
+  z.chokyo_sei_babajotai,
+
+  -- 調教タイム関連フィールド (chokyo_sei_course の略語 '坂', 'P' を使用)
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN SAFE_CAST(REGEXP_REPLACE(z.chokyo_sei_6f, r'[^0-9]', '') AS INT64)
+    ELSE NULL
+  END AS chokyo_sei_hanro_pool_kaisu_int,
+
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
+    ELSE z.chokyo_sei_8f
+  END AS chokyo_sei_8f,
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
+    ELSE SAFE_CAST(z.chokyo_sei_8f AS FLOAT64)
+  END AS chokyo_sei_8f_float,
+
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
+    ELSE z.chokyo_sei_7f
+  END AS chokyo_sei_7f,
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
+    ELSE SAFE_CAST(z.chokyo_sei_7f AS FLOAT64)
+  END AS chokyo_sei_7f_float,
+
+  z.chokyo_sei_6f AS chokyo_sei_6f,
+  SAFE_CAST(z.chokyo_sei_6f AS FLOAT64) AS chokyo_sei_6f_float,
+
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
+    ELSE z.chokyo_sei_5f
+  END AS chokyo_sei_5f,
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
+    ELSE SAFE_CAST(z.chokyo_sei_5f AS FLOAT64)
+  END AS chokyo_sei_5f_float,
+
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' THEN NULL
+    WHEN z.chokyo_sei_course = '坂' THEN z.chokyo_sei_5f -- 坂路は5Fを4Fとして使用
+    ELSE z.chokyo_sei_4f
+  END AS chokyo_sei_4f,
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' THEN NULL
+    WHEN z.chokyo_sei_course = '坂' THEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64)
+    ELSE SAFE_CAST(z.chokyo_sei_4f AS FLOAT64)
+  END AS chokyo_sei_4f_float,
+
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' THEN NULL
+    WHEN z.chokyo_sei_course = '坂' THEN z.chokyo_sei_4f -- 坂路は4Fを3Fとして使用
+    ELSE z.chokyo_sei_3f
+  END AS chokyo_sei_3f,
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' THEN NULL
+    WHEN z.chokyo_sei_course = '坂' THEN SAFE_CAST(z.chokyo_sei_4f AS FLOAT64)
+    ELSE SAFE_CAST(z.chokyo_sei_3f AS FLOAT64)
+  END AS chokyo_sei_3f_float,
+
+  ROUND(
+    CASE
+      WHEN z.chokyo_sei_basho = 'プール' THEN NULL
+      WHEN z.chokyo_sei_course = '坂' THEN SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) -- 坂路は3Fを使用(実質2F)
+      -- それ以外の場合: 3F - (4F - 3F)
+      ELSE SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - (SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_3f AS FLOAT64))
+    END, 1
+  ) AS chokyo_sei_2f_float,
+
+  z.chokyo_sei_1f AS chokyo_sei_1f,
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' THEN NULL
+    ELSE SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)
+  END AS chokyo_sei_1f_float,
+
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
+    ELSE ROUND(SAFE_CAST(z.chokyo_sei_8f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_7f AS FLOAT64), 1)
+  END AS chokyo_sei_lap_8f,
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
+    ELSE ROUND(SAFE_CAST(z.chokyo_sei_7f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_6f AS FLOAT64), 1)
+  END AS chokyo_sei_lap_7f,
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
+    ELSE ROUND(SAFE_CAST(z.chokyo_sei_6f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_5f AS FLOAT64), 1)
+  END AS chokyo_sei_lap_6f,
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
+    ELSE ROUND(SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_4f AS FLOAT64), 1)
+  END AS chokyo_sei_lap_5f,
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' THEN NULL
+    WHEN z.chokyo_sei_course = '坂' THEN ROUND(SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_4f AS FLOAT64), 1)
+    ELSE ROUND(SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_3f AS FLOAT64), 1)
+  END AS chokyo_sei_lap_4f,
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' THEN NULL
+    WHEN z.chokyo_sei_course = '坂' THEN ROUND(SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_3f AS FLOAT64), 1)
+    ELSE
+      -- 3F - 2F(推定)
+      ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - (
+        SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_3f AS FLOAT64)
+      ), 1)
+  END AS chokyo_sei_lap_3f,
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' THEN NULL
+    WHEN z.chokyo_sei_course = '坂' THEN ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 1)
+    ELSE
+      -- 2F(推定) - 1F
+      ROUND(
+        (SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - (SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_3f AS FLOAT64)))
+        - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 1)
+  END AS chokyo_sei_lap_2f,
+
+  CASE
+    WHEN z.chokyo_sei_course = '坂' AND (z.chokyo_sei_basho LIKE '%栗東%' OR z.chokyo_sei_basho LIKE '%美南%') THEN
+      CASE
+        WHEN SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < 12.0
+             AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) <= (SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64))
+        THEN 'A3:終い1F11秒台の加速ラップ'
+        WHEN (SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)) < 12.0
+             AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) > (SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64))
+        THEN 'B3:2F11秒台減速ラップ'
+        WHEN ROUND(SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 1) = ROUND((SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)), 1)
+             AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < 13.0
+        THEN 'C1:2F1F同タイム'
+        WHEN (SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 12.0 AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < 13.0)
+             AND (ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9) >= 12.0 AND ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9) < 13.0)
+             AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) <= ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9)
+        THEN 'A2:終い2F各12秒台の加速ラップ'
+        WHEN (SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 12.0 AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < 13.0)
+             AND (ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9) >= 12.0 AND ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9) < 13.0)
+             AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) > ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9)
+        THEN 'B2:終い2F各12秒台の減速ラップ'
+        WHEN (SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 12.0 AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < 13.0)
+             AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < (SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64))
+        THEN 'A1:終い1Fのみ12秒台の加速ラップ'
+        WHEN ((SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)) >= 12.0 AND (SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)) < 13.0)
+             AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 13.0
+        THEN 'B1:2Fのみ12秒台の減速ラップ'
+        ELSE NULL
+      END
+    ELSE NULL
+  END AS chokyo_sei_lap_group,
+
+  CASE
+    WHEN z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = '坂' AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) <= 12.4 THEN 'はい'
+    WHEN z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = '坂' AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) <= 12.5 THEN 'はい'
+    WHEN z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = 'CW' AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) <= 11.6 THEN 'はい'
+    WHEN z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ' AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) <= 11.7 THEN 'はい'
+    ELSE NULL
+  END AS chokyo_sei_check_time_1f_flag,
+
+  CASE
+    WHEN z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = '坂' AND SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) <= 53.9 THEN 'はい'
+    WHEN z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = '坂' AND SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) <= 54.9 THEN 'はい'
+    WHEN z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = 'CW' AND SAFE_CAST(z.chokyo_sei_6f AS FLOAT64) <= 82.9 THEN 'はい'
+    WHEN z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ' AND SAFE_CAST(z.chokyo_sei_6f AS FLOAT64) <= 83.9 THEN 'はい'
+    ELSE NULL
+  END AS chokyo_sei_check_time_4f_6f_flag,
+
+  CASE
+    WHEN (z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = 'CW') OR (z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ') THEN
+      CASE
+        WHEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) >= 70.0 THEN '70.0～'
+        WHEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) >= 68.0 THEN '68.0～69.9'
+        WHEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) >= 66.0 THEN '66.0～67.9'
+        WHEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) >= 64.0 THEN '64.0～65.9'
+        ELSE NULL
+      END
+    ELSE NULL
+  END AS chokyo_sei_5f_wood_kubun,
+
+  CASE
+    WHEN (z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = 'CW') OR (z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ') THEN
+      CASE
+        WHEN SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) >= 56.0 THEN '56.0～'
+        WHEN SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) >= 54.0 THEN '54.0～55.9'
+        WHEN SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) >= 52.0 THEN '52.0～53.9'
+        WHEN SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) >= 50.0 THEN '50.0～51.9'
+        ELSE NULL
+      END
+    ELSE NULL
+  END AS chokyo_sei_4f_wood_kubun,
+
+  CASE
+    WHEN (z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = 'CW') OR (z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ') THEN
+      CASE
+        WHEN SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 12.5 THEN '12.5～'
+        WHEN SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 12.0 THEN '12.0～12.4'
+        WHEN SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 11.5 THEN '11.5～11.9'
+        WHEN SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 11.0 THEN '11.0～11.4'
+        ELSE NULL
+      END
+    ELSE NULL
+  END AS chokyo_sei_1f_wood_kubun,
+
+  CASE
+    WHEN (z.chokyo_sei_basho = '栗東' OR z.chokyo_sei_basho = '美南') AND z.chokyo_sei_course = '坂' THEN
+      CASE
+        WHEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) >= 56.0 AND SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) <= 57.9 THEN '56.0～57.9'
+        WHEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) >= 54.0 AND SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) <= 55.9 THEN '54.0～55.9'
+        WHEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) >= 52.0 AND SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) <= 53.9 THEN '52.0～53.9'
+        WHEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) >= 50.0 AND SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) <= 51.9 THEN '50.0～51.9'
+        ELSE NULL
+      END
+    ELSE NULL
+  END AS chokyo_sei_4f_hanro_kubun,
+
+  z.chokyo_sei_ichidori,
+  CASE z.chokyo_sei_ichidori
+     WHEN '1' THEN '①' WHEN '2' THEN '②' WHEN '3' THEN '③' WHEN '4' THEN '④' WHEN '5' THEN '⑤'
+     WHEN '6' THEN '⑥' WHEN '7' THEN '⑦' WHEN '8' THEN '⑧' WHEN '9' THEN '⑨'
+     ELSE z.chokyo_sei_ichidori
+  END AS chokyo_sei_ichidori_label,
+  CASE
+    WHEN z.chokyo_sei_awase IS NOT NULL AND z.chokyo_sei_awase != ''
+      AND SAFE_CAST(z.chokyo_sei_ichidori AS INT64) BETWEEN 6 AND 9
+      AND z.chokyo_sei_awase LIKE '%先着%'
+    THEN 'はい'
+    ELSE NULL
+  END AS chokyo_sei_ichidori_furi_win_flag,
+  z.chokyo_sei_ashiiro,
+  CASE z.chokyo_sei_ashiiro
+    WHEN '馬なり' THEN '馬なり' WHEN '馬ナリ' THEN '馬なり' WHEN '一 杯' THEN '一杯' WHEN '一杯' THEN '一杯'
+    WHEN '強 め' THEN '強め' WHEN '強め' THEN '強め' WHEN '強目' THEN '強め' WHEN '末強め' THEN '末強め'
+    WHEN '末強目' THEN '末強め' WHEN '直強め' THEN '直強め' WHEN '直強目' THEN '直強め' WHEN '叩一杯' THEN '叩一杯'
+    WHEN '稍一杯' THEN '稍一杯' WHEN '末一杯' THEN '末一杯' WHEN '直一杯' THEN '直一杯' WHEN 'バテる' THEN 'バテる'
+    WHEN '不明' THEN '不明' WHEN '不　明' THEN '不明' WHEN '不 明' THEN '不明' WHEN 'Ｇ前追' THEN 'G前追'
+    WHEN '楽 走' THEN '楽走' WHEN '向正面' THEN '向正面' WHEN 'ササる' THEN 'ササる' WHEN '稍強め' THEN '稍強め'
+    WHEN '止める' THEN '止める' WHEN 'バカ付' THEN 'バカ付' WHEN '引掛る' THEN '引掛る' WHEN '末抑え' THEN '末抑え'
+    WHEN '直抑え' THEN '直抑え' WHEN '外逃げ' THEN '外逃げ' WHEN 'ヨレる' THEN 'ヨレる'
+    ELSE z.chokyo_sei_ashiiro
+  END AS chokyo_sei_ashiiro_label,
+  z.chokyo_sei_yajirushi,
+  CASE z.chokyo_sei_yajirushi
+    WHEN '1' THEN '一変(↑)' WHEN '2' THEN '平行(→)' WHEN '3' THEN '下降(↓)' WHEN '4' THEN '良化(／)' WHEN '5' THEN '下降気味(＼)'
+    ELSE NULL
+  END AS chokyo_sei_yajirushi_label,
+  z.chokyo_sei_reigai,
+  z.chokyo_sei_awase,
+  z.chokyo_sei_awase_uma_bamei,
+  pls.race_code_uma_kol_partner AS chokyo_sei_awase_uma_race_code_uma_kol,
+  pls.race_code_kol_partner AS chokyo_sei_awase_uma_race_code_kol,
+  CASE pls.kyoso_joken_kubun
+    WHEN '00001' THEN '新馬'
+    WHEN '00002' THEN '未出走'
+    WHEN '00003' THEN '未勝利'
+    WHEN '00004' THEN 'オープン'
+    WHEN '05000' THEN '1勝クラス'
+    WHEN '10000' THEN '2勝クラス'
+    WHEN '16000' THEN '3勝クラス'
+    ELSE NULL
+  END AS chokyo_sei_awase_uma_class,
+  CASE
+    WHEN pls.kyoso_joken_kubun NOT IN ('00004', '16000', '10000', '05000', '00003', '00002', '00001') OR pls.kyoso_joken_kubun IS NULL THEN NULL
+    WHEN (
+      CASE pls.kyoso_joken_kubun
+        WHEN '00004' THEN 5
+        WHEN '16000' THEN 4
+        WHEN '10000' THEN 3
+        WHEN '05000' THEN 2
+        WHEN '00003' THEN 1
+        WHEN '00002' THEN 1
+        WHEN '00001' THEN 1
+        ELSE 0
+      END
+    ) > (
+      CASE z.kyoso_joken_kubun
+        WHEN '00004' THEN 5
+        WHEN '16000' THEN 4
+        WHEN '10000' THEN 3
+        WHEN '05000' THEN 2
+        WHEN '00003' THEN 1
+        WHEN '00002' THEN 1
+        WHEN '00001' THEN 1
+        ELSE 0
+      END
+    ) THEN '格上'
+    WHEN (
+      CASE pls.kyoso_joken_kubun
+        WHEN '00004' THEN 5
+        WHEN '16000' THEN 4
+        WHEN '10000' THEN 3
+        WHEN '05000' THEN 2
+        WHEN '00003' THEN 1
+        WHEN '00002' THEN 1
+        WHEN '00001' THEN 1
+        ELSE 0
+      END
+    ) < (
+      CASE z.kyoso_joken_kubun
+        WHEN '00004' THEN 5
+        WHEN '16000' THEN 4
+        WHEN '10000' THEN 3
+        WHEN '05000' THEN 2
+        WHEN '00003' THEN 1
+        WHEN '00002' THEN 1
+        WHEN '00001' THEN 1
+        ELSE 0
+      END
+    ) THEN '格下'
+    ELSE '同格'
+  END AS chokyo_sei_awase_uma_kaku_kubun,
+  CASE
+    WHEN (
+      CASE
+        WHEN pls.kyoso_joken_kubun NOT IN ('00004', '16000', '10000', '05000', '00003', '00002', '00001') OR pls.kyoso_joken_kubun IS NULL THEN NULL
+        WHEN (
+          CASE pls.kyoso_joken_kubun
+            WHEN '00004' THEN 5
+            WHEN '16000' THEN 4
+            WHEN '10000' THEN 3
+            WHEN '05000' THEN 2
+            WHEN '00003' THEN 1
+            WHEN '00002' THEN 1
+            WHEN '00001' THEN 1
+            ELSE 0
+          END
+        ) > (
+          CASE z.kyoso_joken_kubun
+            WHEN '00004' THEN 5
+            WHEN '16000' THEN 4
+            WHEN '10000' THEN 3
+            WHEN '05000' THEN 2
+            WHEN '00003' THEN 1
+            WHEN '00002' THEN 1
+            WHEN '00001' THEN 1
+            ELSE 0
+          END
+        ) THEN '格上'
+        WHEN (
+          CASE pls.kyoso_joken_kubun
+            WHEN '00004' THEN 5
+            WHEN '16000' THEN 4
+            WHEN '10000' THEN 3
+            WHEN '05000' THEN 2
+            WHEN '00003' THEN 1
+            WHEN '00002' THEN 1
+            WHEN '00001' THEN 1
+            ELSE 0
+          END
+        ) < (
+          CASE z.kyoso_joken_kubun
+            WHEN '00004' THEN 5
+            WHEN '16000' THEN 4
+            WHEN '10000' THEN 3
+            WHEN '05000' THEN 2
+            WHEN '00003' THEN 1
+            WHEN '00002' THEN 1
+            WHEN '00001' THEN 1
+            ELSE 0
+          END
+        ) THEN '格下'
+        ELSE '同格'
+      END
+    ) = '格上' AND z.chokyo_sei_awase LIKE '%先着%' THEN '先着'
+    ELSE NULL
+  END AS chokyo_sei_awase_uma_kakuue_win_flag,
+  SAFE_CAST(REGEXP_EXTRACT(z.chokyo_sei_awase, r'に(\d+\.\d+)秒') AS FLOAT64) AS chokyo_sei_awase_time_sa_float,
+  CASE
+    WHEN z.chokyo_sei_awase LIKE '%同入%' OR z.chokyo_sei_awase LIKE '%内併走%' OR z.chokyo_sei_awase LIKE '%外併走%' THEN '併せ同入'
+    WHEN z.chokyo_sei_awase LIKE '%遅れ%' THEN '併せ遅れ'
+    WHEN z.chokyo_sei_awase LIKE '%先着%' THEN '併せ先着'
+    ELSE '単走'
+  END AS chokyo_sei_awase_kubun,
+  z.chokyo_sei_awase_flag,
+  CASE z.chokyo_sei_awase_flag
+    WHEN '1' THEN '調教2の併せ'
+    WHEN '2' THEN '調教3の併せ'
+    ELSE NULL
+  END AS chokyo_sei_awase_flag_label,
+  z.chokyo_sei_tanpyo,
+  z.chokyo_sei_honsu_course,
+  SAFE_CAST(z.chokyo_sei_honsu_course AS INT64) AS chokyo_sei_honsu_course_num,
+  z.chokyo_sei_honsu_hanro,
+  SAFE_CAST(z.chokyo_sei_honsu_hanro AS INT64) AS chokyo_sei_honsu_hanro_num,
+  z.chokyo_sei_honsu_pool,
+  SAFE_CAST(z.chokyo_sei_honsu_pool AS INT64) AS chokyo_sei_honsu_pool_num,
+
+
   z.chokyo1_flag,
   CASE WHEN z.chokyo1_flag = '1' THEN 'はい' ELSE 'いいえ' END AS chokyo1_flag_label,
   z.chokyo1_kijosha,
@@ -1929,6 +2462,9 @@ FROM
 LEFT JOIN
   partner_lookup AS pl
   ON z.race_code_uma_kol = pl.race_code_uma_kol
+LEFT JOIN
+  partner_lookup_sei AS pls
+  ON z.race_code_uma_kol = pls.race_code_uma_kol
 LEFT JOIN
   shirushi_final AS sc
   ON z.race_code_uma_kol = sc.race_code_uma_kol
