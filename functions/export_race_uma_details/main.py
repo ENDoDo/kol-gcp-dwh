@@ -184,7 +184,7 @@ def export_race_uma_details(request):
             "rotation5", "rotation5_label", "rotation6", "rotation6_label", "rotation7", "rotation7_label", "rotation8", "rotation8_label", "zensou_kankaku",
             "bataiju", "bataiju_kubun", "bataiju_zensou", "bataiju_kubun_zensou", "kyori_kubun_zensou", "kyori_extension_flag", "kyori_shortening_flag",
             "ensei_kansai_to_kantou_flag", "ensei_kantou_to_kansai_flag", "ensei_flag", "track_code1_label_dirtsiba_zensou", "siba_to_dirt_flag", "dirt_to_siba_flag",
-            "record_shisu", "record_shisu_num", "zogen_sa", "zogen_sa_num", "tansho_ninkijun", "tansho_ninkijun_num", "tansho_odds", "tansho_odds_float",
+            "record_shisu", "record_shisu_num", "zogen_sa", "zogen_sa_num",
             "kakutei_chakujun", "kakutei_chakujun_num", "tansho_haraimodoshi", "tansho_haraimodoshi_num", "fukusho_haraimodoshi", "fukusho_haraimodoshi_num",
             "ijo_kubun_code1", "ijo_kubun_code1_label", "ijo_kubun_code2", "ijo_kubun_code2_label", "nyusen_juni", "nyusen_juni_num", "record_flag", "record_flag_label",
             "soha_time", "soha_time_float", "soha_time_label", "chakusa_code1", "chakusa_code1_num", "chakusa_code2", "chakusa_code2_label", "chakusa_label",
