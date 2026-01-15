@@ -261,7 +261,6 @@ config {
     chokyo_sei_4f_hanro_kubun: "競走成績出走馬データ  追い切り 坂路コース4Fタイム区分",
     chokyo_sei_ichidori: "競走成績出走馬データ  追い切り 調教位置取り",
     chokyo_sei_ichidori_label: "競走成績出走馬データ  追い切り 調教位置取り(ラベル)",
-
     chokyo_sei_ashiiro: "競走成績出走馬データ  追い切り 調教脚色",
     chokyo_sei_ashiiro_label: "競走成績出走馬データ  追い切り 調教脚色(ラベル)",
     chokyo_sei_yajirushi: "競走成績出走馬データ  追い切り 調教矢印",
@@ -269,7 +268,6 @@ config {
     chokyo_sei_reigai: "競走成績出走馬データ  追い切り 調教例外",
     chokyo_sei_check_time_1f_flag: "競走成績出走馬データ  追い切り 1F標準タイムクリアフラグ",
     chokyo_sei_check_time_4f_6f_flag: "競走成績出走馬データ  追い切り 4F/6F標準タイムクリアフラグ",
-
     // スピード指数・ローテーション
     speed_sisu_last_1: "スピード指数 1走前",
     speed_sisu_last_1_float: "スピード指数 1走前(小数点)",
