@@ -10,8 +10,8 @@ config {
   columns: {
     chokyoshi_code: "調教師コード",
     chokyoshimei: "調教師名",
-    chokyo_sei_kijosha: "調教騎乗者",
-    cross_kijosha_kubun: "調教騎乗者区分",
+    chokyo_kijosha: "調教騎乗者",
+    chokyo_kijosha_kubun: "調教騎乗者区分",
     track_code1_dirtsiba_label: "トラック区分(芝/ダ)",
     total_tansho_haraimodoshi: "単勝払戻金合計",
     total_fukusho_haraimodoshi: "複勝払戻金合計",
@@ -26,8 +26,8 @@ config {
 SELECT
   chokyoshi_code,
   ARRAY_AGG(chokyoshimei ORDER BY hasso_date DESC LIMIT 1)[OFFSET(0)] AS chokyoshimei,
-  chokyo_sei_kijosha,
-  chokyo_sei_kijosha_kubun AS cross_kijosha_kubun,
+  chokyo_sei_kijosha AS chokyo_kijosha,
+  chokyo_sei_kijosha_kubun AS chokyo_kijosha_kubun,
   track_code1_dirtsiba_label,
   SUM(tansho_haraimodoshi_num) AS total_tansho_haraimodoshi,
   SUM(fukusho_haraimodoshi_num) AS total_fukusho_haraimodoshi,

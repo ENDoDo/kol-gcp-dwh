@@ -634,6 +634,7 @@ WITH
       -- 調教 (sei2由来)
       s2.chokyo_flag AS chokyo_sei_flag,
       s2.chokyo_kijosha AS chokyo_sei_kijosha,
+      s2.chokyo_kijosha_kubun AS chokyo_sei_kijosha_kubun,
       s2.chokyo_nengappi AS chokyo_sei_nengappi,
       s2.chokyo_basho AS chokyo_sei_basho,
       s2.chokyo_course AS chokyo_sei_course,
