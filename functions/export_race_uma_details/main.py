@@ -190,6 +190,7 @@ def export_race_uma_details(request):
             "soha_time", "soha_time_float", "soha_time_label", "chakusa_code1", "chakusa_code1_num", "chakusa_code2", "chakusa_code2_label", "chakusa_label",
             "time_sa", "time_sa_float", "zenhan_3f", "zenhan_3f_float", "kohan_3f", "kohan_3f_float",
             "corner1_juni", "corner1_juni_label", "corner2_juni", "corner2_juni_label", "corner3_juni", "corner3_juni_label", "corner4_juni", "corner4_juni_label", "corner4_ichidori", "corner4_ichidori_label",
+            "comment_kishu_kyusha", "comment_next", "comment_last", "yosou_tansho_ninkijun_num", "yosou_tansho_odds_float",
             "race_name", "kyori_kubun", "keibajo_name", "chuo_chiho_kubun", "chuo_chiho_kubun_label", "kyosomei_15moji", "kyosomei_7moji",
             "grade_code", "grade_code_label", "jpn_flag", "jpn_flag_label", "bettei_barei_handicap_summary_code", "bettei_barei_handicap_summary_code_label", "bettei_barei_handicap_detail",
             "kyoso_joken_age_limit", "kyoso_joken_age_limit_label", "kyoso_joken_kubun", "kyoso_joken_kubun_label", "heichi_shogai_kubun", "heichi_shogai_kubun_label",
