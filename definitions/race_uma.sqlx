@@ -74,10 +74,7 @@ config {
     chokyo_den_oikiri_flag: "調教フラグ",
     chokyo_den_oikiri_flag_label: "調教フラグ はい/いいえ",
     chokyo_den_oikiri_kijosha: "調教騎乗者",
-    chokyo_den_oikiri_kijosha_kubun: "調教騎乗者区分",
-    chokyo_den_oikiri_kijosha_equal_kishumei_flag: "調教騎乗騎手がレースでも騎乗フラグ",
     chokyo_den_oikiri_nengappi: "追い切り 調教年月日",
-    chokyo_den_oikiri_nengappi_label: "追い切り 調教年月日 文字列 y年m月d日(曜日)",
     chokyo_den_oikiri_nengappi_date: "調教年月日",
     chokyo_den_oikiri_basho: "調教場所",
     chokyo_den_oikiri_course: "調教コース",
@@ -981,20 +978,7 @@ SELECT
     ELSE 'いいえ'
   END AS chokyo_den_oikiri_flag_label,
   z.chokyo_den_oikiri_kijosha,
-  CASE
-    WHEN z.chokyo_den_oikiri_kijosha IS NULL THEN NULL
-    WHEN z.chokyo_den_oikiri_kijosha = '助手' THEN '助手'
-    WHEN z.chokyo_den_oikiri_kijosha = '調教師' THEN '調教師'
-    WHEN z.chokyo_den_oikiri_kijosha = '見習' THEN '見習'
-    WHEN z.chokyo_den_oikiri_kijosha = '厩舎' THEN '厩舎'
-    ELSE '騎手'
-  END AS chokyo_den_oikiri_kijosha_kubun,
-  CASE
-    WHEN TRIM(z.chokyo_den_oikiri_kijosha) = TRIM(z.kishumei_ryakusho) THEN 'はい'
-    ELSE 'いいえ'
-  END AS chokyo_den_oikiri_kijosha_equal_kishumei_flag,
   z.chokyo_den_oikiri_nengappi,
-  FORMAT_DATE('%Y年%m月%d日', SAFE.PARSE_DATE('%Y%m%d', z.chokyo_den_oikiri_nengappi)) || '(' || CASE EXTRACT(DAYOFWEEK FROM SAFE.PARSE_DATE('%Y%m%d', z.chokyo_den_oikiri_nengappi)) WHEN 1 THEN '日' WHEN 2 THEN '月' WHEN 3 THEN '火' WHEN 4 THEN '水' WHEN 5 THEN '木' WHEN 6 THEN '金' WHEN 7 THEN '土' END || ')' AS chokyo_den_oikiri_nengappi_label,
   SAFE.PARSE_DATE('%Y%m%d', z.chokyo_den_oikiri_nengappi) AS chokyo_den_oikiri_nengappi_date,
   z.chokyo_den_oikiri_basho,
   z.chokyo_den_oikiri_course,
