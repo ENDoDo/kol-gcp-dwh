@@ -634,7 +634,13 @@ WITH
       -- 調教 (sei2由来)
       s2.chokyo_flag AS chokyo_sei_flag,
       s2.chokyo_kijosha AS chokyo_sei_kijosha,
-      s2.chokyo_kijosha_kubun AS chokyo_sei_kijosha_kubun,
+      CASE
+        WHEN s2.chokyo_kijosha IS NULL THEN NULL
+        WHEN s2.chokyo_kijosha = '調教師' THEN '調教師'
+        WHEN s2.chokyo_kijosha = '見習' THEN '見習'
+        WHEN s2.chokyo_kijosha IN ('厩舎', '助手') THEN '厩舎'
+        ELSE '騎手'
+      END AS chokyo_sei_kijosha_kubun,
       s2.chokyo_nengappi AS chokyo_sei_nengappi,
       s2.chokyo_basho AS chokyo_sei_basho,
       s2.chokyo_course AS chokyo_sei_course,
