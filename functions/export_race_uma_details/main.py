@@ -119,16 +119,65 @@ def export_race_uma_details(request):
             "kishu_shozokubasho_code", "kishu_shozokubasho_code_label", "kishu_shozoku_chokyoshi_code",
             "chokyoshi_code", "chokyoshimei", "chokyoshimei_ryakusho", "chokyoshi_shozokubasho_code", "chokyoshi_shozokubasho_code_label",
             "chokyoshi_tracen_kubun", "chokyoshi_tracen_kubun_label",
-            "chokyo_flag", "chokyo_flag_label", "chokyo_kijosha", "chokyo_kijosha_equal_kishumei_flag", "chokyo_nengappi", "chokyo_nengappi_label", "chokyo_nengappi_date",
-            "chokyo_basho", "chokyo_course", "chokyo_course_kubun", "chokyo_basho_course_label", "chokyo_babajotai", "chokyo_hanro_pool_kaisu_int",
-            "chokyo_8f", "chokyo_8f_float", "chokyo_7f", "chokyo_7f_float", "chokyo_6f", "chokyo_6f_float", "chokyo_5f", "chokyo_5f_float",
-            "chokyo_4f", "chokyo_4f_float", "chokyo_3f", "chokyo_3f_float", "chokyo_2f_float", "chokyo_1f", "chokyo_1f_float",
-            "chokyo_lap_8f", "chokyo_lap_7f", "chokyo_lap_6f", "chokyo_lap_5f", "chokyo_lap_4f", "chokyo_lap_3f", "chokyo_lap_2f", "chokyo_lap_group",
+            "chokyo_den_oikiri_flag", "chokyo_den_oikiri_flag_label", "chokyo_den_oikiri_kijosha",
+            "chokyo_den_oikiri_nengappi_date", "chokyo_den_oikiri_nengappi",
+            "chokyo_den_oikiri_basho", "chokyo_den_oikiri_course", "chokyo_den_oikiri_course_kubun", "chokyo_den_oikiri_basho_course_label",
+            "chokyo_den_oikiri_babajotai", "chokyo_den_oikiri_hanro_pool_kaisu_int",
+            "chokyo_den_oikiri_8f", "chokyo_den_oikiri_8f_float", "chokyo_den_oikiri_7f", "chokyo_den_oikiri_7f_float",
+            "chokyo_den_oikiri_6f", "chokyo_den_oikiri_6f_float", "chokyo_den_oikiri_5f", "chokyo_den_oikiri_5f_float",
+            "chokyo_den_oikiri_4f", "chokyo_den_oikiri_4f_float", "chokyo_den_oikiri_3f", "chokyo_den_oikiri_3f_float",
+            "chokyo_den_oikiri_2f_float", "chokyo_den_oikiri_1f", "chokyo_den_oikiri_1f_float",
+            "chokyo_den_oikiri_lap_8f", "chokyo_den_oikiri_lap_7f", "chokyo_den_oikiri_lap_6f", "chokyo_den_oikiri_lap_5f",
+            "chokyo_den_oikiri_lap_4f", "chokyo_den_oikiri_lap_3f", "chokyo_den_oikiri_lap_2f", "chokyo_den_oikiri_lap_group",
+            "chokyo_den_oikiri_5f_wood_kubun", "chokyo_den_oikiri_4f_wood_kubun", "chokyo_den_oikiri_1f_wood_kubun", "chokyo_den_oikiri_4f_hanro_kubun",
             "shirushi_hanro_4f_flag", "shirushi_hanro_1f_flag", "shirushi_wood_6f_flag", "shirushi_wood_1f_flag",
-            "shirushi_point", "shirushi_kubun_yosou_tansho_ninkijun", "shirushi_kubun_rank", "shirushi_shirushi_label", "shirushi_shirushi_num",
-            "chokyo_ichidori", "chokyo_ichidori_label", "chokyo_ashiiro", "chokyo_ashiiro_label", "chokyo_yajirushi", "chokyo_yajirushi_label",
-            "chokyo_reigai", "chokyo_awase", "chokyo_awase_kubun", "chokyo_awase_flag", "chokyo_awase_flag_label", "chokyo_tanpyo",
-            "chokyo_honsu_course", "chokyo_honsu_course_num", "chokyo_honsu_hanro", "chokyo_honsu_hanro_num", "chokyo_honsu_pool", "chokyo_honsu_pool_num",
+            "shirushi_awase_senchaku_flag", "shirushi_point", "shirushi_kubun_yosou_tansho_ninkijun", "shirushi_kubun_rank",
+            "shirushi_shirushi_label", "shirushi_shirushi_num",
+            "chokyo_den_oikiri_ichidori", "chokyo_den_oikiri_ichidori_label", "chokyo_den_oikiri_ashiiro", "chokyo_den_oikiri_ashiiro_label",
+            "chokyo_den_oikiri_yajirushi", "chokyo_den_oikiri_yajirushi_label", "chokyo_den_oikiri_reigai",
+            "chokyo_den_chokyo1_flag", "chokyo_den_chokyo1_flag_label", "chokyo_den_chokyo1_kijosha",
+            "chokyo_den_chokyo1_nengappi", "chokyo_den_chokyo1_nengappi_date",
+            "chokyo_den_chokyo1_basho", "chokyo_den_chokyo1_course", "chokyo_den_chokyo1_course_kubun", "chokyo_den_chokyo1_basho_course_label",
+            "chokyo_den_chokyo1_babajotai", "chokyo_den_chokyo1_hanro_pool_kaisu_int",
+            "chokyo_den_chokyo1_8f", "chokyo_den_chokyo1_8f_float", "chokyo_den_chokyo1_7f", "chokyo_den_chokyo1_7f_float",
+            "chokyo_den_chokyo1_6f", "chokyo_den_chokyo1_6f_float", "chokyo_den_chokyo1_5f", "chokyo_den_chokyo1_5f_float",
+            "chokyo_den_chokyo1_4f", "chokyo_den_chokyo1_4f_float", "chokyo_den_chokyo1_3f", "chokyo_den_chokyo1_3f_float",
+            "chokyo_den_chokyo1_2f_float", "chokyo_den_chokyo1_1f", "chokyo_den_chokyo1_1f_float",
+            "chokyo_den_chokyo1_ichidori", "chokyo_den_chokyo1_ichidori_label", "chokyo_den_chokyo1_ashiiro", "chokyo_den_chokyo1_ashiiro_label",
+            "chokyo_den_chokyo1_yajirushi", "chokyo_den_chokyo1_yajirushi_label", "chokyo_den_chokyo1_reigai",
+            "chokyo_den_chokyo2_flag", "chokyo_den_chokyo2_flag_label", "chokyo_den_chokyo2_kijosha",
+            "chokyo_den_chokyo2_nengappi", "chokyo_den_chokyo2_nengappi_date",
+            "chokyo_den_chokyo2_basho", "chokyo_den_chokyo2_course", "chokyo_den_chokyo2_course_kubun", "chokyo_den_chokyo2_basho_course_label",
+            "chokyo_den_chokyo2_babajotai", "chokyo_den_chokyo2_hanro_pool_kaisu_int",
+            "chokyo_den_chokyo2_8f", "chokyo_den_chokyo2_8f_float", "chokyo_den_chokyo2_7f", "chokyo_den_chokyo2_7f_float",
+            "chokyo_den_chokyo2_6f", "chokyo_den_chokyo2_6f_float", "chokyo_den_chokyo2_5f", "chokyo_den_chokyo2_5f_float",
+            "chokyo_den_chokyo2_4f", "chokyo_den_chokyo2_4f_float", "chokyo_den_chokyo2_3f", "chokyo_den_chokyo2_3f_float",
+            "chokyo_den_chokyo2_2f_float", "chokyo_den_chokyo2_1f", "chokyo_den_chokyo2_1f_float",
+            "chokyo_den_chokyo2_ichidori", "chokyo_den_chokyo2_ichidori_label", "chokyo_den_chokyo2_ashiiro", "chokyo_den_chokyo2_ashiiro_label",
+            "chokyo_den_chokyo2_yajirushi", "chokyo_den_chokyo2_yajirushi_label", "chokyo_den_chokyo2_reigai",
+            "chokyo_den_chokyo3_flag", "chokyo_den_chokyo3_flag_label", "chokyo_den_chokyo3_kijosha",
+            "chokyo_den_chokyo3_nengappi", "chokyo_den_chokyo3_nengappi_date",
+            "chokyo_den_chokyo3_basho", "chokyo_den_chokyo3_course", "chokyo_den_chokyo3_course_kubun", "chokyo_den_chokyo3_basho_course_label",
+            "chokyo_den_chokyo3_babajotai", "chokyo_den_chokyo3_hanro_pool_kaisu_int",
+            "chokyo_den_chokyo3_8f", "chokyo_den_chokyo3_8f_float", "chokyo_den_chokyo3_7f", "chokyo_den_chokyo3_7f_float",
+            "chokyo_den_chokyo3_6f", "chokyo_den_chokyo3_6f_float", "chokyo_den_chokyo3_5f", "chokyo_den_chokyo3_5f_float",
+            "chokyo_den_chokyo3_4f", "chokyo_den_chokyo3_4f_float", "chokyo_den_chokyo3_3f", "chokyo_den_chokyo3_3f_float",
+            "chokyo_den_chokyo3_2f_float", "chokyo_den_chokyo3_1f", "chokyo_den_chokyo3_1f_float",
+            "chokyo_den_chokyo3_ichidori", "chokyo_den_chokyo3_ichidori_label", "chokyo_den_chokyo3_ashiiro", "chokyo_den_chokyo3_ashiiro_label",
+            "chokyo_den_chokyo3_yajirushi", "chokyo_den_chokyo3_yajirushi_label", "chokyo_den_chokyo3_reigai",
+            "chokyo_sei_flag", "chokyo_sei_flag_label", "chokyo_sei_kijosha", "chokyo_sei_kijosha_kubun",
+            "chokyo_sei_kijosha_equal_kishumei_flag", "chokyo_sei_nengappi", "chokyo_sei_nengappi_label", "chokyo_sei_nengappi_date",
+            "chokyo_sei_basho", "chokyo_sei_course", "chokyo_sei_course_kubun", "chokyo_sei_basho_course_label",
+            "chokyo_sei_babajotai", "chokyo_sei_hanro_pool_kaisu_int",
+            "chokyo_sei_8f", "chokyo_sei_8f_float", "chokyo_sei_7f", "chokyo_sei_7f_float", "chokyo_sei_6f", "chokyo_sei_6f_float",
+            "chokyo_sei_5f", "chokyo_sei_5f_float", "chokyo_sei_4f", "chokyo_sei_4f_float", "chokyo_sei_3f", "chokyo_sei_3f_float",
+            "chokyo_sei_2f_float", "chokyo_sei_1f", "chokyo_sei_1f_float",
+            "chokyo_sei_lap_8f", "chokyo_sei_lap_7f", "chokyo_sei_lap_6f", "chokyo_sei_lap_5f",
+            "chokyo_sei_lap_4f", "chokyo_sei_lap_3f", "chokyo_sei_lap_2f", "chokyo_sei_lap_group",
+            "chokyo_sei_5f_wood_kubun", "chokyo_sei_4f_wood_kubun", "chokyo_sei_1f_wood_kubun", "chokyo_sei_4f_hanro_kubun",
+            "chokyo_sei_ichidori", "chokyo_sei_ichidori_label", "chokyo_sei_ashiiro", "chokyo_sei_ashiiro_label",
+            "chokyo_sei_yajirushi", "chokyo_sei_yajirushi_label", "chokyo_sei_reigai",
+            "chokyo_sei_check_time_1f_flag", "chokyo_sei_check_time_4f_6f_flag",
             "speed_sisu_last_1", "speed_sisu_last_1_float", "speed_sisu_last_2", "speed_sisu_last_2_float", "speed_sisu_last_3", "speed_sisu_last_3_float",
             "speed_sisu_last_4", "speed_sisu_last_4_float", "speed_sisu_last_5", "speed_sisu_last_5_float",
             "rotation1", "rotation1_label", "rotation2", "rotation2_label", "rotation3", "rotation3_label", "rotation4", "rotation4_label",
@@ -187,36 +236,36 @@ def export_race_uma_details(request):
                 ftp_conn.storbinary(f"STOR {filename}", bio)
                 logger.info(f"{filename} のアップロード完了")
 
-                # Bubble APIへの通知
-                if BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
-                    ftp_directory = os.environ.get("FTP_DIRECTORY")
-                    # FTPディレクトリの考慮
-                    if ftp_directory:
-                        dir_path = ftp_directory.strip("/")
-                        csv_url = f"{CSV_BASE_URL}/{dir_path}/{filename}"
-                    else:
-                        csv_url = f"{CSV_BASE_URL}/{filename}"
+                # Bubble APIへの通知 (一時停止中)
+                # if BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
+                #     ftp_directory = os.environ.get("FTP_DIRECTORY")
+                #     # FTPディレクトリの考慮
+                #     if ftp_directory:
+                #         dir_path = ftp_directory.strip("/")
+                #         csv_url = f"{CSV_BASE_URL}/{dir_path}/{filename}"
+                #     else:
+                #         csv_url = f"{CSV_BASE_URL}/{filename}"
 
-                    logger.info(f"通知対象CSV URL: {csv_url}")
-                    api_key = get_secret(BUBBLE_API_KEY_SECRET_ID)
-                    headers = {
-                        "Content-Type": "application/json",
-                        "Authorization": f"Bearer {api_key}"
-                    }
-                    payload = {
-                        "csv_url": csv_url
-                    }
-                    try:
-                        logger.info(f"Bubble APIへリクエストを送信します: URL={BUBBLE_API_URL}")
-                        response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
-                        response.raise_for_status()
-                        logger.info(f"Bubble APIへの通知に成功しました ({filename}): {response.json()}")
-                    except Exception as e:
-                        logger.error(f"Bubble APIへの通知に失敗しました ({filename}): {e}")
-                        # 続行する
-                else:
-                    if i == 0: # ログ過多防止のため初回のみログ出力
-                         logger.info("Bubble API設定がされていないため、通知をスキップします。")
+                #     logger.info(f"通知対象CSV URL: {csv_url}")
+                #     api_key = get_secret(BUBBLE_API_KEY_SECRET_ID)
+                #     headers = {
+                #         "Content-Type": "application/json",
+                #         "Authorization": f"Bearer {api_key}"
+                #     }
+                #     payload = {
+                #         "csv_url": csv_url
+                #     }
+                #     try:
+                #         logger.info(f"Bubble APIへリクエストを送信します: URL={BUBBLE_API_URL}")
+                #         response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
+                #         response.raise_for_status()
+                #         logger.info(f"Bubble APIへの通知に成功しました ({filename}): {response.json()}")
+                #     except Exception as e:
+                #         logger.error(f"Bubble APIへの通知に失敗しました ({filename}): {e}")
+                #         # 続行する
+                # else:
+                #     if i == 0: # ログ過多防止のため初回のみログ出力
+                #          logger.info("Bubble API設定がされていないため、通知をスキップします。")
             except Exception as e:
                 logger.error(f"FTPアップロードエラー: {filename}, {e}")
                 # 再送ロジックを入れるか、ここではエラーとして処理を継続するか
