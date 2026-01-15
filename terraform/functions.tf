@@ -73,7 +73,7 @@ resource "google_cloudfunctions2_function" "export_schedules" {
       SECRET_USER = "projects/56638639323/secrets/kol_ftp_bubble_username"
       SECRET_PASS = "projects/56638639323/secrets/kol_ftp_bubble_password"
       FTP_DIRECTORY = terraform.workspace == "prd" ? "/production" : "/development"
-      BUBBLE_API_URL = terraform.workspace == "prd" ? "https://member.kol-bi.jp/version-test/api/1.1/wf/import_schedule" : "https://temp-toreyomi-20260113.bubbleapps.io/version-test/api/1.1/wf/import_schedule"
+      BUBBLE_API_URL = terraform.workspace == "prd" ? "https://member.kol-bi.jp/version-test/api/1.1/wf/import_schedule" : "https://temp-toreyomi-20260115.bubbleapps.io/version-test/api/1.1/wf/import_schedule"
       BUBBLE_API_KEY_SECRET_ID = "projects/56638639323/secrets/kol_bubble_workflow_api_key"
       CSV_BASE_URL = "https://kol-bi.jp/umasiri.dev"
     }
@@ -168,7 +168,7 @@ resource "google_cloudfunctions2_function" "export_race_uma_details" {
       SECRET_USER = "projects/56638639323/secrets/kol_ftp_bubble_username"
       SECRET_PASS = "projects/56638639323/secrets/kol_ftp_bubble_password"
       FTP_DIRECTORY = terraform.workspace == "prd" ? "/production" : "/development"
-      BUBBLE_API_URL = terraform.workspace == "prd" ? "https://member.kol-bi.jp/version-test/api/1.1/wf/import_race_uma_detail" : "https://temp-toreyomi-20260113.bubbleapps.io/version-test/api/1.1/wf/import_race_uma_detail"
+      BUBBLE_API_URL = terraform.workspace == "prd" ? "https://member.kol-bi.jp/version-test/api/1.1/wf/import_race_uma_detail" : "https://temp-toreyomi-20260115.bubbleapps.io/version-test/api/1.1/wf/import_race_uma_detail"
       BUBBLE_API_KEY_SECRET_ID = "projects/56638639323/secrets/kol_bubble_workflow_api_key"
       CSV_BASE_URL = "https://kol-bi.jp/umasiri.dev"
     }
@@ -241,7 +241,7 @@ resource "google_cloudfunctions2_function" "export_races" {
       SECRET_USER = "projects/56638639323/secrets/kol_ftp_bubble_username"
       SECRET_PASS = "projects/56638639323/secrets/kol_ftp_bubble_password"
       FTP_DIRECTORY = terraform.workspace == "prd" ? "/production" : "/development"
-      BUBBLE_API_URL = terraform.workspace == "prd" ? "https://member.kol-bi.jp/version-test/api/1.1/wf/import_race" : "https://temp-toreyomi-20260113.bubbleapps.io/version-test/api/1.1/wf/import_race"
+      BUBBLE_API_URL = terraform.workspace == "prd" ? "https://member.kol-bi.jp/version-test/api/1.1/wf/import_race" : "https://temp-toreyomi-20260115.bubbleapps.io/version-test/api/1.1/wf/import_race"
       BUBBLE_API_KEY_SECRET_ID = "projects/56638639323/secrets/kol_bubble_workflow_api_key"
       CSV_BASE_URL = "https://kol-bi.jp/umasiri.dev"
     }
