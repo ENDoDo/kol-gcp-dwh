@@ -1020,8 +1020,14 @@ SELECT
     ELSE SAFE_CAST(z.chokyo_den_oikiri_7f_d2 AS FLOAT64)
   END AS chokyo_den_oikiri_7f_float,
 
-  z.chokyo_den_oikiri_6f_d2 AS chokyo_den_oikiri_6f,
-  SAFE_CAST(z.chokyo_den_oikiri_6f_d2 AS FLOAT64) AS chokyo_den_oikiri_6f_float,
+  CASE
+    WHEN z.chokyo_den_oikiri_basho = 'プール' OR z.chokyo_den_oikiri_course = '坂' THEN NULL
+    ELSE z.chokyo_den_oikiri_6f_d2
+  END AS chokyo_den_oikiri_6f,
+  CASE
+    WHEN z.chokyo_den_oikiri_basho = 'プール' OR z.chokyo_den_oikiri_course = '坂' THEN NULL
+    ELSE SAFE_CAST(z.chokyo_den_oikiri_6f_d2 AS FLOAT64)
+  END AS chokyo_den_oikiri_6f_float,
 
   CASE
     WHEN z.chokyo_den_oikiri_basho = 'プール' OR z.chokyo_den_oikiri_course = '坂' THEN NULL
