@@ -1568,8 +1568,16 @@ SELECT
   CASE WHEN z.chokyo_den_chokyo1_basho = 'プール' THEN NULL ELSE z.chokyo_den_chokyo1_5f END AS chokyo_den_chokyo1_5f,
   CASE WHEN z.chokyo_den_chokyo1_basho = 'プール' THEN NULL ELSE SAFE_CAST(z.chokyo_den_chokyo1_5f AS FLOAT64) END AS chokyo_den_chokyo1_5f_float,
 
-  CASE WHEN z.chokyo_den_chokyo1_basho = 'プール' THEN NULL ELSE z.chokyo_den_chokyo1_4f END AS chokyo_den_chokyo1_4f,
-  CASE WHEN z.chokyo_den_chokyo1_basho = 'プール' THEN NULL ELSE SAFE_CAST(z.chokyo_den_chokyo1_4f AS FLOAT64) END AS chokyo_den_chokyo1_4f_float,
+  CASE
+    WHEN z.chokyo_den_chokyo1_course = '坂' THEN z.chokyo_den_chokyo1_5f
+    WHEN z.chokyo_den_chokyo1_basho = 'プール' THEN NULL
+    ELSE z.chokyo_den_chokyo1_4f
+  END AS chokyo_den_chokyo1_4f,
+  CASE
+    WHEN z.chokyo_den_chokyo1_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo1_5f AS FLOAT64)
+    WHEN z.chokyo_den_chokyo1_basho = 'プール' THEN NULL
+    ELSE SAFE_CAST(z.chokyo_den_chokyo1_4f AS FLOAT64)
+  END AS chokyo_den_chokyo1_4f_float,
 
   CASE
     WHEN z.chokyo_den_chokyo1_course = '坂' THEN z.chokyo_den_chokyo1_4f
@@ -1585,8 +1593,7 @@ SELECT
   ROUND(
     CASE
       WHEN z.chokyo_den_chokyo1_basho = 'プール' THEN NULL
-      WHEN z.chokyo_den_chokyo1_course = '坂' THEN
-        SAFE_CAST(z.chokyo_den_chokyo1_4f AS FLOAT64) - (SAFE_CAST(z.chokyo_den_chokyo1_5f AS FLOAT64) - SAFE_CAST(z.chokyo_den_chokyo1_4f AS FLOAT64))
+      WHEN z.chokyo_den_chokyo1_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo1_3f AS FLOAT64)
       ELSE SAFE_CAST(z.chokyo_den_chokyo1_3f AS FLOAT64) - (SAFE_CAST(z.chokyo_den_chokyo1_4f AS FLOAT64) - SAFE_CAST(z.chokyo_den_chokyo1_3f AS FLOAT64))
     END, 1
   ) AS chokyo_den_chokyo1_2f_float,
