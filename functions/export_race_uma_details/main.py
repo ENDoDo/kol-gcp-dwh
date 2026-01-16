@@ -265,7 +265,7 @@ def export_race_uma_details(request):
                         logger.error(f"Bubble APIへの通知に失敗しました ({filename}): {e}")
                         # 続行する
                 else:
-                    if i == 0: # ログ過多防止のため初回のみログ出力
+                    if current_part_num == 1: # ログ過多防止のため初回のみログ出力
                          logger.info("Bubble API設定がされていないため、通知をスキップします。")
             except Exception as e:
                 logger.error(f"FTPアップロードエラー: {filename}, {e}")
