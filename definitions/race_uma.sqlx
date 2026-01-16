@@ -1069,7 +1069,10 @@ SELECT
     END, 1
   ) AS chokyo_den_oikiri_2f_float,
 
-  z.chokyo_den_oikiri_1f_d2 AS chokyo_den_oikiri_1f,
+  CASE
+    WHEN z.chokyo_den_oikiri_basho = 'プール' THEN NULL
+    ELSE z.chokyo_den_oikiri_1f_d2
+  END AS chokyo_den_oikiri_1f,
   CASE
     WHEN z.chokyo_den_oikiri_basho = 'プール' THEN NULL
     ELSE SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64)
@@ -1325,8 +1328,14 @@ SELECT
     ELSE SAFE_CAST(z.chokyo_sei_7f AS FLOAT64)
   END AS chokyo_sei_7f_float,
 
-  z.chokyo_sei_6f AS chokyo_sei_6f,
-  SAFE_CAST(z.chokyo_sei_6f AS FLOAT64) AS chokyo_sei_6f_float,
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
+    ELSE z.chokyo_sei_6f
+  END AS chokyo_sei_6f,
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
+    ELSE SAFE_CAST(z.chokyo_sei_6f AS FLOAT64)
+  END AS chokyo_sei_6f_float,
 
   CASE
     WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
@@ -1368,7 +1377,10 @@ SELECT
     END, 1
   ) AS chokyo_sei_2f_float,
 
-  z.chokyo_sei_1f AS chokyo_sei_1f,
+  CASE
+    WHEN z.chokyo_sei_basho = 'プール' THEN NULL
+    ELSE z.chokyo_sei_1f
+  END AS chokyo_sei_1f,
   CASE
     WHEN z.chokyo_sei_basho = 'プール' THEN NULL
     ELSE SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)
@@ -1598,7 +1610,10 @@ SELECT
     END, 1
   ) AS chokyo_den_chokyo1_2f_float,
 
-  z.chokyo_den_chokyo1_1f,
+  CASE
+    WHEN z.chokyo_den_chokyo1_basho = 'プール' THEN NULL
+    ELSE z.chokyo_den_chokyo1_1f
+  END AS chokyo_den_chokyo1_1f,
   CASE WHEN z.chokyo_den_chokyo1_basho = 'プール' THEN NULL ELSE SAFE_CAST(z.chokyo_den_chokyo1_1f AS FLOAT64) END AS chokyo_den_chokyo1_1f_float,
 
   z.chokyo_den_chokyo1_ichidori,
@@ -1689,7 +1704,10 @@ SELECT
     END, 1
   ) AS chokyo_den_chokyo2_2f_float,
 
-  z.chokyo_den_chokyo2_1f,
+  CASE
+    WHEN z.chokyo_den_chokyo2_basho = 'プール' THEN NULL
+    ELSE z.chokyo_den_chokyo2_1f
+  END AS chokyo_den_chokyo2_1f,
   CASE WHEN z.chokyo_den_chokyo2_basho = 'プール' THEN NULL ELSE SAFE_CAST(z.chokyo_den_chokyo2_1f AS FLOAT64) END AS chokyo_den_chokyo2_1f_float,
 
   z.chokyo_den_chokyo2_ichidori,
@@ -1780,7 +1798,10 @@ SELECT
     END, 1
   ) AS chokyo_den_chokyo3_2f_float,
 
-  z.chokyo_den_chokyo3_1f,
+  CASE
+    WHEN z.chokyo_den_chokyo3_basho = 'プール' THEN NULL
+    ELSE z.chokyo_den_chokyo3_1f
+  END AS chokyo_den_chokyo3_1f,
   CASE WHEN z.chokyo_den_chokyo3_basho = 'プール' THEN NULL ELSE SAFE_CAST(z.chokyo_den_chokyo3_1f AS FLOAT64) END AS chokyo_den_chokyo3_1f_float,
 
   z.chokyo_den_chokyo3_ichidori,
