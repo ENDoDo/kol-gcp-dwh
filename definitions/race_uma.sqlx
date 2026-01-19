@@ -1151,10 +1151,10 @@ SELECT
         THEN 'B3:2F11秒台減速ラップ'
 
         -- A2: 終い2F各12秒台の加速ラップ
-        -- 12.0 <= 1F < 13.0 AND 12.0 <= 2F_Lap < 13.0 AND 1F <= 2F_Lap
+        -- 12.0 <= 1F < 13.0 AND 12.0 <= 2F_Lap < 13.0 AND 1F < 2F_Lap
         WHEN (SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) >= 12.0 AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) < 13.0)
              AND (ROUND(SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 9) >= 12.0 AND ROUND(SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 9) < 13.0)
-             AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) <= ROUND(SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 9)
+             AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) < ROUND(SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 9)
         THEN 'A2:終い2F各12秒台の加速ラップ'
 
         -- B2: 終い2F各12秒台の減速ラップ
@@ -1165,9 +1165,9 @@ SELECT
         THEN 'B2:終い2F各12秒台の減速ラップ'
 
         -- A1: 終い1Fのみ12秒台の加速ラップ (1F < 2F_Lap)
-        -- 12.0 <= 1F < 13.0 AND 1F < 2F_Lap
+        -- 12.0 <= 1F < 13.0 AND 2F_Lap >= 13.0
         WHEN (SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) >= 12.0 AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) < 13.0)
-             AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) < (SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64))
+             AND ROUND(SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 9) >= 13.0
         THEN 'A1:終い1Fのみ12秒台の加速ラップ'
 
         -- B1: 2Fのみ12秒台の減速ラップ (1Fは13.0以上)
@@ -1468,23 +1468,27 @@ SELECT
         THEN 'B3:2F11秒台減速ラップ'
 
         -- A2: 終い2F各12秒台の加速ラップ
+        -- 12.0 <= 1F < 13.0 AND 12.0 <= 2F_Lap < 13.0 AND 1F < 2F_Lap
         WHEN (SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 12.0 AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < 13.0)
              AND (ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9) >= 12.0 AND ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9) < 13.0)
-             AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) <= ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9)
+             AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9)
         THEN 'A2:終い2F各12秒台の加速ラップ'
 
         -- B2: 終い2F各12秒台の減速ラップ
+        -- 12.0 <= 1F < 13.0 AND 12.0 <= 2F_Lap < 13.0 AND 1F > 2F_Lap
         WHEN (SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 12.0 AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < 13.0)
              AND (ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9) >= 12.0 AND ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9) < 13.0)
              AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) > ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9)
         THEN 'B2:終い2F各12秒台の減速ラップ'
 
-        -- A1: 終い1Fのみ12秒台の加速ラップ
+        -- A1: 終い1Fのみ12秒台の加速ラップ (1F < 2F_Lap)
+        -- 12.0 <= 1F < 13.0 AND 2F_Lap >= 13.0
         WHEN (SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 12.0 AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < 13.0)
-             AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < (SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64))
+             AND ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9) >= 13.0
         THEN 'A1:終い1Fのみ12秒台の加速ラップ'
 
         -- B1: 2Fのみ12秒台の減速ラップ
+        -- 12.0 <= 2F_Lap < 13.0 AND 1F >= 13.0
         WHEN ((SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)) >= 12.0 AND (SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)) < 13.0)
              AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 13.0
         THEN 'B1:2Fのみ12秒台の減速ラップ'
