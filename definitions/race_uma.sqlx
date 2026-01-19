@@ -1138,10 +1138,10 @@ SELECT
              AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) < 13.0
         THEN 'C1:2F1F同タイム'
 
-        -- A3: 終い1F 11秒台の加速ラップ (加速 or 等速)
-        -- 1F < 12.0 AND 1F <= 2F_Lap
+        -- A3: 終い1F 11秒台の加速ラップ
+        -- 1F < 12.0 AND 1F < 2F_Lap
         WHEN SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) < 12.0
-             AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) <= (SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64))
+             AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) < (SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64))
         THEN 'A3:終い1F11秒台の加速ラップ'
 
         -- B3: 2F 11秒台減速ラップ
@@ -1457,9 +1457,9 @@ SELECT
              AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < 13.0
         THEN 'C1:2F1F同タイム'
 
-        -- A3: 終い1F 11秒台の加速ラップ (加速 or 等速)
+        -- A3: 終い1F 11秒台の加速ラップ
         WHEN SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < 12.0
-             AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) <= (SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64))
+             AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < (SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64))
         THEN 'A3:終い1F11秒台の加速ラップ'
 
         -- B3: 2F 11秒台減速ラップ
