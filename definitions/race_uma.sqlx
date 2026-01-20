@@ -1365,14 +1365,14 @@ SELECT
   pl.kyoso_joken_kubun_label AS chokyo_den_awase_uma_class,
 
   CASE
-    WHEN z.kyoso_joken_rank_int > pl.kyoso_joken_rank_int THEN '格上'
-    WHEN z.kyoso_joken_rank_int < pl.kyoso_joken_rank_int THEN '格下'
-    WHEN z.kyoso_joken_rank_int = pl.kyoso_joken_rank_int AND z.kyoso_joken_rank_int > 0 THEN '同格'
+    WHEN pl.kyoso_joken_rank_int > z.kyoso_joken_rank_int THEN '格上'
+    WHEN pl.kyoso_joken_rank_int < z.kyoso_joken_rank_int THEN '格下'
+    WHEN pl.kyoso_joken_rank_int = z.kyoso_joken_rank_int AND z.kyoso_joken_rank_int > 0 THEN '同格'
     ELSE NULL
   END AS chokyo_den_awase_uma_kaku_kubun,
 
   CASE
-    WHEN z.kyoso_joken_rank_int > pl.kyoso_joken_rank_int AND z.chokyo_den_oikiri_awase LIKE '%先着%' THEN 'はい'
+    WHEN pl.kyoso_joken_rank_int > z.kyoso_joken_rank_int AND z.chokyo_den_oikiri_awase LIKE '%先着%' THEN 'はい'
     ELSE NULL
   END AS chokyo_den_awase_uma_kakuue_win_flag,
 
