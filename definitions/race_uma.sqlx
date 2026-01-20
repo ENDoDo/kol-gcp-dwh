@@ -110,6 +110,24 @@ config {
     chokyo_den_oikiri_ashiiro_label: "調教脚色(ラベル)",
     chokyo_den_oikiri_yajirushi: "調教矢印",
     chokyo_den_oikiri_yajirushi_label: "調教矢印(ラベル)",
+    chokyo_den_ichidori_furi_win_flag: "併せ馬が存在し、かつchokyo_ichidoriが6～9(大外周り)かつ併せ先着の場合「はい」該当しない場合はnull",
+    chokyo_den_awase_uma_bamei: "出馬表出走馬データ 調教併せ 馬名",
+    chokyo_den_awase_uma_race_code_uma_kol: "出馬表出走馬データ 調教併せ馬 併せ当時のKOL仕様馬毎レースID",
+    chokyo_den_awase_uma_race_code_kol: "出馬表出走馬データ 調教併せ馬 併せ当時のKOL仕様レースID",
+    chokyo_den_awase_uma_class: "出馬表出走馬データ 調教併せ馬 併せ当時のkyoso_joken_kubun_labelをもとに対応",
+    chokyo_den_awase_uma_kaku_kubun: "出馬表出走馬データ 調教併せ馬 併せ当時の馬のクラスとの比較区分 格上/同格/格下",
+    chokyo_den_awase_uma_kakuue_win_flag: "出馬表出走馬データ 調教併せ馬 格上に対して先着した場合は「はい」該当しない場合はnull",
+    chokyo_den_awase_time_sa_float: "出馬表出走馬データ 調教併せのテキストからタイム差を抽出(「秒」は除く)",
+    chokyo_den_awase_kubun: "出馬表出走馬データ 調教併せ区分",
+    chokyo_den_awase_flag: "出馬表出走馬データ 調教併せフラグ",
+    chokyo_den_awase_flag_label: "出馬表出走馬データ chokyo_awase_flagをもとに対応 調教2の併せ/調教3の併せ",
+    chokyo_den_tanpyo: "出馬表出走馬データ ブックによる調教短評",
+    chokyo_den_honsu_course: "出馬表出走馬データ 前走からの調教本数でコース追いの本数",
+    chokyo_den_honsu_course_num: "出馬表出走馬データ 前走からの調教本数でコース追いの本数 整数型",
+    chokyo_den_honsu_hanro: "出馬表出走馬データ 前走からの調教本数で坂路追いの本数",
+    chokyo_den_honsu_hanro_num: "出馬表出走馬データ 前走からの調教本数で坂路追いの本数 整数型",
+    chokyo_den_honsu_pool: "出馬表出走馬データ 前走からの調教本数でプール追いの本数",
+    chokyo_den_honsu_pool_num: "出馬表出走馬データ 前走からの調教本数でプール追いの本数 整数型",
     chokyo_den_oikiri_reigai: "調教例外",
     // 調教1
     chokyo_den_chokyo1_flag: "調教1 調教フラグ",
@@ -662,6 +680,25 @@ WITH
       k.ketto5_mf_hanshoku_toroku_bango,
       k.ketto5_mf_bamei,
       d1.kyoso_joken_kubun,
+      CASE d1.kyoso_joken_kubun
+        WHEN '00001' THEN '新馬'
+        WHEN '00002' THEN '未出走'
+        WHEN '00003' THEN '未勝利'
+        WHEN '00004' THEN 'オープン'
+        WHEN '05000' THEN '1勝クラス'
+        WHEN '10000' THEN '2勝クラス'
+        WHEN '16000' THEN '3勝クラス'
+        ELSE NULL
+      END AS kyoso_joken_kubun_label,
+      CASE
+        WHEN d1.kyoso_joken_kubun IN ('00001', '00002') THEN 1
+        WHEN d1.kyoso_joken_kubun = '00003' THEN 2
+        WHEN d1.kyoso_joken_kubun = '05000' THEN 3
+        WHEN d1.kyoso_joken_kubun = '10000' THEN 4
+        WHEN d1.kyoso_joken_kubun = '16000' THEN 5
+        WHEN d1.kyoso_joken_kubun = '00004' THEN 6
+        ELSE 0
+      END AS kyoso_joken_rank_int,
       SAFE_CAST(d1.kyori AS INT64) AS kyori,
       CASE
         WHEN SAFE_CAST(d1.kyori AS INT64) <= 1399 THEN '短距離'
@@ -745,7 +782,34 @@ WITH
       z.race_code_uma_kol,
       p.race_code_uma_kol AS race_code_uma_kol_partner,
       SUBSTR(p.race_code_uma_kol, 1, 16) AS race_code_kol_partner,
-      d1.kyoso_joken_kubun
+      d1.kyoso_joken_kubun,
+      s2.kakutei_chakujun AS partner_last_race_chakujun,
+      CASE d1.kyoso_joken_kubun
+        WHEN '00001' THEN '新馬'
+        WHEN '00002' THEN '未出走'
+        WHEN '00003' THEN '未勝利'
+        WHEN '00004' THEN 'オープン'
+        WHEN '05000' THEN '1勝クラス'
+        WHEN '10000' THEN '2勝クラス'
+        WHEN '16000' THEN '3勝クラス'
+        ELSE NULL
+      END AS kyoso_joken_kubun_label,
+      CASE
+        WHEN s2.kakutei_chakujun = '01' AND d1.kyoso_joken_kubun IN ('00001', '00002') THEN 3 -- 新馬/未出走 優勝 -> 1勝クラス(3)
+        WHEN s2.kakutei_chakujun = '01' AND d1.kyoso_joken_kubun = '00003' THEN 3 -- 未勝利 優勝 -> 1勝クラス(3)
+        WHEN s2.kakutei_chakujun = '01' AND d1.kyoso_joken_kubun = '05000' THEN 4 -- 1勝クラス 優勝 -> 2勝クラス(4)
+        WHEN s2.kakutei_chakujun = '01' AND d1.kyoso_joken_kubun = '10000' THEN 5 -- 2勝クラス 優勝 -> 3勝クラス(5)
+        WHEN s2.kakutei_chakujun = '01' AND d1.kyoso_joken_kubun = '16000' THEN 6 -- 3勝クラス 優勝 -> オープン(6)
+
+        -- 勝っていない、またはオープン馬の場合
+        WHEN d1.kyoso_joken_kubun IN ('00001', '00002') THEN 1
+        WHEN d1.kyoso_joken_kubun = '00003' THEN 2
+        WHEN d1.kyoso_joken_kubun = '05000' THEN 3
+        WHEN d1.kyoso_joken_kubun = '10000' THEN 4
+        WHEN d1.kyoso_joken_kubun = '16000' THEN 5
+        WHEN d1.kyoso_joken_kubun = '00004' THEN 6
+        ELSE 0
+      END AS kyoso_joken_rank_int
     FROM
       with_zensou_data AS z
     INNER JOIN
@@ -754,6 +818,9 @@ WITH
     LEFT JOIN
       ${ref("kol_den1")} AS d1
       ON SUBSTR(p.race_code_uma_kol, 1, 16) = d1.race_code_kol
+    LEFT JOIN
+      ${ref("kol_sei2")} AS s2
+      ON p.race_code_uma_kol = s2.race_code_uma_kol
     WHERE
       z.chokyo_den_oikiri_awase_uma_bamei IS NOT NULL AND z.chokyo_den_oikiri_awase_uma_bamei != ''
       AND p.kaisai_nengappi < z.kaisai_nengappi
@@ -1281,6 +1348,57 @@ SELECT
     ELSE NULL
   END AS chokyo_den_oikiri_yajirushi_label,
   z.chokyo_den_oikiri_reigai,
+
+  CASE
+     WHEN z.chokyo_den_oikiri_awase IS NOT NULL AND z.chokyo_den_oikiri_awase != ''
+          AND z.chokyo_den_oikiri_ichidori IN ('6','7','8','9')
+          AND z.chokyo_den_oikiri_awase LIKE '%先着%'
+     THEN 'はい'
+     ELSE NULL
+  END AS chokyo_den_ichidori_furi_win_flag,
+
+  z.chokyo_den_oikiri_awase_uma_bamei AS chokyo_den_awase_uma_bamei,
+  pl.race_code_uma_kol_partner AS chokyo_den_awase_uma_race_code_uma_kol,
+  pl.race_code_kol_partner AS chokyo_den_awase_uma_race_code_kol,
+  pl.kyoso_joken_kubun_label AS chokyo_den_awase_uma_class,
+
+  CASE
+    WHEN z.kyoso_joken_rank_int > pl.kyoso_joken_rank_int THEN '格上'
+    WHEN z.kyoso_joken_rank_int < pl.kyoso_joken_rank_int THEN '格下'
+    WHEN z.kyoso_joken_rank_int = pl.kyoso_joken_rank_int AND z.kyoso_joken_rank_int > 0 THEN '同格'
+    ELSE NULL
+  END AS chokyo_den_awase_uma_kaku_kubun,
+
+  CASE
+    WHEN z.kyoso_joken_rank_int > pl.kyoso_joken_rank_int AND z.chokyo_den_oikiri_awase LIKE '%先着%' THEN 'はい'
+    ELSE NULL
+  END AS chokyo_den_awase_uma_kakuue_win_flag,
+
+  REGEXP_EXTRACT(z.chokyo_den_oikiri_awase, r'([\d\.]+)秒') AS chokyo_den_awase_time_sa_float,
+
+  CASE
+    WHEN z.chokyo_den_oikiri_awase LIKE '%同入%' THEN '併せ同入'
+    WHEN z.chokyo_den_oikiri_awase LIKE '%遅れ%' THEN '併せ遅れ'
+    WHEN z.chokyo_den_oikiri_awase LIKE '%先着%' THEN '併せ先着'
+    WHEN z.chokyo_den_oikiri_awase LIKE '%単走%' THEN '単走'
+    ELSE NULL
+  END AS chokyo_den_awase_kubun,
+
+  z.chokyo_den_oikiri_awase_flag AS chokyo_den_awase_flag,
+  CASE
+     WHEN z.chokyo_den_oikiri_awase_flag = '2' THEN '調教2の併せ'
+     WHEN z.chokyo_den_oikiri_awase_flag = '3' THEN '調教3の併せ'
+     ELSE NULL
+  END AS chokyo_den_awase_flag_label,
+
+  z.chokyo_den_oikiri_tanpyo AS chokyo_den_tanpyo,
+
+  z.chokyo_den_oikiri_honsu_course AS chokyo_den_honsu_course,
+  SAFE_CAST(z.chokyo_den_oikiri_honsu_course AS INT64) AS chokyo_den_honsu_course_num,
+  z.chokyo_den_oikiri_honsu_hanro AS chokyo_den_honsu_hanro,
+  SAFE_CAST(z.chokyo_den_oikiri_honsu_hanro AS INT64) AS chokyo_den_honsu_hanro_num,
+  z.chokyo_den_oikiri_honsu_pool AS chokyo_den_honsu_pool,
+  SAFE_CAST(z.chokyo_den_oikiri_honsu_pool AS INT64) AS chokyo_den_honsu_pool_num,
 
   -- 調教 (sei2由来) -------------------------------------------------------------
   z.chokyo_sei_flag,
