@@ -823,7 +823,9 @@ WITH
       ON p.race_code_uma_kol = s2.race_code_uma_kol
     WHERE
       z.chokyo_den_oikiri_awase_uma_bamei IS NOT NULL AND z.chokyo_den_oikiri_awase_uma_bamei != ''
-      AND p.kaisai_nengappi < z.kaisai_nengappi
+      -- 併せ当時のクラスを取得するため、調教日(chokyo_den_oikiri_nengappi)より前のレースを参照する
+      -- 調教日が取得できない場合は、発走日(kaisai_nengappi)を代用する
+      AND p.kaisai_nengappi < COALESCE(z.chokyo_den_oikiri_nengappi, z.kaisai_nengappi)
     QUALIFY
       ROW_NUMBER() OVER (PARTITION BY z.race_code_uma_kol ORDER BY p.kaisai_nengappi DESC) = 1
   ),
