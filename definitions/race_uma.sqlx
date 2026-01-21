@@ -1072,60 +1072,32 @@ SELECT
     ELSE NULL
   END AS chokyo_den_oikiri_hanro_pool_kaisu_int,
 
-  CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' OR z.chokyo_den_oikiri_course = '坂' THEN NULL
-    ELSE z.chokyo_den_oikiri_8f_d2
-  END AS chokyo_den_oikiri_8f,
-  CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' OR z.chokyo_den_oikiri_course = '坂' THEN NULL
-    ELSE SAFE_CAST(z.chokyo_den_oikiri_8f_d2 AS FLOAT64)
-  END AS chokyo_den_oikiri_8f_float,
+  z.chokyo_den_oikiri_8f_d2 AS chokyo_den_oikiri_8f,
+  SAFE_CAST(z.chokyo_den_oikiri_8f_d2 AS FLOAT64) AS chokyo_den_oikiri_8f_float,
+
+  z.chokyo_den_oikiri_7f_d2 AS chokyo_den_oikiri_7f,
+  SAFE_CAST(z.chokyo_den_oikiri_7f_d2 AS FLOAT64) AS chokyo_den_oikiri_7f_float,
+
+  z.chokyo_den_oikiri_6f_d2 AS chokyo_den_oikiri_6f,
+  SAFE_CAST(z.chokyo_den_oikiri_6f_d2 AS FLOAT64) AS chokyo_den_oikiri_6f_float,
+
+  z.chokyo_den_oikiri_5f_d2 AS chokyo_den_oikiri_5f,
+  SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) AS chokyo_den_oikiri_5f_float,
 
   CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' OR z.chokyo_den_oikiri_course = '坂' THEN NULL
-    ELSE z.chokyo_den_oikiri_7f_d2
-  END AS chokyo_den_oikiri_7f,
-  CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' OR z.chokyo_den_oikiri_course = '坂' THEN NULL
-    ELSE SAFE_CAST(z.chokyo_den_oikiri_7f_d2 AS FLOAT64)
-  END AS chokyo_den_oikiri_7f_float,
-
-  CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' OR z.chokyo_den_oikiri_course = '坂' THEN NULL
-    ELSE z.chokyo_den_oikiri_6f_d2
-  END AS chokyo_den_oikiri_6f,
-  CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' OR z.chokyo_den_oikiri_course = '坂' THEN NULL
-    ELSE SAFE_CAST(z.chokyo_den_oikiri_6f_d2 AS FLOAT64)
-  END AS chokyo_den_oikiri_6f_float,
-
-  CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' OR z.chokyo_den_oikiri_course = '坂' THEN NULL
-    ELSE z.chokyo_den_oikiri_5f_d2
-  END AS chokyo_den_oikiri_5f,
-  CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' OR z.chokyo_den_oikiri_course = '坂' THEN NULL
-    ELSE SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64)
-  END AS chokyo_den_oikiri_5f_float,
-
-  CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' THEN NULL
     WHEN z.chokyo_den_oikiri_course = '坂' THEN z.chokyo_den_oikiri_5f_d2 -- 坂路は5Fを4Fとして使用
     ELSE z.chokyo_den_oikiri_4f_d2
   END AS chokyo_den_oikiri_4f,
   CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' THEN NULL
     WHEN z.chokyo_den_oikiri_course = '坂' THEN SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64)
     ELSE SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64)
   END AS chokyo_den_oikiri_4f_float,
 
   CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' THEN NULL
     WHEN z.chokyo_den_oikiri_course = '坂' THEN z.chokyo_den_oikiri_4f_d2 -- 坂路は4Fを3Fとして使用
     ELSE z.chokyo_den_oikiri_3f_d2
   END AS chokyo_den_oikiri_3f,
   CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' THEN NULL
     WHEN z.chokyo_den_oikiri_course = '坂' THEN SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64)
     ELSE SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64)
   END AS chokyo_den_oikiri_3f_float,
@@ -1134,58 +1106,34 @@ SELECT
     CASE
       WHEN z.chokyo_den_oikiri_basho = 'プール' THEN NULL
       WHEN z.chokyo_den_oikiri_course = '坂' THEN SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) -- 坂路は3Fを使用(実質2F)
-      -- それ以外の場合: 3F - (4F - 3F)
-      ELSE SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - (SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64))
+      -- それ以外の場合: 3F - 1F
+      ELSE SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64)
     END, 1
   ) AS chokyo_den_oikiri_2f_float,
 
-  CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' THEN NULL
-    ELSE z.chokyo_den_oikiri_1f_d2
-  END AS chokyo_den_oikiri_1f,
-  CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' THEN NULL
-    ELSE SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64)
-  END AS chokyo_den_oikiri_1f_float,
+  z.chokyo_den_oikiri_1f_d2 AS chokyo_den_oikiri_1f,
+  SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) AS chokyo_den_oikiri_1f_float,
 
+  ROUND(SAFE_CAST(z.chokyo_den_oikiri_8f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_7f_d2 AS FLOAT64), 1) AS chokyo_den_oikiri_lap_8f,
+  ROUND(SAFE_CAST(z.chokyo_den_oikiri_7f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_6f_d2 AS FLOAT64), 1) AS chokyo_den_oikiri_lap_7f,
+  ROUND(SAFE_CAST(z.chokyo_den_oikiri_6f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64), 1) AS chokyo_den_oikiri_lap_6f,
   CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' OR z.chokyo_den_oikiri_course = '坂' THEN NULL
-    ELSE ROUND(SAFE_CAST(z.chokyo_den_oikiri_8f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_7f_d2 AS FLOAT64), 1)
-  END AS chokyo_den_oikiri_lap_8f,
-  CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' OR z.chokyo_den_oikiri_course = '坂' THEN NULL
-    ELSE ROUND(SAFE_CAST(z.chokyo_den_oikiri_7f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_6f_d2 AS FLOAT64), 1)
-  END AS chokyo_den_oikiri_lap_7f,
-  CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' OR z.chokyo_den_oikiri_course = '坂' THEN NULL
-    ELSE ROUND(SAFE_CAST(z.chokyo_den_oikiri_6f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64), 1)
-  END AS chokyo_den_oikiri_lap_6f,
-  CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' OR z.chokyo_den_oikiri_course = '坂' THEN NULL
+    WHEN z.chokyo_den_oikiri_course = '坂' THEN NULL
     ELSE ROUND(SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64), 1)
   END AS chokyo_den_oikiri_lap_5f,
   CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' THEN NULL
     WHEN z.chokyo_den_oikiri_course = '坂' THEN ROUND(SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64), 1)
     ELSE ROUND(SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64), 1)
   END AS chokyo_den_oikiri_lap_4f,
   CASE
     WHEN z.chokyo_den_oikiri_basho = 'プール' THEN NULL
     WHEN z.chokyo_den_oikiri_course = '坂' THEN ROUND(SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64), 1)
-    ELSE
-      -- 3F - 2F(推定)
-      ROUND(SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - (
-        SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64)
-      ), 1)
+    ELSE SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64)
   END AS chokyo_den_oikiri_lap_3f,
   CASE
     WHEN z.chokyo_den_oikiri_basho = 'プール' THEN NULL
     WHEN z.chokyo_den_oikiri_course = '坂' THEN ROUND(SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 1)
-    ELSE
-      -- 2F(推定) - 1F
-      ROUND(
-        (SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - (SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64)))
-        - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 1)
+    ELSE ROUND((SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64)) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 1)
   END AS chokyo_den_oikiri_lap_2f,
 
   CASE
@@ -1211,13 +1159,13 @@ SELECT
         -- A3: 終い1F 11秒台の加速ラップ
         -- 1F < 12.0 AND 1F < 2F_Lap
         WHEN SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) < 12.0
-             AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) < (SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64))
+             AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) < ROUND(SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 9)
         THEN 'A3:終い1F11秒台の加速ラップ'
 
         -- B3: 2F 11秒台減速ラップ
         -- 2F_Lap < 12.0 AND 1F > 2F_Lap
-        WHEN (SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64)) < 12.0
-             AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) > (SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64))
+        WHEN ROUND(SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 9) < 12.0
+             AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) > ROUND(SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 9)
         THEN 'B3:2F11秒台減速ラップ'
 
         -- A2: 終い2F各12秒台の加速ラップ
@@ -1242,7 +1190,7 @@ SELECT
 
         -- B1: 2Fのみ12秒台の減速ラップ (1Fは13.0以上)
         -- 12.0 <= 2F_Lap < 13.0 AND 1F >= 13.0
-        WHEN ((SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64)) >= 12.0 AND (SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64)) < 13.0)
+        WHEN (ROUND(SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 9) >= 12.0 AND ROUND(SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 9) < 13.0)
              AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) >= 13.0
         THEN 'B1:2Fのみ12秒台の減速ラップ'
 
