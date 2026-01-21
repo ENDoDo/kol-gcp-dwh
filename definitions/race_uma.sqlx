@@ -1529,12 +1529,12 @@ SELECT
 
         -- A3: 終い1F 11秒台の加速ラップ
         WHEN SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < 12.0
-             AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < (SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64))
+             AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9)
         THEN 'A3:終い1F11秒台の加速ラップ'
 
         -- B3: 2F 11秒台減速ラップ
-        WHEN (SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)) < 12.0
-             AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) > (SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64))
+        WHEN ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9) < 12.0
+             AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) > ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9)
         THEN 'B3:2F11秒台減速ラップ'
 
         -- A2: 終い2F各12秒台の加速ラップ
@@ -1559,7 +1559,7 @@ SELECT
 
         -- B1: 2Fのみ12秒台の減速ラップ
         -- 12.0 <= 2F_Lap < 13.0 AND 1F >= 13.0
-        WHEN ((SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)) >= 12.0 AND (SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)) < 13.0)
+        WHEN (ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9) >= 12.0 AND ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 9) < 13.0)
              AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 13.0
         THEN 'B1:2Fのみ12秒台の減速ラップ'
 
