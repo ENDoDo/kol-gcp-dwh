@@ -1135,19 +1135,19 @@ SELECT
         -- C3: 2F1F同タイム (< 12.0)
         WHEN ROUND(SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 1) = ROUND((SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64)), 1)
              AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) < 12.0
-        THEN 'C3:2F1F同タイム'
+        THEN 'C3:終い2F1F11秒台の同タイム'
 
         -- C2: 2F1F同タイム (12.0 <= 1F < 12.5)
         WHEN ROUND(SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 1) = ROUND((SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64)), 1)
              AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) >= 12.0
              AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) < 12.5
-        THEN 'C2:2F1F同タイム'
+        THEN 'C2:終い2F1F12秒台前半の同タイム'
 
         -- C1: 2F1F同タイム (12.5 <= 1F < 13.0)
         WHEN ROUND(SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 1) = ROUND((SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64)), 1)
              AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) >= 12.5
              AND SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) < 13.0
-        THEN 'C1:2F1F同タイム'
+        THEN 'C1:終い2F1F12秒台後半の同タイム'
 
         -- A3: 終い1F 11秒台の加速ラップ
         -- 1F < 12.0 AND 1F < 2F_Lap
@@ -1454,19 +1454,19 @@ SELECT
         -- C3: 2F1F同タイム (< 12.0)
         WHEN ROUND(SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 1) = ROUND((SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)), 1)
              AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < 12.0
-        THEN 'C3:2F1F同タイム'
+        THEN 'C3:終い2F1F11秒台の同タイム'
 
         -- C2: 2F1F同タイム (12.0 <= 1F < 12.5)
         WHEN ROUND(SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 1) = ROUND((SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)), 1)
              AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 12.0
              AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < 12.5
-        THEN 'C2:2F1F同タイム'
+        THEN 'C2:終い2F1F12秒台前半の同タイム'
 
         -- C1: 2F1F同タイム (12.5 <= 1F < 13.0)
         WHEN ROUND(SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 1) = ROUND((SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)), 1)
              AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 12.5
              AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < 13.0
-        THEN 'C1:2F1F同タイム'
+        THEN 'C1:終い2F1F12秒台後半の同タイム'
 
         -- A3: 終い1F 11秒台の加速ラップ
         WHEN SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) < 12.0
