@@ -111,6 +111,7 @@ config {
     chokyo_den_oikiri_yajirushi: "調教矢印",
     chokyo_den_oikiri_yajirushi_label: "調教矢印(ラベル)",
     chokyo_den_ichidori_furi_win_flag: "併せ馬が存在し、かつchokyo_ichidoriが6～9(大外周り)かつ併せ先着の場合「はい」該当しない場合はnull",
+    chokyo_den_awase: "出馬表出走馬データ 調教併せ",
     chokyo_den_awase_uma_bamei: "出馬表出走馬データ 調教併せ 馬名",
     chokyo_den_awase_uma_race_code_uma_kol: "出馬表出走馬データ 調教併せ馬 併せ当時のKOL仕様馬毎レースID",
     chokyo_den_awase_uma_race_code_kol: "出馬表出走馬データ 調教併せ馬 併せ当時のKOL仕様レースID",
@@ -1359,6 +1360,7 @@ SELECT
      ELSE NULL
   END AS chokyo_den_ichidori_furi_win_flag,
 
+  z.chokyo_den_oikiri_awase AS chokyo_den_awase,
   z.chokyo_den_oikiri_awase_uma_bamei AS chokyo_den_awase_uma_bamei,
   pl.race_code_uma_kol_partner AS chokyo_den_awase_uma_race_code_uma_kol,
   pl.race_code_kol_partner AS chokyo_den_awase_uma_race_code_kol,
