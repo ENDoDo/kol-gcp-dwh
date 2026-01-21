@@ -796,13 +796,6 @@ WITH
         ELSE NULL
       END AS kyoso_joken_kubun_label,
       CASE
-        WHEN s2.kakutei_chakujun = '01' AND d1.kyoso_joken_kubun IN ('00001', '00002') THEN 3 -- 新馬/未出走 優勝 -> 1勝クラス(3)
-        WHEN s2.kakutei_chakujun = '01' AND d1.kyoso_joken_kubun = '00003' THEN 3 -- 未勝利 優勝 -> 1勝クラス(3)
-        WHEN s2.kakutei_chakujun = '01' AND d1.kyoso_joken_kubun = '05000' THEN 4 -- 1勝クラス 優勝 -> 2勝クラス(4)
-        WHEN s2.kakutei_chakujun = '01' AND d1.kyoso_joken_kubun = '10000' THEN 5 -- 2勝クラス 優勝 -> 3勝クラス(5)
-        WHEN s2.kakutei_chakujun = '01' AND d1.kyoso_joken_kubun = '16000' THEN 6 -- 3勝クラス 優勝 -> オープン(6)
-
-        -- 勝っていない、またはオープン馬の場合
         WHEN d1.kyoso_joken_kubun IN ('00001', '00002') THEN 1
         WHEN d1.kyoso_joken_kubun = '00003' THEN 2
         WHEN d1.kyoso_joken_kubun = '05000' THEN 3
