@@ -1485,44 +1485,26 @@ SELECT
   z.chokyo_sei_1f,
   SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) AS chokyo_sei_1f_float,
 
+  ROUND(SAFE_CAST(z.chokyo_sei_8f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_7f AS FLOAT64), 1) AS chokyo_sei_lap_8f,
+  ROUND(SAFE_CAST(z.chokyo_sei_7f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_6f AS FLOAT64), 1) AS chokyo_sei_lap_7f,
+  ROUND(SAFE_CAST(z.chokyo_sei_6f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_5f AS FLOAT64), 1) AS chokyo_sei_lap_6f,
   CASE
-    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
-    ELSE ROUND(SAFE_CAST(z.chokyo_sei_8f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_7f AS FLOAT64), 1)
-  END AS chokyo_sei_lap_8f,
-  CASE
-    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
-    ELSE ROUND(SAFE_CAST(z.chokyo_sei_7f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_6f AS FLOAT64), 1)
-  END AS chokyo_sei_lap_7f,
-  CASE
-    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
-    ELSE ROUND(SAFE_CAST(z.chokyo_sei_6f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_5f AS FLOAT64), 1)
-  END AS chokyo_sei_lap_6f,
-  CASE
-    WHEN z.chokyo_sei_basho = 'プール' OR z.chokyo_sei_course = '坂' THEN NULL
+    WHEN z.chokyo_sei_course = '坂' THEN NULL
     ELSE ROUND(SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_4f AS FLOAT64), 1)
   END AS chokyo_sei_lap_5f,
   CASE
-    WHEN z.chokyo_sei_basho = 'プール' THEN NULL
     WHEN z.chokyo_sei_course = '坂' THEN ROUND(SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_4f AS FLOAT64), 1)
     ELSE ROUND(SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_3f AS FLOAT64), 1)
   END AS chokyo_sei_lap_4f,
   CASE
     WHEN z.chokyo_sei_basho = 'プール' THEN NULL
     WHEN z.chokyo_sei_course = '坂' THEN ROUND(SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_3f AS FLOAT64), 1)
-    ELSE
-      -- 3F - 2F(推定)
-      ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - (
-        SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_3f AS FLOAT64)
-      ), 1)
+    ELSE SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)
   END AS chokyo_sei_lap_3f,
   CASE
     WHEN z.chokyo_sei_basho = 'プール' THEN NULL
     WHEN z.chokyo_sei_course = '坂' THEN ROUND(SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 1)
-    ELSE
-      -- 2F(推定) - 1F
-      ROUND(
-        (SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - (SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_3f AS FLOAT64)))
-        - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 1)
+    ELSE ROUND((SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64), 1)
   END AS chokyo_sei_lap_2f,
 
   CASE
