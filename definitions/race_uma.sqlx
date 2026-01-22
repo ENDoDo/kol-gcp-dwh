@@ -1322,11 +1322,11 @@ SELECT
   REGEXP_EXTRACT(z.chokyo_den_oikiri_awase, r'([\d\.]+)秒') AS chokyo_den_awase_time_sa_float,
 
   CASE
+    WHEN z.chokyo_den_oikiri_awase IS NULL THEN NULL
     WHEN z.chokyo_den_oikiri_awase LIKE '%同入%' THEN '併せ同入'
     WHEN z.chokyo_den_oikiri_awase LIKE '%遅れ%' THEN '併せ遅れ'
     WHEN z.chokyo_den_oikiri_awase LIKE '%先着%' THEN '併せ先着'
-    WHEN z.chokyo_den_oikiri_awase LIKE '%単走%' THEN '単走'
-    ELSE NULL
+    ELSE '単走'
   END AS chokyo_den_awase_kubun,
 
   z.chokyo_den_oikiri_awase_flag AS chokyo_den_awase_flag,
