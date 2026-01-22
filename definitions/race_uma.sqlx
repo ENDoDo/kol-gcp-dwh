@@ -1324,6 +1324,8 @@ SELECT
   CASE
     WHEN z.chokyo_den_oikiri_awase IS NULL THEN NULL
     WHEN z.chokyo_den_oikiri_awase LIKE '%同入%' THEN '併せ同入'
+    WHEN z.chokyo_den_oikiri_awase LIKE '%外併走%' THEN '併せ同入'
+    WHEN z.chokyo_den_oikiri_awase LIKE '%内併走%' THEN '併せ同入'
     WHEN z.chokyo_den_oikiri_awase LIKE '%遅れ%' THEN '併せ遅れ'
     WHEN z.chokyo_den_oikiri_awase LIKE '%先着%' THEN '併せ先着'
     ELSE '単走'
