@@ -1371,7 +1371,6 @@ SELECT
   z.chokyo_sei_course,
   CASE
     WHEN z.chokyo_sei_course = '坂' THEN '坂路'
-    WHEN z.chokyo_sei_course = 'Ｐ' OR z.chokyo_sei_course = 'P' THEN 'ポリトラック'
     WHEN z.chokyo_sei_basho = 'プール' THEN 'プール'
     ELSE 'コース'
   END AS chokyo_sei_course_kubun,
