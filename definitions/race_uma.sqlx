@@ -1050,7 +1050,6 @@ SELECT
   z.chokyo_den_oikiri_course,
   CASE
     WHEN z.chokyo_den_oikiri_course = '坂' THEN '坂路'
-    WHEN z.chokyo_den_oikiri_course = 'Ｐ' OR z.chokyo_den_oikiri_course = 'P' THEN 'ポリトラック'
     WHEN z.chokyo_den_oikiri_basho = 'プール' THEN 'プール'
     ELSE 'コース'
   END AS chokyo_den_oikiri_course_kubun,
