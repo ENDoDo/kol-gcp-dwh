@@ -754,11 +754,13 @@ WITH
     SELECT
       *,
       CASE
+        WHEN chokyo_den_oikiri_course IS NULL THEN NULL
         WHEN chokyo_den_oikiri_course = '坂' THEN '坂路'
         WHEN chokyo_den_oikiri_basho = 'プール' THEN 'プール'
         ELSE 'コース'
       END AS chokyo_den_oikiri_course_kubun,
       CASE
+        WHEN chokyo_sei_course IS NULL THEN NULL
         WHEN chokyo_sei_course = '坂' THEN '坂路'
         WHEN chokyo_sei_basho = 'プール' THEN 'プール'
         ELSE 'コース'
@@ -1049,6 +1051,7 @@ SELECT
   z.chokyo_den_oikiri_basho,
   z.chokyo_den_oikiri_course,
   CASE
+    WHEN z.chokyo_den_oikiri_course IS NULL THEN NULL
     WHEN z.chokyo_den_oikiri_course = '坂' THEN '坂路'
     WHEN z.chokyo_den_oikiri_basho = 'プール' THEN 'プール'
     ELSE 'コース'
@@ -1369,6 +1372,7 @@ SELECT
   z.chokyo_sei_basho,
   z.chokyo_sei_course,
   CASE
+    WHEN z.chokyo_sei_course IS NULL THEN NULL
     WHEN z.chokyo_sei_course = '坂' THEN '坂路'
     WHEN z.chokyo_sei_basho = 'プール' THEN 'プール'
     ELSE 'コース'
@@ -1605,6 +1609,7 @@ SELECT
   z.chokyo_den_chokyo1_basho,
   z.chokyo_den_chokyo1_course,
   CASE
+    WHEN z.chokyo_den_chokyo1_course IS NULL THEN NULL
     WHEN z.chokyo_den_chokyo1_course = '坂' THEN '坂路'
     WHEN z.chokyo_den_chokyo1_basho = 'プール' THEN 'プール'
     ELSE 'コース'
@@ -1694,6 +1699,7 @@ SELECT
   z.chokyo_den_chokyo2_basho,
   z.chokyo_den_chokyo2_course,
   CASE
+    WHEN z.chokyo_den_chokyo2_course IS NULL THEN NULL
     WHEN z.chokyo_den_chokyo2_course = '坂' THEN '坂路'
     WHEN z.chokyo_den_chokyo2_basho = 'プール' THEN 'プール'
     ELSE 'コース'
@@ -1783,6 +1789,7 @@ SELECT
   z.chokyo_den_chokyo3_basho,
   z.chokyo_den_chokyo3_course,
   CASE
+    WHEN z.chokyo_den_chokyo3_course IS NULL THEN NULL
     WHEN z.chokyo_den_chokyo3_course = '坂' THEN '坂路'
     WHEN z.chokyo_den_chokyo3_basho = 'プール' THEN 'プール'
     ELSE 'コース'
