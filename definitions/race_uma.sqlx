@@ -584,13 +584,51 @@ WITH
         WHEN d2.chokyo3_flag = '1' THEN d2.chokyo3_reigai
         ELSE NULL
       END AS chokyo_den_oikiri_reigai,
-      d2.chokyo_awase AS chokyo_den_oikiri_awase,
-      REGEXP_EXTRACT(d2.chokyo_awase, r'^(.+?)に') AS chokyo_den_oikiri_awase_uma_bamei,
-      d2.chokyo_awase_flag AS chokyo_den_oikiri_awase_flag,
-      d2.chokyo_tanpyo AS chokyo_den_oikiri_tanpyo,
-      d2.chokyo_honsu_course AS chokyo_den_oikiri_honsu_course,
-      d2.chokyo_honsu_hanro AS chokyo_den_oikiri_honsu_hanro,
-      d2.chokyo_honsu_pool AS chokyo_den_oikiri_honsu_pool,
+      CASE
+        WHEN d2.chokyo1_flag = '1' THEN d2.chokyo_awase
+        WHEN d2.chokyo2_flag = '1' THEN d2.chokyo_awase
+        WHEN d2.chokyo3_flag = '1' THEN d2.chokyo_awase
+        ELSE NULL
+      END AS chokyo_den_oikiri_awase,
+      REGEXP_EXTRACT(
+        CASE
+          WHEN d2.chokyo1_flag = '1' THEN d2.chokyo_awase
+          WHEN d2.chokyo2_flag = '1' THEN d2.chokyo_awase
+          WHEN d2.chokyo3_flag = '1' THEN d2.chokyo_awase
+          ELSE NULL
+        END,
+        r'^(.+?)に'
+      ) AS chokyo_den_oikiri_awase_uma_bamei,
+      CASE
+        WHEN d2.chokyo1_flag = '1' THEN d2.chokyo_awase_flag
+        WHEN d2.chokyo2_flag = '1' THEN d2.chokyo_awase_flag
+        WHEN d2.chokyo3_flag = '1' THEN d2.chokyo_awase_flag
+        ELSE NULL
+      END AS chokyo_den_oikiri_awase_flag,
+      CASE
+        WHEN d2.chokyo1_flag = '1' THEN d2.chokyo_tanpyo
+        WHEN d2.chokyo2_flag = '1' THEN d2.chokyo_tanpyo
+        WHEN d2.chokyo3_flag = '1' THEN d2.chokyo_tanpyo
+        ELSE NULL
+      END AS chokyo_den_oikiri_tanpyo,
+      CASE
+        WHEN d2.chokyo1_flag = '1' THEN d2.chokyo_honsu_course
+        WHEN d2.chokyo2_flag = '1' THEN d2.chokyo_honsu_course
+        WHEN d2.chokyo3_flag = '1' THEN d2.chokyo_honsu_course
+        ELSE NULL
+      END AS chokyo_den_oikiri_honsu_course,
+      CASE
+        WHEN d2.chokyo1_flag = '1' THEN d2.chokyo_honsu_hanro
+        WHEN d2.chokyo2_flag = '1' THEN d2.chokyo_honsu_hanro
+        WHEN d2.chokyo3_flag = '1' THEN d2.chokyo_honsu_hanro
+        ELSE NULL
+      END AS chokyo_den_oikiri_honsu_hanro,
+      CASE
+        WHEN d2.chokyo1_flag = '1' THEN d2.chokyo_honsu_pool
+        WHEN d2.chokyo2_flag = '1' THEN d2.chokyo_honsu_pool
+        WHEN d2.chokyo3_flag = '1' THEN d2.chokyo_honsu_pool
+        ELSE NULL
+      END AS chokyo_den_oikiri_honsu_pool,
       -- 調教1
       d2.chokyo1_flag AS chokyo_den_chokyo1_flag,
       d2.chokyo1_kijosha AS chokyo_den_chokyo1_kijosha,
