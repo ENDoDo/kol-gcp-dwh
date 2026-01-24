@@ -2177,7 +2177,7 @@ SELECT
   CAST(z.YosouTanOdds AS FLOAT64) AS yosou_tansho_odds_float,
   sc.shirushi_hanro_4f_flag,
   sc.shirushi_hanro_1f_flag,
-  sc.shirushi_wood_6f_flag,
+  sc.shirushi_wood_4f_flag,
   sc.shirushi_wood_1f_flag,
   sc.shirushi_awase_senchaku_flag,
   sc.shirushi_point,
