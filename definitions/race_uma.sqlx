@@ -339,7 +339,7 @@ config {
     // 印（Shirushi）カラム
     shirushi_hanro_4f_flag: "坂路4F最速フラグ",
     shirushi_hanro_1f_flag: "坂路1F最速フラグ",
-    shirushi_wood_6f_flag: "ウッド6F最速フラグ",
+    shirushi_wood_4f_flag: "ウッド4F最速フラグ",
     shirushi_wood_1f_flag: "ウッド1F最速フラグ",
     shirushi_awase_senchaku_flag: "調教推奨印 併せ馬 先着している馬 該当馬は「はい」それ以外はnull",
     shirushi_point: "印ポイント",
