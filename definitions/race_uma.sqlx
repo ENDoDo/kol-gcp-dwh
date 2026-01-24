@@ -889,14 +889,14 @@ WITH
       -- Wood Logic
       CASE
         WHEN ((chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW') OR (chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ'))
-             AND chokyo_den_oikiri_6f_d2 IS NOT NULL
+             AND chokyo_den_oikiri_4f_d2 IS NOT NULL
         THEN RANK() OVER (
           PARTITION BY SUBSTR(race_code_uma_kol, 1, 16),
           IF(((chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW') OR (chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ')), 1, 0)
-          ORDER BY SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_6f_d2, r'[^0-9.]', '') AS FLOAT64) ASC
+          ORDER BY SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_4f_d2, r'[^0-9.]', '') AS FLOAT64) ASC
         )
         ELSE NULL
-      END AS wood_6f_rank,
+      END AS wood_4f_rank,
       CASE
         WHEN ((chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW') OR (chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ'))
              AND chokyo_den_oikiri_1f_d2 IS NOT NULL
@@ -920,7 +920,7 @@ WITH
       *,
       IF(hanro_4f_rank = 1, 1, 0) AS shirushi_hanro_4f_flag_int,
       IF(hanro_1f_rank = 1, 1, 0) AS shirushi_hanro_1f_flag_int,
-      IF(wood_6f_rank = 1, 1, 0) AS shirushi_wood_6f_flag_int,
+      IF(wood_4f_rank = 1, 1, 0) AS shirushi_wood_4f_flag_int,
       IF(wood_1f_rank = 1, 1, 0) AS shirushi_wood_1f_flag_int
     FROM shirushi_calc_raw
   ),
@@ -928,7 +928,7 @@ WITH
   shirushi_points AS (
     SELECT
       *,
-      (shirushi_hanro_4f_flag_int + shirushi_hanro_1f_flag_int + shirushi_wood_6f_flag_int + shirushi_wood_1f_flag_int) AS shirushi_point
+      (shirushi_hanro_4f_flag_int + shirushi_hanro_1f_flag_int + shirushi_wood_4f_flag_int + shirushi_wood_1f_flag_int) AS shirushi_point
     FROM shirushi_flags
   ),
 
@@ -937,7 +937,7 @@ WITH
       *,
       IF(shirushi_hanro_4f_flag_int = 1, 'はい', NULL) AS shirushi_hanro_4f_flag,
       IF(shirushi_hanro_1f_flag_int = 1, 'はい', NULL) AS shirushi_hanro_1f_flag,
-      IF(shirushi_wood_6f_flag_int = 1, 'はい', NULL) AS shirushi_wood_6f_flag,
+      IF(shirushi_wood_4f_flag_int = 1, 'はい', NULL) AS shirushi_wood_4f_flag,
       IF(shirushi_wood_1f_flag_int = 1, 'はい', NULL) AS shirushi_wood_1f_flag,
       IF(shirushi_point > 0 AND chokyo_den_oikiri_awase LIKE '%先着%', 'はい', NULL) AS shirushi_awase_senchaku_flag,
       CASE
