@@ -17,6 +17,7 @@ config {
     keibajo_code_jvd: "JRA-VAN仕様競馬場コード",
     keibajo_code_kol: "KOL仕様競馬場コード",
     hasso_date: "発走日時",
+    hasso_date_utc: "発走日時(UTC)",
     kaiji: "開催回次",
     nichiji: "開催日次",
     race_bango: "レース番号 2桁",
@@ -452,7 +453,7 @@ SELECT
   ru.*,
   r.* EXCEPT (
     -- race_umaと重複するカラムをraceテーブルから除外
-    race_code_kol, race_code_jvd, hasso_date, kaiji, nichiji, race_bango, race_bango_num,
+    race_code_kol, race_code_jvd, hasso_date, hasso_date_utc, kaiji, nichiji, race_bango, race_bango_num,
     keibajo_code_jvd, keibajo_code_kol, created, modified
   )
 FROM

@@ -17,6 +17,7 @@ config {
     keibajo_code_jvd: "JRA-VAN仕様競馬場コード",
     keibajo_code_kol: "KOL仕様競馬場コード",
     hasso_date: "発走日時",
+    hasso_date_utc: "発走日時(UTC)",
     kaiji: "開催回次",
     nichiji: "開催日次",
     race_bango: "レース番号 2桁",
@@ -421,6 +422,7 @@ WITH
       d2.umaban,
       d2.ketto_toroku_bango,
       DATETIME_ADD(PARSE_DATETIME('%Y%m%d%H%M', d2.kaisai_nengappi || REPLACE(d1.hasso_jikoku, ':', '')), INTERVAL 9 HOUR) AS hasso_date,
+      PARSE_DATETIME('%Y%m%d%H%M', d2.kaisai_nengappi || REPLACE(d1.hasso_jikoku, ':', '')) AS hasso_date_utc,
       d2.wakuban,
       d2.bamei,
       d2.seibetsu_code,
@@ -993,6 +995,7 @@ SELECT
   z.keibajo_code_jvd_from_kol AS keibajo_code_jvd,
   z.keibajo_code AS keibajo_code_kol,
   z.hasso_date,
+  z.hasso_date_utc,
   z.kaisai_kaiji AS kaiji,
   z.kaisai_kaiji AS nichiji, -- (注: 元のSQL通り kaiji を nichiji にも割り当て)
   z.wakuban,
