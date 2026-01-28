@@ -147,6 +147,10 @@ config {
     chokyo_den_honsu_pool: "出馬表出走馬データ 前走からの調教本数でプール追いの本数",
     chokyo_den_honsu_pool_num: "出馬表出走馬データ 前走からの調教本数でプール追いの本数 整数型",
     chokyo_den_oikiri_reigai: "調教例外",
+    chokyo_den_oikiri_kijosha_kubun: "調教1～3追い切り 調教騎乗者区分",
+    chokyo_den_oikiri_kijosha_equal_kishumei_flag: "調教1～3追い切り 調教騎乗騎手がレースでも騎乗フラグ",
+    chokyo_den_oikiri_check_time_1f_flag: "調教1～3追い切り 1Fの標準タイムクリア判定のフラグ",
+    chokyo_den_oikiri_check_time_4f_6f_flag: "調教1～3追い切り 4F/6Fの標準タイムクリア判定のフラグ",
     // スピード指数・ローテーション
     // 調教1
     chokyo_den_chokyo1_flag: "調教1 調教フラグ",
@@ -454,6 +458,7 @@ SELECT
   r.* EXCEPT (
     -- race_umaと重複するカラムをraceテーブルから除外
     race_code_kol, race_code_jvd, hasso_date, hasso_date_utc, kaiji, nichiji, race_bango, race_bango_num,
+    chokyo_den_oikiri_kijosha_kubun, chokyo_den_oikiri_kijosha_equal_kishumei_flag, chokyo_den_oikiri_check_time_1f_flag, chokyo_den_oikiri_check_time_4f_6f_flag,
     keibajo_code_jvd, keibajo_code_kol, created, modified
   )
 FROM

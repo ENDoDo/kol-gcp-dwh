@@ -131,6 +131,10 @@ config {
     chokyo_den_honsu_pool: "出馬表出走馬データ 前走からの調教本数でプール追いの本数",
     chokyo_den_honsu_pool_num: "出馬表出走馬データ 前走からの調教本数でプール追いの本数 整数型",
     chokyo_den_oikiri_reigai: "調教例外",
+    chokyo_den_oikiri_kijosha_kubun: "調教1～3追い切り 調教騎乗者区分",
+    chokyo_den_oikiri_kijosha_equal_kishumei_flag: "調教1～3追い切り 調教騎乗騎手がレースでも騎乗フラグ",
+    chokyo_den_oikiri_check_time_1f_flag: "調教1～3追い切り 1Fの標準タイムクリア判定のフラグ",
+    chokyo_den_oikiri_check_time_4f_6f_flag: "調教1～3追い切り 4F/6Fの標準タイムクリア判定のフラグ",
     // 調教1
     chokyo_den_chokyo1_flag: "調教1 調教フラグ",
     chokyo_den_chokyo1_flag_label: "調教1 chokyo_flagをもとに対応 はい/いいえ",
@@ -806,6 +810,36 @@ WITH
         ELSE 'コース'
       END AS chokyo_sei_course_kubun,
 
+      CASE
+        WHEN chokyo_den_oikiri_kijosha IS NULL THEN NULL
+        WHEN chokyo_den_oikiri_kijosha = '調教師' THEN '調教師'
+        WHEN chokyo_den_oikiri_kijosha = '見習' THEN '見習'
+        WHEN chokyo_den_oikiri_kijosha IN ('厩舎', '助手') THEN '厩舎'
+        ELSE '騎手'
+      END AS chokyo_den_oikiri_kijosha_kubun,
+
+      CASE
+        WHEN chokyo_den_oikiri_kijosha IS NOT NULL AND chokyo_den_oikiri_kijosha = kishumei_ryakusho THEN 'はい'
+        WHEN chokyo_den_oikiri_kijosha IS NOT NULL THEN 'いいえ'
+        ELSE NULL
+      END AS chokyo_den_oikiri_kijosha_equal_kishumei_flag,
+
+      CASE
+        WHEN chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = '坂' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) <= 12.4 THEN 'はい'
+        WHEN chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = '坂' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) <= 12.5 THEN 'はい'
+        WHEN chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) <= 11.6 THEN 'はい'
+        WHEN chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) <= 11.7 THEN 'はい'
+        ELSE NULL
+      END AS chokyo_den_oikiri_check_time_1f_flag,
+
+      CASE
+        WHEN chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = '坂' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_5f_d2, r'[^0-9.]', '') AS FLOAT64) <= 53.9 THEN 'はい'
+        WHEN chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = '坂' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_5f_d2, r'[^0-9.]', '') AS FLOAT64) <= 54.9 THEN 'はい'
+        WHEN chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_6f_d2, r'[^0-9.]', '') AS FLOAT64) <= 82.9 THEN 'はい'
+        WHEN chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_6f_d2, r'[^0-9.]', '') AS FLOAT64) <= 83.9 THEN 'はい'
+        ELSE NULL
+      END AS chokyo_den_oikiri_check_time_4f_6f_flag,
+
       -- 前走データの取得ロジック
       -- PARTITION BY は race_code_uma_kol (馬毎) で行う
       LAG(race_code_kol) OVER (PARTITION BY race_code_uma_kol ORDER BY hasso_date, race_code_kol) AS text_zensou_race_code_kol,
@@ -1333,7 +1367,11 @@ SELECT
     ELSE NULL
   END AS chokyo_den_oikiri_yajirushi_label,
   z.chokyo_den_oikiri_reigai,
-
+  z.chokyo_den_oikiri_kijosha_kubun,
+  z.chokyo_den_oikiri_kijosha_equal_kishumei_flag,
+  z.chokyo_den_oikiri_check_time_1f_flag,
+  z.chokyo_den_oikiri_check_time_4f_6f_flag,
+  -- 調教1
   CASE
      WHEN z.chokyo_den_oikiri_awase IS NOT NULL AND z.chokyo_den_oikiri_awase != ''
           AND z.chokyo_den_oikiri_ichidori IN ('6','7','8','9')
