@@ -194,9 +194,8 @@ WITH
   split_kumiban AS (
     SELECT
       *,
-      -- Split by '-' (for standard KUMIBAN like "03-05")
-      -- If "03", split gives ["03"]
-      SPLIT(umaban_kumiban, '-') AS umaban_list
+      -- Extract every 2 characters (assuming 0-padded 2-digit numbers)
+      REGEXP_EXTRACT_ALL(umaban_kumiban, r'.{2}') AS umaban_list
     FROM unpivoted
   ),
 
@@ -205,7 +204,9 @@ WITH
     SELECT
       r.race_code_kol,
       r.kensyu_kubun,
-      r.umaban_kumiban,
+      r.umaban_kumiban AS original_kumiban,
+      -- Create formatted kumiban (e.g. 01-02-03)
+      ARRAY_TO_STRING(r.umaban_list, '-') AS formatted_kumiban,
       r.haitou,
       -- Use SAFE_CAST to ensure integer comparison (e.g. "03" vs "3")
       ARRAY_AGG(COALESCE(ru.shirushi_shirushi_label, '×') ORDER BY offset) AS shirushi_list_raw
@@ -214,7 +215,7 @@ WITH
     LEFT JOIN race_info ru
       ON r.race_code_kol = ru.race_code_kol
       AND SAFE_CAST(ru.umaban AS INT64) = SAFE_CAST(u AS INT64)
-    GROUP BY 1, 2, 3, 4
+    GROUP BY 1, 2, 3, 4, 5
   ),
 
   -- Create distinct race info first to avoid duplication when joining
@@ -247,7 +248,7 @@ SELECT
   r.race_bango_num,
   d.race_name,
   j.kensyu_kubun,
-  j.umaban_kumiban,
+  j.formatted_kumiban AS umaban_kumiban, -- Use formatted version
   j.haitou,
   ARRAY_TO_STRING(j.shirushi_list_raw, '-') AS yosou_shirushi
 FROM joined_shirushi j
