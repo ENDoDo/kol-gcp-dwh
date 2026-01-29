@@ -1,0 +1,255 @@
+config {
+  type: "table",
+  description: "レースの的中情報（券種、組番、配当）と予想印を紐付けたテーブル",
+  columns: {
+    race_code_kol: "KOL仕様レースID",
+    race_code_jvd: "JRA-VAN仕様レースID",
+    year: "発生年 YYYY",
+    month_day: "発生月日 MMDD",
+    kaisai_nengappi: "開催年月日 date型 (JST)",
+    kaisai_nengappi_utc: "開催年月日 date型 (UTC)",
+    keibajo_code_jvd: "JRA-VAN仕様競馬場コード",
+    keibajo_code_kol: "KOL仕様競馬場コード",
+    keibajo_name: "競馬場名",
+    race_bango_num: "レース番号 整数型",
+    race_name: "レース名 (競走名15文字)",
+    yosou_shirushi: "予想印 (例: ◎-△)",
+    kensyu_kubun: "券種 (単勝, 複勝, 普通馬連, 馬単, ワイド, 3連複, 3連単)",
+    umaban_kumiban: "組番 (例: 10, 3-5)",
+    haitou: "配当"
+  }
+}
+
+WITH
+  -- 1. Get Race Info and Shirushi
+  race_info AS (
+    SELECT
+      race_code_kol,
+      race_code_jvd,
+      DATE(hasso_date) AS kaisai_nengappi,
+      DATE(hasso_date_utc) AS kaisai_nengappi_utc,
+      FORMAT_DATE('%Y', DATE(hasso_date)) AS year,
+      FORMAT_DATE('%m%d', DATE(hasso_date)) AS month_day,
+      keibajo_code_jvd,
+      keibajo_code_kol,
+      CASE keibajo_code_jvd
+        WHEN '01' THEN '札幌'
+        WHEN '02' THEN '函館'
+        WHEN '03' THEN '福島'
+        WHEN '04' THEN '新潟'
+        WHEN '05' THEN '東京'
+        WHEN '06' THEN '中山'
+        WHEN '07' THEN '中京'
+        WHEN '08' THEN '京都'
+        WHEN '09' THEN '阪神'
+        WHEN '10' THEN '小倉'
+        ELSE NULL
+      END AS keibajo_name,
+      race_bango_num,
+      -- Get Shirushi info
+      umaban,
+      shirushi_shirushi_label
+    FROM ${ref("race_uma")}
+  ),
+
+  -- 2. Get Race Name from kol_den1
+  den1 AS (
+    SELECT
+      race_code_kol,
+      kyosomei_15moji AS race_name
+    FROM ${ref("kol_den1")}
+  ),
+
+  -- 3. Get Dividends from kol_sei1 (One row per race)
+  dividends AS (
+    SELECT
+      race_code_kol,
+      -- Select all needed columns
+      tansho1_haraimodoshikin, tansho1_umaban,
+      tansho2_haraimodoshikin, tansho2_umaban,
+      tansho3_haraimodoshikin, tansho3_umaban,
+
+      fukusho1_haraimodoshikin, fukusho1_umaban,
+      fukusho2_haraimodoshikin, fukusho2_umaban,
+      fukusho3_haraimodoshikin, fukusho3_umaban,
+      fukusho4_haraimodoshikin, fukusho4_umaban,
+      fukusho5_haraimodoshikin, fukusho5_umaban,
+
+      umaren1_haraimodoshikin, umaren1_kumiban,
+      umaren2_haraimodoshikin, umaren2_kumiban,
+      umaren3_haraimodoshikin, umaren3_kumiban,
+
+      umatan1_haraimodoshikin, umatan1_kumiban,
+      umatan2_haraimodoshikin, umatan2_kumiban,
+      umatan3_haraimodoshikin, umatan3_kumiban,
+      umatan4_haraimodoshikin, umatan4_kumiban,
+      umatan5_haraimodoshikin, umatan5_kumiban,
+      umatan6_haraimodoshikin, umatan6_kumiban,
+
+      wide1_haraimodoshikin, wide1_kumiban,
+      wide2_haraimodoshikin, wide2_kumiban,
+      wide3_haraimodoshikin, wide3_kumiban,
+      wide4_haraimodoshikin, wide4_kumiban,
+      wide5_haraimodoshikin, wide5_kumiban,
+      wide6_haraimodoshikin, wide6_kumiban,
+      wide7_haraimodoshikin, wide7_kumiban,
+
+      sanrenpuku1_haraimodoshikin, sanrenpuku1_kumiban,
+      sanrenpuku2_haraimodoshikin, sanrenpuku2_kumiban,
+      sanrenpuku3_haraimodoshikin, sanrenpuku3_kumiban,
+
+      sanrentan1_haraimodoshikin, sanrentan1_kumiban,
+      sanrentan2_haraimodoshikin, sanrentan2_kumiban,
+      sanrentan3_haraimodoshikin, sanrentan3_kumiban,
+      sanrentan4_haraimodoshikin, sanrentan4_kumiban,
+      sanrentan5_haraimodoshikin, sanrentan5_kumiban,
+      sanrentan6_haraimodoshikin, sanrentan6_kumiban
+
+    FROM ${ref("kol_sei1")}
+  ),
+
+  -- 4. Unpivot Dividends
+  unpivoted AS (
+    -- Tansho
+    SELECT race_code_kol, '単勝' AS kensyu_kubun, tansho1_umaban AS umaban_kumiban, tansho1_haraimodoshikin AS haitou FROM dividends WHERE tansho1_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '単勝', tansho2_umaban, tansho2_haraimodoshikin FROM dividends WHERE tansho2_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '単勝', tansho3_umaban, tansho3_haraimodoshikin FROM dividends WHERE tansho3_haraimodoshikin IS NOT NULL
+    UNION ALL
+
+    -- Fukusho
+    SELECT race_code_kol, '複勝', fukusho1_umaban, fukusho1_haraimodoshikin FROM dividends WHERE fukusho1_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '複勝', fukusho2_umaban, fukusho2_haraimodoshikin FROM dividends WHERE fukusho2_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '複勝', fukusho3_umaban, fukusho3_haraimodoshikin FROM dividends WHERE fukusho3_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '複勝', fukusho4_umaban, fukusho4_haraimodoshikin FROM dividends WHERE fukusho4_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '複勝', fukusho5_umaban, fukusho5_haraimodoshikin FROM dividends WHERE fukusho5_haraimodoshikin IS NOT NULL
+    UNION ALL
+
+    -- Umaren
+    SELECT race_code_kol, '馬連', umaren1_kumiban, umaren1_haraimodoshikin FROM dividends WHERE umaren1_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '馬連', umaren2_kumiban, umaren2_haraimodoshikin FROM dividends WHERE umaren2_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '馬連', umaren3_kumiban, umaren3_haraimodoshikin FROM dividends WHERE umaren3_haraimodoshikin IS NOT NULL
+    UNION ALL
+
+    -- Umatan
+    SELECT race_code_kol, '馬単', umatan1_kumiban, umatan1_haraimodoshikin FROM dividends WHERE umatan1_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '馬単', umatan2_kumiban, umatan2_haraimodoshikin FROM dividends WHERE umatan2_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '馬単', umatan3_kumiban, umatan3_haraimodoshikin FROM dividends WHERE umatan3_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '馬単', umatan4_kumiban, umatan4_haraimodoshikin FROM dividends WHERE umatan4_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '馬単', umatan5_kumiban, umatan5_haraimodoshikin FROM dividends WHERE umatan5_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '馬単', umatan6_kumiban, umatan6_haraimodoshikin FROM dividends WHERE umatan6_haraimodoshikin IS NOT NULL
+    UNION ALL
+
+    -- Wide
+    SELECT race_code_kol, 'ワイド', wide1_kumiban, wide1_haraimodoshikin FROM dividends WHERE wide1_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, 'ワイド', wide2_kumiban, wide2_haraimodoshikin FROM dividends WHERE wide2_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, 'ワイド', wide3_kumiban, wide3_haraimodoshikin FROM dividends WHERE wide3_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, 'ワイド', wide4_kumiban, wide4_haraimodoshikin FROM dividends WHERE wide4_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, 'ワイド', wide5_kumiban, wide5_haraimodoshikin FROM dividends WHERE wide5_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, 'ワイド', wide6_kumiban, wide6_haraimodoshikin FROM dividends WHERE wide6_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, 'ワイド', wide7_kumiban, wide7_haraimodoshikin FROM dividends WHERE wide7_haraimodoshikin IS NOT NULL
+    UNION ALL
+
+    -- Sanrenpuku
+    SELECT race_code_kol, '3連複', sanrenpuku1_kumiban, sanrenpuku1_haraimodoshikin FROM dividends WHERE sanrenpuku1_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '3連複', sanrenpuku2_kumiban, sanrenpuku2_haraimodoshikin FROM dividends WHERE sanrenpuku2_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '3連複', sanrenpuku3_kumiban, sanrenpuku3_haraimodoshikin FROM dividends WHERE sanrenpuku3_haraimodoshikin IS NOT NULL
+    UNION ALL
+
+    -- Sanrentan
+    SELECT race_code_kol, '3連単', sanrentan1_kumiban, sanrentan1_haraimodoshikin FROM dividends WHERE sanrentan1_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '3連単', sanrentan2_kumiban, sanrentan2_haraimodoshikin FROM dividends WHERE sanrentan2_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '3連単', sanrentan3_kumiban, sanrentan3_haraimodoshikin FROM dividends WHERE sanrentan3_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '3連単', sanrentan4_kumiban, sanrentan4_haraimodoshikin FROM dividends WHERE sanrentan4_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '3連単', sanrentan5_kumiban, sanrentan5_haraimodoshikin FROM dividends WHERE sanrentan5_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, '3連単', sanrentan6_kumiban, sanrentan6_haraimodoshikin FROM dividends WHERE sanrentan6_haraimodoshikin IS NOT NULL
+  ),
+
+  -- 5. Split Kumiban
+  split_kumiban AS (
+    SELECT
+      *,
+      -- Split by '-' (for standard KUMIBAN like "03-05")
+      -- If "03", split gives ["03"]
+      SPLIT(umaban_kumiban, '-') AS umaban_list
+    FROM unpivoted
+  ),
+
+  -- 6. Join with Shirushi
+  joined_shirushi AS (
+    SELECT
+      r.race_code_kol,
+      r.kensyu_kubun,
+      r.umaban_kumiban,
+      r.haitou,
+      -- Use SAFE_CAST to ensure integer comparison (e.g. "03" vs "3")
+      ARRAY_AGG(COALESCE(ru.shirushi_shirushi_label, '×') ORDER BY offset) AS shirushi_list_raw
+    FROM split_kumiban r
+    CROSS JOIN UNNEST(r.umaban_list) AS u WITH OFFSET AS offset
+    LEFT JOIN race_info ru
+      ON r.race_code_kol = ru.race_code_kol
+      AND SAFE_CAST(ru.umaban AS INT64) = SAFE_CAST(u AS INT64)
+    GROUP BY 1, 2, 3, 4
+  ),
+
+  -- Create distinct race info first to avoid duplication when joining
+  distinct_race_info AS (
+    SELECT DISTINCT
+      race_code_kol,
+      race_code_jvd,
+      kaisai_nengappi,
+      kaisai_nengappi_utc,
+      year,
+      month_day,
+      keibajo_code_jvd,
+      keibajo_code_kol,
+      keibajo_name,
+      race_bango_num
+    FROM race_info
+  )
+
+-- Final SELECT
+SELECT
+  r.race_code_kol,
+  r.race_code_jvd,
+  r.year,
+  r.month_day,
+  r.kaisai_nengappi,
+  r.kaisai_nengappi_utc,
+  r.keibajo_code_jvd,
+  r.keibajo_code_kol,
+  r.keibajo_name,
+  r.race_bango_num,
+  d.race_name,
+  j.kensyu_kubun,
+  j.umaban_kumiban,
+  j.haitou,
+  ARRAY_TO_STRING(j.shirushi_list_raw, '-') AS yosou_shirushi
+FROM joined_shirushi j
+JOIN distinct_race_info r ON j.race_code_kol = r.race_code_kol
+LEFT JOIN den1 d ON j.race_code_kol = d.race_code_kol
