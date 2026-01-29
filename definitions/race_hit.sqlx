@@ -16,7 +16,7 @@ config {
     yosou_shirushi: "予想印 (例: ◎-△)",
     kensyu_kubun: "券種 (単勝, 複勝, 普通馬連, 馬単, ワイド, 3連複, 3連単)",
     umaban_kumiban: "組番 (例: 10, 3-5)",
-    haitou: "配当"
+    haitou: "配当 (整数)"
   }
 }
 
@@ -207,7 +207,8 @@ WITH
       r.umaban_kumiban AS original_kumiban,
       -- Create formatted kumiban (e.g. 01-02-03)
       ARRAY_TO_STRING(r.umaban_list, '-') AS formatted_kumiban,
-      r.haitou,
+      -- Cast haitou to INT64 here
+      SAFE_CAST(r.haitou AS INT64) AS haitou,
       -- Use SAFE_CAST to ensure integer comparison (e.g. "03" vs "3")
       ARRAY_AGG(COALESCE(ru.shirushi_shirushi_label, '×') ORDER BY offset) AS shirushi_list_raw
     FROM split_kumiban r
