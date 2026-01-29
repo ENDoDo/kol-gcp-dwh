@@ -134,7 +134,7 @@ config {
     chokyo_den_oikiri_kijosha_kubun: "調教1～3追い切り 調教騎乗者区分",
     chokyo_den_oikiri_kijosha_equal_kishumei_flag: "調教1～3追い切り 調教騎乗騎手がレースでも騎乗フラグ",
     chokyo_den_oikiri_check_time_1f_flag: "調教1～3追い切り 1Fの標準タイムクリア判定のフラグ",
-    chokyo_den_oikiri_check_time_4f_6f_flag: "調教1～3追い切り 4F/6Fの標準タイムクリア判定のフラグ",
+    chokyo_den_oikiri_time_4f_6f_flag: "調教1～3追い切り 4F/6Fの標準タイムクリア判定のフラグ",
     // 調教1
     chokyo_den_chokyo1_flag: "調教1 調教フラグ",
     chokyo_den_chokyo1_flag_label: "調教1 chokyo_flagをもとに対応 はい/いいえ",
@@ -880,12 +880,12 @@ WITH
       END AS chokyo_den_oikiri_check_time_1f_flag,
 
       CASE
-        WHEN chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = '坂' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_5f_d2, r'[^0-9.]', '') AS FLOAT64) <= 53.9 THEN 'はい'
-        WHEN chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = '坂' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_5f_d2, r'[^0-9.]', '') AS FLOAT64) <= 54.9 THEN 'はい'
+        WHEN chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = '坂' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_4f_d2, r'[^0-9.]', '') AS FLOAT64) <= 53.9 THEN 'はい'
+        WHEN chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = '坂' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_4f_d2, r'[^0-9.]', '') AS FLOAT64) <= 54.9 THEN 'はい'
         WHEN chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_6f_d2, r'[^0-9.]', '') AS FLOAT64) <= 82.9 THEN 'はい'
         WHEN chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_6f_d2, r'[^0-9.]', '') AS FLOAT64) <= 83.9 THEN 'はい'
         ELSE NULL
-      END AS chokyo_den_oikiri_check_time_4f_6f_flag,
+      END AS chokyo_den_oikiri_time_4f_6f_flag,
 
       -- 前走データの取得ロジック
       -- PARTITION BY は race_code_uma_kol (馬毎) で行う
@@ -1417,7 +1417,7 @@ SELECT
   z.chokyo_den_oikiri_kijosha_kubun,
   z.chokyo_den_oikiri_kijosha_equal_kishumei_flag,
   z.chokyo_den_oikiri_check_time_1f_flag,
-  z.chokyo_den_oikiri_check_time_4f_6f_flag,
+  z.chokyo_den_oikiri_time_4f_6f_flag,
   -- 調教1
   CASE
      WHEN z.chokyo_den_oikiri_awase IS NOT NULL AND z.chokyo_den_oikiri_awase != ''

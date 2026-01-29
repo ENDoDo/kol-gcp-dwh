@@ -150,7 +150,7 @@ config {
     chokyo_den_oikiri_kijosha_kubun: "調教1～3追い切り 調教騎乗者区分",
     chokyo_den_oikiri_kijosha_equal_kishumei_flag: "調教1～3追い切り 調教騎乗騎手がレースでも騎乗フラグ",
     chokyo_den_oikiri_check_time_1f_flag: "調教1～3追い切り 1Fの標準タイムクリア判定のフラグ",
-    chokyo_den_oikiri_check_time_4f_6f_flag: "調教1～3追い切り 4F/6Fの標準タイムクリア判定のフラグ",
+    chokyo_den_oikiri_time_4f_6f_flag: "調教1～3追い切り 4F/6Fの標準タイムクリア判定のフラグ",
     // スピード指数・ローテーション
     // 調教1
     chokyo_den_chokyo1_flag: "調教1 調教フラグ",
