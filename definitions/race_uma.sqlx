@@ -694,13 +694,45 @@ WITH
       d2.chokyo3_reigai AS chokyo_den_chokyo3_reigai,
       -- 調教 (sei2由来)
       s2.chokyo_flag AS chokyo_sei_flag,
-      s2.chokyo_kijosha AS chokyo_sei_kijosha,
       CASE
-        WHEN s2.chokyo_kijosha IS NULL THEN NULL
-        WHEN s2.chokyo_kijosha = '調教師' THEN '調教師'
-        WHEN s2.chokyo_kijosha = '見習' THEN '見習'
-        WHEN s2.chokyo_kijosha IN ('厩舎', '助手') THEN '厩舎'
-        ELSE '騎手'
+        WHEN d2.kaisai_nengappi <= '20251219' THEN
+          CASE s2.chokyo_kijosha
+             WHEN '調教師' THEN '助手'
+             WHEN '助手' THEN '攻馬手'
+             WHEN '見習' THEN '調教師'
+             WHEN '厩舎' THEN '見習'
+             WHEN '攻馬手' THEN '見習'
+             ELSE s2.chokyo_kijosha
+          END
+        ELSE
+          CASE s2.chokyo_kijosha
+             WHEN '調教師' THEN '調教師'
+             WHEN '助手' THEN '助手'
+             WHEN '見習' THEN '見習'
+             WHEN '厩舎' THEN '見習'
+             WHEN '攻馬手' THEN '攻馬手'
+             ELSE s2.chokyo_kijosha
+          END
+      END AS chokyo_sei_kijosha,
+      CASE
+        WHEN d2.kaisai_nengappi <= '20251219' THEN
+          CASE s2.chokyo_kijosha
+             WHEN '調教師' THEN '助手'
+             WHEN '助手' THEN '攻馬手'
+             WHEN '見習' THEN '調教師'
+             WHEN '厩舎' THEN '見習'
+             WHEN '攻馬手' THEN '見習'
+             ELSE '騎手'
+          END
+        ELSE
+          CASE s2.chokyo_kijosha
+             WHEN '調教師' THEN '調教師'
+             WHEN '助手' THEN '助手'
+             WHEN '見習' THEN '見習'
+             WHEN '厩舎' THEN '見習'
+             WHEN '攻馬手' THEN '攻馬手'
+             ELSE 'それ以外'
+          END
       END AS chokyo_sei_kijosha_kubun,
       s2.chokyo_nengappi AS chokyo_sei_nengappi,
       s2.chokyo_basho AS chokyo_sei_basho,
