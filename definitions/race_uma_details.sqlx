@@ -458,7 +458,6 @@ SELECT
   r.* EXCEPT (
     -- race_umaと重複するカラムをraceテーブルから除外
     race_code_kol, race_code_jvd, hasso_date, hasso_date_utc, kaiji, nichiji, race_bango, race_bango_num,
-    chokyo_den_oikiri_kijosha_kubun, chokyo_den_oikiri_kijosha_equal_kishumei_flag, chokyo_den_oikiri_check_time_1f_flag, chokyo_den_oikiri_check_time_4f_6f_flag,
     keibajo_code_jvd, keibajo_code_kol, created, modified
   )
 FROM
