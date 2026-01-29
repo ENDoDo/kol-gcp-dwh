@@ -17,6 +17,9 @@ config {
     kensyu_kubun: "券種 (単勝, 複勝, 普通馬連, 馬単, ワイド, 3連複, 3連単)",
     umaban_kumiban: "組番 (例: 10, 3-5)",
     haitou: "配当 (整数)"
+  },
+  bigquery: {
+    partitionBy: "kaisai_nengappi_utc"
   }
 }
 
