@@ -2291,3 +2291,5 @@ LEFT JOIN
 LEFT JOIN
   ${ref("races_uma_odds_jvd_new")} AS odds
   ON odds.RaceUmaCode = z.race_code_uma_kol
+WHERE
+  z.hasso_date >= '2023-01-01'

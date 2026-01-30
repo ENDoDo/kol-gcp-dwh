@@ -306,3 +306,5 @@ SELECT
 FROM joined_shirushi j
 JOIN distinct_race_info r ON j.race_code_kol = r.race_code_kol
 LEFT JOIN den1 d ON j.race_code_kol = d.race_code_kol
+WHERE
+  r.kaisai_nengappi >= '2023-01-01'

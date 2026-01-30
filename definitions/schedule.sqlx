@@ -35,6 +35,8 @@ SELECT
   CURRENT_TIMESTAMP() AS created
 FROM
   ${ref("kol_den1")}
+WHERE
+  kaisai_nengappi >= '20230101'
 -- 発走日ごとにグループ化
 GROUP BY
   id,
