@@ -37,7 +37,7 @@ SELECT
   COUNTIF(kakutei_chakujun_num >= 4) AS count_4chaku_ika,
   COUNT(*) AS count_total_races
 FROM
-  ${ref("race_uma_details")}
+  ${ref("race_uma")}
 WHERE
   chokyoshimei IS NOT NULL
   AND chokyo_sei_kijosha IS NOT NULL
