@@ -14,6 +14,9 @@ config {
     period2_end: "発走日時 date型 YYYY:MM:DD 23:59:59",
     modified: "データ更新日時",
     created: "データ作成日時"
+  },
+  bigquery: {
+    partitionBy: "DATE(period1_start)"
   }
 }
 
