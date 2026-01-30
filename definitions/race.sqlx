@@ -358,4 +358,4 @@ FROM
 LEFT JOIN
   ${ref("kol_sei1")} AS s1 ON d1.race_code_kol = s1.race_code_kol
 WHERE
-  d1.hasso_date >= '2023-01-01'
+  d1.kaisai_nengappi >= '20230101'
