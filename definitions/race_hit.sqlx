@@ -59,7 +59,55 @@ WITH
   den1 AS (
     SELECT
       race_code_kol,
-      kyosomei_15moji AS race_name
+      CASE
+        WHEN kyoso_joken_kubun = '00004' THEN
+          CONCAT(
+            kyosomei_15moji,
+            CASE
+              WHEN grade_code IS NOT NULL AND grade_code IN ('0', '1', '2', '3', '4', '5') THEN
+                CONCAT(
+                  '(',
+                  (
+                    CASE grade_code
+                      WHEN '0' THEN 'GⅠ'
+                      WHEN '1' THEN 'GⅡ'
+                      WHEN '2' THEN 'GⅢ'
+                      WHEN '3' THEN 'JGⅠ'
+                      WHEN '4' THEN 'JGⅡ'
+                      WHEN '5' THEN 'JGⅢ'
+                    END
+                  ),
+                  ')'
+                )
+              ELSE ''
+            END
+          )
+        ELSE
+          CONCAT(
+            CASE WHEN heichi_shogai_kubun = '1' THEN '障害' ELSE '' END,
+            CASE kyoso_joken_age_limit
+              WHEN '0' THEN '2歳'
+              WHEN '1' THEN '3歳'
+              WHEN '2' THEN '4歳'
+              WHEN '3' THEN '3,4,5歳'
+              WHEN '4' THEN '4,5,6歳'
+              WHEN '5' THEN '3歳以上'
+              WHEN '6' THEN '4歳以上'
+              WHEN '7' THEN '3,4歳'
+              WHEN '8' THEN '4,5歳'
+              ELSE ''
+            END,
+            CASE kyoso_joken_kubun
+              WHEN '00001' THEN '新馬'
+              WHEN '00002' THEN '未出走'
+              WHEN '00003' THEN '未勝利'
+              WHEN '05000' THEN '1勝クラス'
+              WHEN '10000' THEN '2勝クラス'
+              WHEN '16000' THEN '3勝クラス'
+              ELSE ''
+            END
+          )
+      END AS race_name
     FROM ${ref("kol_den1")}
   ),
 
