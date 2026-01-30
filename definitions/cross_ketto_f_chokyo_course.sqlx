@@ -36,7 +36,7 @@ FROM
 WHERE
   ketto1_f_hanshoku_toroku_bango IS NOT NULL
   AND chokyo_sei_basho_course_label IS NOT NULL
-  AND CAST(EXTRACT(YEAR FROM hasso_date) AS STRING) BETWEEN CAST(EXTRACT(YEAR FROM CURRENT_DATE('Asia/Tokyo')) - 3 AS STRING) AND CAST(EXTRACT(YEAR FROM CURRENT_DATE('Asia/Tokyo')) - 1 AS STRING)
+  AND hasso_date >= '2023-01-01' AND hasso_date < '2026-01-01'
 GROUP BY
   ketto1_f_hanshoku_toroku_bango,
   chokyo_sei_basho_course_label
