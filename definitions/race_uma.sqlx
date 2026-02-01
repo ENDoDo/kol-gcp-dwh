@@ -731,7 +731,7 @@ WITH
              WHEN '見習' THEN '見習'
              WHEN '厩舎' THEN '見習'
              WHEN '攻馬手' THEN '攻馬手'
-             ELSE 'それ以外'
+             ELSE '騎手'
           END
       END AS chokyo_sei_kijosha_kubun,
       s2.chokyo_nengappi AS chokyo_sei_nengappi,
