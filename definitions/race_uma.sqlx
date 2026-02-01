@@ -843,27 +843,13 @@ WITH
       END AS chokyo_sei_course_kubun,
 
       CASE
-        WHEN DATE(hasso_date) <= '2025-12-19' THEN
-          CASE
-             WHEN chokyo_den_oikiri_kijosha IS NULL THEN NULL
-             WHEN chokyo_den_oikiri_kijosha = '調教師' THEN '助手'
-             WHEN chokyo_den_oikiri_kijosha = '助手' THEN '攻馬手'
-             WHEN chokyo_den_oikiri_kijosha = '見習' THEN '調教師'
-             WHEN chokyo_den_oikiri_kijosha = '厩舎' THEN '見習'
-             WHEN chokyo_den_oikiri_kijosha = '攻馬手' THEN '見習'
-             ELSE '騎手'
-          END
-        ELSE
-          CASE
-             WHEN chokyo_den_oikiri_kijosha IS NULL THEN NULL
-             WHEN chokyo_den_oikiri_kijosha = '調教師' THEN '調教師'
-             WHEN chokyo_den_oikiri_kijosha = '助手' THEN '助手'
-             WHEN chokyo_den_oikiri_kijosha = '見習' THEN '見習'
-             WHEN chokyo_den_oikiri_kijosha = '厩舎' THEN '見習'
-             WHEN chokyo_den_oikiri_kijosha = '攻馬手' THEN '攻馬手'
-             ELSE 'それ以外'
-          END
-      END AS chokyo_den_oikiri_kijosha_kubun,
+         WHEN chokyo_den_oikiri_kijosha IS NULL THEN NULL
+         WHEN chokyo_den_oikiri_kijosha = '調教師' THEN '調教師'
+         WHEN chokyo_den_oikiri_kijosha = '助手' THEN '助手'
+         WHEN chokyo_den_oikiri_kijosha = '見習' THEN '見習'
+         WHEN chokyo_den_oikiri_kijosha = '厩舎' THEN '見習'
+         ELSE '騎手'
+       END AS chokyo_den_oikiri_kijosha_kubun,
 
       CASE
         WHEN chokyo_den_oikiri_kijosha IS NOT NULL AND chokyo_den_oikiri_kijosha = kishumei_ryakusho THEN 'はい'
