@@ -8,7 +8,6 @@ config {
     month_day: "発生月日 MMDD",
     kaisai_nengappi: "開催年月日 date型 (JST)",
     kaisai_nengappi_utc: "開催年月日 date型 (UTC)",
-    hasso_date_utc: "発走日時 (UTC)",
     keibajo_code_jvd: "JRA-VAN仕様競馬場コード",
     keibajo_code_kol: "KOL仕様競馬場コード",
     keibajo_name: "競馬場名",
@@ -20,7 +19,7 @@ config {
     haitou: "配当 (整数)"
   },
   bigquery: {
-    partitionBy: "DATE(hasso_date_utc)"
+    partitionBy: "kaisai_nengappi_utc"
   }
 }
 
@@ -32,7 +31,6 @@ WITH
       race_code_jvd,
       DATE(hasso_date) AS kaisai_nengappi,
       DATE(hasso_date_utc) AS kaisai_nengappi_utc,
-      hasso_date_utc,
       FORMAT_DATE('%Y', DATE(hasso_date)) AS year,
       FORMAT_DATE('%m%d', DATE(hasso_date)) AS month_day,
       keibajo_code_jvd,
@@ -279,7 +277,6 @@ WITH
       race_code_jvd,
       kaisai_nengappi,
       kaisai_nengappi_utc,
-      hasso_date_utc,
       year,
       month_day,
       keibajo_code_jvd,
@@ -297,7 +294,6 @@ SELECT
   r.month_day,
   r.kaisai_nengappi,
   r.kaisai_nengappi_utc,
-  r.hasso_date_utc,
   r.keibajo_code_jvd,
   r.keibajo_code_kol,
   r.keibajo_name,
