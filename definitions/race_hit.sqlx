@@ -6,6 +6,8 @@ config {
     race_code_jvd: "JRA-VAN仕様レースID",
     year: "発生年 YYYY",
     month_day: "発生月日 MMDD",
+    hasso_date: "発走日時 (JST)",
+    hasso_date_utc: "発走日時 (UTC)",
     kaisai_nengappi: "開催年月日 date型 (JST)",
     kaisai_nengappi_utc: "開催年月日 date型 (UTC)",
     keibajo_code_jvd: "JRA-VAN仕様競馬場コード",
@@ -19,7 +21,7 @@ config {
     haitou: "配当 (整数)"
   },
   bigquery: {
-    partitionBy: "kaisai_nengappi_utc"
+    partitionBy: "hasso_date_utc"
   }
 }
 
@@ -29,6 +31,8 @@ WITH
     SELECT
       race_code_kol,
       race_code_jvd,
+      hasso_date,
+      hasso_date_utc,
       DATE(hasso_date) AS kaisai_nengappi,
       DATE(hasso_date_utc) AS kaisai_nengappi_utc,
       FORMAT_DATE('%Y', DATE(hasso_date)) AS year,
@@ -275,6 +279,8 @@ WITH
     SELECT DISTINCT
       race_code_kol,
       race_code_jvd,
+      hasso_date,
+      hasso_date_utc,
       kaisai_nengappi,
       kaisai_nengappi_utc,
       year,
@@ -292,6 +298,8 @@ SELECT
   r.race_code_jvd,
   r.year,
   r.month_day,
+  r.hasso_date,
+  r.hasso_date_utc,
   r.kaisai_nengappi,
   r.kaisai_nengappi_utc,
   r.keibajo_code_jvd,
