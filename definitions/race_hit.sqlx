@@ -21,7 +21,7 @@ config {
     haitou: "配当 (整数)"
   },
   bigquery: {
-    partitionBy: "hasso_date_utc"
+    partitionBy: "DATE(hasso_date_utc)"
   }
 }
 
