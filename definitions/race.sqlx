@@ -103,7 +103,7 @@ SELECT
   d1.race_num AS race_bango,
   SAFE_CAST(d1.race_num AS INT64) AS race_bango_num,
   CASE
-    WHEN d1.kyoso_joken_kubun = '00004' THEN
+    WHEN d1.kyoso_joken_kubun = '00004' AND d1.kyosomei_15moji IS NOT NULL THEN
       CONCAT(
         d1.kyosomei_15moji,
         CASE
@@ -144,6 +144,7 @@ SELECT
           WHEN '00001' THEN '新馬'
           WHEN '00002' THEN '未出走'
           WHEN '00003' THEN '未勝利'
+          WHEN '00004' THEN 'オープン'
           WHEN '05000' THEN '1勝クラス'
           WHEN '10000' THEN '2勝クラス'
           WHEN '16000' THEN '3勝クラス'
