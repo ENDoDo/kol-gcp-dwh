@@ -144,10 +144,10 @@ SELECT
           WHEN '00001' THEN '新馬'
           WHEN '00002' THEN '未出走'
           WHEN '00003' THEN '未勝利'
-          WHEN '00004' THEN 'オープン'
           WHEN '05000' THEN '1勝クラス'
           WHEN '10000' THEN '2勝クラス'
           WHEN '16000' THEN '3勝クラス'
+          WHEN '00004' THEN 'オープン'
           ELSE ''
         END
       )
