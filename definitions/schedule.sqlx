@@ -12,6 +12,7 @@ config {
     month_day: "発走月日4文字 MMDD",
     period1_start: "発走日時 date型 YYYY:MM:DD 00:00:00",
     period2_end: "発走日時 date型 YYYY:MM:DD 23:59:59",
+    main_race_names: "当日に開催されるメインレース名（オープン競走）。スペースとカンマ区切りのリスト型。グレードが高い順に表示。",
     modified: "データ更新日時",
     created: "データ作成日時"
   },
@@ -20,30 +21,52 @@ config {
   }
 }
 
+WITH
+  -- raceテーブルからオープン競走（00004）を取得し、日ごとにレース名を結合
+  main_races AS (
+    SELECT
+      SUBSTR(race_code_kol, 1, 8) AS date_id,
+      -- グレード順（NULLの場合は最後）にレース名を結合
+      STRING_AGG(race_name, ' , ' ORDER BY COALESCE(grade_code, '9') ASC, race_code_kol ASC) AS main_race_names
+    FROM
+      ${ref("race")}
+    WHERE
+      kyoso_joken_kubun = '00004' -- オープン
+    GROUP BY
+      date_id
+  )
+
 -- kol_den1テーブルから開催年月日を抽出し、各種日付形式に変換する
 SELECT
   -- 発走日（YYYYMMDD）
-  kaisai_nengappi AS id,
+  d1.kaisai_nengappi AS id,
   -- 発走年（YYYY）
-  SUBSTR(kaisai_nengappi, 1, 4) AS year,
+  SUBSTR(d1.kaisai_nengappi, 1, 4) AS year,
   -- 発走月日（MMDD）
-  SUBSTR(kaisai_nengappi, 5, 4) AS month_day,
+  SUBSTR(d1.kaisai_nengappi, 5, 4) AS month_day,
   -- 期間開始日時（YYYY-MM-DD 00:00:00）
-  DATETIME_ADD(PARSE_DATETIME('%Y%m%d %H:%M:%S', kaisai_nengappi || ' 00:00:00'), INTERVAL 9 HOUR) AS period1_start,
+  DATETIME_ADD(PARSE_DATETIME('%Y%m%d %H:%M:%S', d1.kaisai_nengappi || ' 00:00:00'), INTERVAL 9 HOUR) AS period1_start,
   -- 期間終了日時（YYYY-MM-DD 23:59:59）
-  DATETIME_ADD(PARSE_DATETIME('%Y%m%d %H:%M:%S', kaisai_nengappi || ' 23:59:59'), INTERVAL 9 HOUR) AS period2_end,
+  DATETIME_ADD(PARSE_DATETIME('%Y%m%d %H:%M:%S', d1.kaisai_nengappi || ' 23:59:59'), INTERVAL 9 HOUR) AS period2_end,
+  -- メインレース名リスト
+  mr.main_race_names,
   -- データ更新日時
   CURRENT_TIMESTAMP() AS modified,
   -- データ作成日時
   CURRENT_TIMESTAMP() AS created
 FROM
-  ${ref("kol_den1")}
+  ${ref("kol_den1")} AS d1
+LEFT JOIN
+  main_races AS mr
+ON
+  d1.kaisai_nengappi = mr.date_id
 WHERE
-  kaisai_nengappi >= '20230101'
+  d1.kaisai_nengappi >= '20230101'
 -- 発走日ごとにグループ化
 GROUP BY
   id,
   year,
   month_day,
   period1_start,
-  period2_end
+  period2_end,
+  main_race_names
