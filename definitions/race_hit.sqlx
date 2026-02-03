@@ -64,7 +64,7 @@ WITH
     SELECT
       race_code_kol,
       CASE
-        WHEN kyoso_joken_kubun = '00004' THEN
+        WHEN kyoso_joken_kubun = '00004' AND kyosomei_15moji IS NOT NULL THEN
           CONCAT(
             kyosomei_15moji,
             CASE
@@ -108,6 +108,7 @@ WITH
               WHEN '05000' THEN '1勝クラス'
               WHEN '10000' THEN '2勝クラス'
               WHEN '16000' THEN '3勝クラス'
+              WHEN '00004' THEN 'オープン'
               ELSE ''
             END
           )
