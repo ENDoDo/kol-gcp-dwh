@@ -32,6 +32,8 @@ WITH
       ${ref("race")}
     WHERE
       kyoso_joken_kubun = '00004' -- オープン
+      AND kyosomei_15moji IS NOT NULL
+      AND kyosomei_15moji != ''
     GROUP BY
       date_id
   )
