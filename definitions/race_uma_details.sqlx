@@ -20,7 +20,7 @@ config {
     hasso_date_utc: "発走日時(UTC)",
     kaiji: "開催回次",
     nichiji: "開催日次",
-    race_bango: "レース番号 2桁",
+
     race_bango_num: "レース番号 整数型",
     waku_kubun: "枠番区分",
     wakuban: "枠番",
@@ -31,13 +31,13 @@ config {
     bamei: "馬名",
     seibetsu_code: "性別コード",
     seibetsu_code_label: "性別 牡/牝/せん",
-    barei: "馬齢",
+
     barei_num: "馬齢 整数型",
-    futan_juryo: "負担重量 単位:0.1kg",
+
     futan_juryo_float: "負担重量 小数点第一位まで",
     blinker_shiyo_kubun: "ブリンカー使用区分",
     blinker_shiyo_kubun_label: "ブリンカー使用 はい/いいえ",
-    rating: "レイティング 3桁",
+
     rating_float: "レイティング 小数点第一位まで",
     // 馬主・血統
     banushimei: "馬主名",
@@ -89,14 +89,9 @@ config {
     chokyo_den_oikiri_7f_float: "調教タイム 7F (小数点)",
     chokyo_den_oikiri_6f: "調教タイム 6F",
     chokyo_den_oikiri_6f_float: "調教タイム 6F (小数点)",
-    chokyo_den_oikiri_5f: "調教タイム 5F",
-    chokyo_den_oikiri_5f_float: "調教タイム 5F (小数点)",
-    chokyo_den_oikiri_4f: "調教タイム 4F",
-    chokyo_den_oikiri_4f_float: "調教タイム 4F (小数点)",
-    chokyo_den_oikiri_3f: "調教タイム 3F",
-    chokyo_den_oikiri_3f_float: "調教タイム 3F (小数点)",
+
     chokyo_den_oikiri_2f_float: "調教タイム 2F推定値 (小数点)",
-    chokyo_den_oikiri_1f: "調教タイム 1F",
+
     chokyo_den_oikiri_1f_float: "調教タイム 1F (小数点)",
     chokyo_den_oikiri_lap_8f: "追い切り 8Fラップタイム 8f-7f",
     chokyo_den_oikiri_lap_7f: "追い切り 7Fラップタイム 7f-6f",
@@ -140,12 +135,7 @@ config {
     chokyo_den_awase_flag: "出馬表出走馬データ 調教併せフラグ",
     chokyo_den_awase_flag_label: "出馬表出走馬データ chokyo_awase_flagをもとに対応 調教2の併せ/調教3の併せ",
     chokyo_den_tanpyo: "出馬表出走馬データ ブックによる調教短評",
-    chokyo_den_honsu_course: "出馬表出走馬データ 前走からの調教本数でコース追いの本数",
-    chokyo_den_honsu_course_num: "出馬表出走馬データ 前走からの調教本数でコース追いの本数 整数型",
-    chokyo_den_honsu_hanro: "出馬表出走馬データ 前走からの調教本数で坂路追いの本数",
-    chokyo_den_honsu_hanro_num: "出馬表出走馬データ 前走からの調教本数で坂路追いの本数 整数型",
-    chokyo_den_honsu_pool: "出馬表出走馬データ 前走からの調教本数でプール追いの本数",
-    chokyo_den_honsu_pool_num: "出馬表出走馬データ 前走からの調教本数でプール追いの本数 整数型",
+
     chokyo_den_oikiri_reigai: "調教例外",
     chokyo_den_oikiri_kijosha_kubun: "調教1～3追い切り 調教騎乗者区分",
     chokyo_den_oikiri_kijosha_equal_kishumei_flag: "調教1～3追い切り 調教騎乗騎手がレースでも騎乗フラグ",
@@ -170,14 +160,14 @@ config {
     chokyo_den_chokyo1_7f_float: "調教1 調教タイム 7F (小数点)",
     chokyo_den_chokyo1_6f: "調教1 調教タイム 6F",
     chokyo_den_chokyo1_6f_float: "調教1 調教タイム 6F (小数点)",
-    chokyo_den_chokyo1_5f: "調教1 調教タイム 5F",
+
     chokyo_den_chokyo1_5f_float: "調教1 調教タイム 5F (小数点)",
-    chokyo_den_chokyo1_4f: "調教1 調教タイム 4F",
+
     chokyo_den_chokyo1_4f_float: "調教1 調教タイム 4F (小数点)",
-    chokyo_den_chokyo1_3f: "調教1 調教タイム 3F",
+
     chokyo_den_chokyo1_3f_float: "調教1 調教タイム 3F (小数点)",
     chokyo_den_chokyo1_2f_float: "調教1 調教タイム 2F推定値 (小数点)",
-    chokyo_den_chokyo1_1f: "調教1 調教タイム 1F",
+
     chokyo_den_chokyo1_1f_float: "調教1 調教タイム 1F (小数点)",
     chokyo_den_chokyo1_ichidori: "調教1 調教位置取り",
     chokyo_den_chokyo1_ichidori_label: "調教1 調教位置取り(ラベル)",
@@ -204,14 +194,14 @@ config {
     chokyo_den_chokyo2_7f_float: "調教2 調教タイム 7F (小数点)",
     chokyo_den_chokyo2_6f: "調教2 調教タイム 6F",
     chokyo_den_chokyo2_6f_float: "調教2 調教タイム 6F (小数点)",
-    chokyo_den_chokyo2_5f: "調教2 調教タイム 5F",
+
     chokyo_den_chokyo2_5f_float: "調教2 調教タイム 5F (小数点)",
-    chokyo_den_chokyo2_4f: "調教2 調教タイム 4F",
+
     chokyo_den_chokyo2_4f_float: "調教2 調教タイム 4F (小数点)",
-    chokyo_den_chokyo2_3f: "調教2 調教タイム 3F",
+
     chokyo_den_chokyo2_3f_float: "調教2 調教タイム 3F (小数点)",
     chokyo_den_chokyo2_2f_float: "調教2 調教タイム 2F推定値 (小数点)",
-    chokyo_den_chokyo2_1f: "調教2 調教タイム 1F",
+
     chokyo_den_chokyo2_1f_float: "調教2 調教タイム 1F (小数点)",
     chokyo_den_chokyo2_ichidori: "調教2 調教位置取り",
     chokyo_den_chokyo2_ichidori_label: "調教2 調教位置取り(ラベル)",
@@ -238,14 +228,14 @@ config {
     chokyo_den_chokyo3_7f_float: "調教3 調教タイム 7F (小数点)",
     chokyo_den_chokyo3_6f: "調教3 調教タイム 6F",
     chokyo_den_chokyo3_6f_float: "調教3 調教タイム 6F (小数点)",
-    chokyo_den_chokyo3_5f: "調教3 調教タイム 5F",
+
     chokyo_den_chokyo3_5f_float: "調教3 調教タイム 5F (小数点)",
-    chokyo_den_chokyo3_4f: "調教3 調教タイム 4F",
+
     chokyo_den_chokyo3_4f_float: "調教3 調教タイム 4F (小数点)",
-    chokyo_den_chokyo3_3f: "調教3 調教タイム 3F",
+
     chokyo_den_chokyo3_3f_float: "調教3 調教タイム 3F (小数点)",
     chokyo_den_chokyo3_2f_float: "調教3 調教タイム 2F推定値 (小数点)",
-    chokyo_den_chokyo3_1f: "調教3 調教タイム 1F",
+
     chokyo_den_chokyo3_1f_float: "調教3 調教タイム 1F (小数点)",
     chokyo_den_chokyo3_ichidori: "調教3 調教位置取り",
     chokyo_den_chokyo3_ichidori_label: "調教3 調教位置取り(ラベル)",
@@ -275,14 +265,14 @@ config {
     chokyo_sei_7f_float: "競走成績出走馬データ  追い切り chokyo_7f 小数点第一位まで",
     chokyo_sei_6f: "競走成績出走馬データ  追い切り 調教タイム 6F",
     chokyo_sei_6f_float: "競走成績出走馬データ  追い切り chokyo_6f 小数点第一位まで",
-    chokyo_sei_5f: "競走成績出走馬データ  追い切り 調教タイム 5F",
+
     chokyo_sei_5f_float: "競走成績出走馬データ  追い切り chokyo_5f 小数点第一位まで",
-    chokyo_sei_4f: "競走成績出走馬データ  追い切り 調教タイム 4F",
+
     chokyo_sei_4f_float: "競走成績出走馬データ  追い切り chokyo_4f 小数点第一位まで",
-    chokyo_sei_3f: "競走成績出走馬データ  追い切り 調教タイム 3F",
+
     chokyo_sei_3f_float: "競走成績出走馬データ  追い切り chokyo_3f 小数点第一位まで",
     chokyo_sei_2f_float: "競走成績出走馬データ  追い切り 調教タイム 2F推定値 (小数点)",
-    chokyo_sei_1f: "競走成績出走馬データ  追い切り 調教タイム 1F",
+
     chokyo_sei_1f_float: "競走成績出走馬データ  追い切り chokyo_1f 小数点第一位まで",
     chokyo_sei_lap_8f: "競走成績出走馬データ  追い切り 8Fラップタイム 8f-7f",
     chokyo_sei_lap_7f: "競走成績出走馬データ  追い切り 7Fラップタイム 7f-6f",
@@ -307,32 +297,8 @@ config {
     chokyo_sei_check_time_1f_flag: "競走成績出走馬データ  追い切り 1F標準タイムクリアフラグ",
     chokyo_sei_check_time_4f_6f_flag: "競走成績出走馬データ  追い切り 4F/6F標準タイムクリアフラグ",
 
-    speed_sisu_last_1: "スピード指数 1走前",
-    speed_sisu_last_1_float: "スピード指数 1走前(小数点)",
-    speed_sisu_last_2: "スピード指数 2走前",
-    speed_sisu_last_2_float: "スピード指数 2走前(小数点)",
-    speed_sisu_last_3: "スピード指数 3走前",
-    speed_sisu_last_3_float: "スピード指数 3走前(小数点)",
-    speed_sisu_last_4: "スピード指数 4走前",
-    speed_sisu_last_4_float: "スピード指数 4走前(小数点)",
-    speed_sisu_last_5: "スピード指数 5走前",
-    speed_sisu_last_5_float: "スピード指数 5走前(小数点)",
-    rotation1: "ローテーション1週前",
-    rotation1_label: "ローテーション1週前(ラベル)",
-    rotation2: "ローテーション2週前",
-    rotation2_label: "ローテーション2週前(ラベル)",
-    rotation3: "ローテーション3週前",
-    rotation3_label: "ローテーション3週前(ラベル)",
-    rotation4: "ローテーション4週前",
-    rotation4_label: "ローテーション4週前(ラベル)",
-    rotation5: "ローテーション5週前",
-    rotation5_label: "ローテーション5週前(ラベル)",
-    rotation6: "ローテーション6週前",
-    rotation6_label: "ローテーション6週前(ラベル)",
-    rotation7: "ローテーション7週前",
-    rotation7_label: "ローテーション7週前(ラベル)",
-    rotation8: "ローテーション8週前",
-    rotation8_label: "ローテーション8週前(ラベル)",
+
+
     zensou_kankaku: "前走との間隔。rotatin1～8の確定着順をもとに判定 連闘/中1周/中2週/中3週/中4週/中5週/中6週/中7週",
     // 馬体重・前走比較
     bataiju: "馬体重(kg)",
@@ -349,15 +315,14 @@ config {
     siba_to_dirt_flag: "芝→ダ替わりフラグ",
     dirt_to_siba_flag: "ダ→芝替わりフラグ",
     // 成績 (sei2)
-    record_shisu: "レコード指数",
-    record_shisu_num: "レコード指数(整数)",
-    zogen_sa: "増減差",
+
+
     zogen_sa_num: "増減差(整数)",
-    kakutei_chakujun: "確定着順",
+
     kakutei_chakujun_num: "確定着順(整数)",
-    tansho_haraimodoshi: "単勝払戻",
+
     tansho_haraimodoshi_num: "単勝払戻(整数)",
-    fukusho_haraimodoshi: "複勝払戻",
+
     fukusho_haraimodoshi_num: "複勝払戻(整数)",
     ijo_kubun_code1: "異常区分コード1",
     ijo_kubun_code1_label: "異常区分コード1(ラベル)",
@@ -365,21 +330,20 @@ config {
     ijo_kubun_code2_label: "異常区分コード2(ラベル)",
     nyusen_juni: "入線順位",
     nyusen_juni_num: "入線順位(整数)",
-    record_flag: "レコードフラグ",
-    record_flag_label: "レコードフラグ(ラベル)",
-    soha_time: "走破タイム",
+
+
     soha_time_float: "走破タイム(秒換算)",
     soha_time_label: "走破タイム(xx分xx.x秒)",
-    chakusa_code1: "着差コード1",
+
     chakusa_code1_num: "着差コード1(整数)",
     chakusa_code2: "着差コード2",
     chakusa_code2_label: "着差コード2(ラベル)",
     chakusa_label: "着差(ラベル)",
-    time_sa: "タイム差",
+
     time_sa_float: "タイム差(小数点)",
-    zenhan_3f: "前半3F",
+
     zenhan_3f_float: "前半3F(小数点)",
-    kohan_3f: "後半3F",
+
     kohan_3f_float: "後半3F(小数点)",
     corner1_juni: "1角順位",
     corner1_juni_label: "1角順位(ラベル)",

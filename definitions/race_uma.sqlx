@@ -20,7 +20,7 @@ config {
     hasso_date_utc: "発走日時(UTC)",
     kaiji: "開催回次",
     nichiji: "開催日次",
-    race_bango: "レース番号 2桁",
+
     race_bango_num: "レース番号 整数型",
     waku_kubun: "枠番区分",
     wakuban: "枠番",
@@ -31,13 +31,13 @@ config {
     bamei: "馬名",
     seibetsu_code: "性別コード",
     seibetsu_code_label: "性別 牡/牝/せん",
-    barei: "馬齢",
+
     barei_num: "馬齢 整数型",
-    futan_juryo: "負担重量 単位:0.1kg",
+
     futan_juryo_float: "負担重量 小数点第一位まで",
     blinker_shiyo_kubun: "ブリンカー使用区分",
     blinker_shiyo_kubun_label: "ブリンカー使用 はい/いいえ",
-    rating: "レイティング 3桁",
+
     rating_float: "レイティング 小数点第一位まで",
     // 馬主・血統
     banushimei: "馬主名",
@@ -84,20 +84,6 @@ config {
     chokyo_den_oikiri_babajotai: "調教馬場状態",
     chokyo_den_oikiri_hanro_pool_kaisu_int: "坂路またはプール:chokyo_6f それ以外:null",
     chokyo_den_oikiri_8f: "調教タイム 8F",
-    chokyo_den_oikiri_8f_float: "調教タイム 8F (小数点)",
-    chokyo_den_oikiri_7f: "調教タイム 7F",
-    chokyo_den_oikiri_7f_float: "調教タイム 7F (小数点)",
-    chokyo_den_oikiri_6f: "調教タイム 6F",
-    chokyo_den_oikiri_6f_float: "調教タイム 6F (小数点)",
-    chokyo_den_oikiri_5f: "調教タイム 5F",
-    chokyo_den_oikiri_5f_float: "調教タイム 5F (小数点)",
-    chokyo_den_oikiri_4f: "調教タイム 4F",
-    chokyo_den_oikiri_4f_float: "調教タイム 4F (小数点)",
-    chokyo_den_oikiri_3f: "調教タイム 3F",
-    chokyo_den_oikiri_3f_float: "調教タイム 3F (小数点)",
-    chokyo_den_oikiri_2f_float: "調教タイム 2F推定値 (小数点)",
-    chokyo_den_oikiri_1f: "調教タイム 1F",
-    chokyo_den_oikiri_1f_float: "調教タイム 1F (小数点)",
     chokyo_den_oikiri_lap_8f: "追い切り 8Fラップタイム 8f-7f",
     chokyo_den_oikiri_lap_7f: "追い切り 7Fラップタイム 7f-6f",
     chokyo_den_oikiri_lap_6f: "追い切り 6Fラップタイム 6f-5f",
@@ -124,12 +110,7 @@ config {
     chokyo_den_awase_flag: "出馬表出走馬データ 調教併せフラグ",
     chokyo_den_awase_flag_label: "出馬表出走馬データ chokyo_awase_flagをもとに対応 調教2の併せ/調教3の併せ",
     chokyo_den_tanpyo: "出馬表出走馬データ ブックによる調教短評",
-    chokyo_den_honsu_course: "出馬表出走馬データ 前走からの調教本数でコース追いの本数",
-    chokyo_den_honsu_course_num: "出馬表出走馬データ 前走からの調教本数でコース追いの本数 整数型",
-    chokyo_den_honsu_hanro: "出馬表出走馬データ 前走からの調教本数で坂路追いの本数",
-    chokyo_den_honsu_hanro_num: "出馬表出走馬データ 前走からの調教本数で坂路追いの本数 整数型",
-    chokyo_den_honsu_pool: "出馬表出走馬データ 前走からの調教本数でプール追いの本数",
-    chokyo_den_honsu_pool_num: "出馬表出走馬データ 前走からの調教本数でプール追いの本数 整数型",
+
     chokyo_den_oikiri_reigai: "調教例外",
     chokyo_den_oikiri_kijosha_kubun: "調教1～3追い切り 調教騎乗者区分",
     chokyo_den_oikiri_kijosha_equal_kishumei_flag: "調教1～3追い切り 調教騎乗騎手がレースでも騎乗フラグ",
@@ -157,14 +138,14 @@ config {
     chokyo_den_chokyo1_7f_float: "調教1 調教タイム 7F (小数点)",
     chokyo_den_chokyo1_6f: "調教1 調教タイム 6F",
     chokyo_den_chokyo1_6f_float: "調教1 調教タイム 6F (小数点)",
-    chokyo_den_chokyo1_5f: "調教1 調教タイム 5F",
+
     chokyo_den_chokyo1_5f_float: "調教1 調教タイム 5F (小数点)",
-    chokyo_den_chokyo1_4f: "調教1 調教タイム 4F",
+
     chokyo_den_chokyo1_4f_float: "調教1 調教タイム 4F (小数点)",
-    chokyo_den_chokyo1_3f: "調教1 調教タイム 3F",
+
     chokyo_den_chokyo1_3f_float: "調教1 調教タイム 3F (小数点)",
     chokyo_den_chokyo1_2f_float: "調教1 調教タイム 2F推定値 (小数点)",
-    chokyo_den_chokyo1_1f: "調教1 調教タイム 1F",
+
     chokyo_den_chokyo1_1f_float: "調教1 調教タイム 1F (小数点)",
     chokyo_den_chokyo1_ichidori: "調教1 調教位置取り",
     chokyo_den_chokyo1_ichidori_label: "調教1 調教位置取り(ラベル)",
@@ -191,14 +172,14 @@ config {
     chokyo_den_chokyo2_7f_float: "調教2 調教タイム 7F (小数点)",
     chokyo_den_chokyo2_6f: "調教2 調教タイム 6F",
     chokyo_den_chokyo2_6f_float: "調教2 調教タイム 6F (小数点)",
-    chokyo_den_chokyo2_5f: "調教2 調教タイム 5F",
+
     chokyo_den_chokyo2_5f_float: "調教2 調教タイム 5F (小数点)",
-    chokyo_den_chokyo2_4f: "調教2 調教タイム 4F",
+
     chokyo_den_chokyo2_4f_float: "調教2 調教タイム 4F (小数点)",
-    chokyo_den_chokyo2_3f: "調教2 調教タイム 3F",
+
     chokyo_den_chokyo2_3f_float: "調教2 調教タイム 3F (小数点)",
     chokyo_den_chokyo2_2f_float: "調教2 調教タイム 2F推定値 (小数点)",
-    chokyo_den_chokyo2_1f: "調教2 調教タイム 1F",
+
     chokyo_den_chokyo2_1f_float: "調教2 調教タイム 1F (小数点)",
     chokyo_den_chokyo2_ichidori: "調教2 調教位置取り",
     chokyo_den_chokyo2_ichidori_label: "調教2 調教位置取り(ラベル)",
@@ -225,14 +206,14 @@ config {
     chokyo_den_chokyo3_7f_float: "調教3 調教タイム 7F (小数点)",
     chokyo_den_chokyo3_6f: "調教3 調教タイム 6F",
     chokyo_den_chokyo3_6f_float: "調教3 調教タイム 6F (小数点)",
-    chokyo_den_chokyo3_5f: "調教3 調教タイム 5F",
+
     chokyo_den_chokyo3_5f_float: "調教3 調教タイム 5F (小数点)",
-    chokyo_den_chokyo3_4f: "調教3 調教タイム 4F",
+
     chokyo_den_chokyo3_4f_float: "調教3 調教タイム 4F (小数点)",
-    chokyo_den_chokyo3_3f: "調教3 調教タイム 3F",
+
     chokyo_den_chokyo3_3f_float: "調教3 調教タイム 3F (小数点)",
     chokyo_den_chokyo3_2f_float: "調教3 調教タイム 2F推定値 (小数点)",
-    chokyo_den_chokyo3_1f: "調教3 調教タイム 1F",
+
     chokyo_den_chokyo3_1f_float: "調教3 調教タイム 1F (小数点)",
     chokyo_den_chokyo3_ichidori: "調教3 調教位置取り",
     chokyo_den_chokyo3_ichidori_label: "調教3 調教位置取り(ラベル)",
@@ -262,14 +243,14 @@ config {
     chokyo_sei_7f_float: "競走成績出走馬データ  追い切り chokyo_7f 小数点第一位まで",
     chokyo_sei_6f: "競走成績出走馬データ  追い切り 調教タイム 6F",
     chokyo_sei_6f_float: "競走成績出走馬データ  追い切り chokyo_6f 小数点第一位まで",
-    chokyo_sei_5f: "競走成績出走馬データ  追い切り 調教タイム 5F",
+
     chokyo_sei_5f_float: "競走成績出走馬データ  追い切り chokyo_5f 小数点第一位まで",
-    chokyo_sei_4f: "競走成績出走馬データ  追い切り 調教タイム 4F",
+
     chokyo_sei_4f_float: "競走成績出走馬データ  追い切り chokyo_4f 小数点第一位まで",
-    chokyo_sei_3f: "競走成績出走馬データ  追い切り 調教タイム 3F",
+
     chokyo_sei_3f_float: "競走成績出走馬データ  追い切り chokyo_3f 小数点第一位まで",
     chokyo_sei_2f_float: "競走成績出走馬データ  追い切り 調教タイム 2F推定値 (小数点)",
-    chokyo_sei_1f: "競走成績出走馬データ  追い切り 調教タイム 1F",
+
     chokyo_sei_1f_float: "競走成績出走馬データ  追い切り chokyo_1f 小数点第一位まで",
     chokyo_sei_lap_8f: "競走成績出走馬データ  追い切り 8Fラップタイム 8f-7f",
     chokyo_sei_lap_7f: "競走成績出走馬データ  追い切り 7Fラップタイム 7f-6f",
@@ -293,32 +274,7 @@ config {
     chokyo_sei_check_time_1f_flag: "競走成績出走馬データ  追い切り 1F標準タイムクリアフラグ",
     chokyo_sei_check_time_4f_6f_flag: "競走成績出走馬データ  追い切り 4F/6F標準タイムクリアフラグ",
     // スピード指数・ローテーション
-    speed_sisu_last_1: "スピード指数 1走前",
-    speed_sisu_last_1_float: "スピード指数 1走前(小数点)",
-    speed_sisu_last_2: "スピード指数 2走前",
-    speed_sisu_last_2_float: "スピード指数 2走前(小数点)",
-    speed_sisu_last_3: "スピード指数 3走前",
-    speed_sisu_last_3_float: "スピード指数 3走前(小数点)",
-    speed_sisu_last_4: "スピード指数 4走前",
-    speed_sisu_last_4_float: "スピード指数 4走前(小数点)",
-    speed_sisu_last_5: "スピード指数 5走前",
-    speed_sisu_last_5_float: "スピード指数 5走前(小数点)",
-    rotation1: "ローテーション1週前",
-    rotation1_label: "ローテーション1週前(ラベル)",
-    rotation2: "ローテーション2週前",
-    rotation2_label: "ローテーション2週前(ラベル)",
-    rotation3: "ローテーション3週前",
-    rotation3_label: "ローテーション3週前(ラベル)",
-    rotation4: "ローテーション4週前",
-    rotation4_label: "ローテーション4週前(ラベル)",
-    rotation5: "ローテーション5週前",
-    rotation5_label: "ローテーション5週前(ラベル)",
-    rotation6: "ローテーション6週前",
-    rotation6_label: "ローテーション6週前(ラベル)",
-    rotation7: "ローテーション7週前",
-    rotation7_label: "ローテーション7週前(ラベル)",
-    rotation8: "ローテーション8週前",
-    rotation8_label: "ローテーション8週前(ラベル)",
+
     zensou_kankaku: "前走との間隔。rotatin1～8の確定着順をもとに判定 連闘/中1周/中2週/中3週/中4週/中5週/中6週/中7週",
     // 馬体重・前走比較
     bataiju: "馬体重(kg)",
@@ -336,8 +292,7 @@ config {
     dirt_to_siba_flag: "ダ→芝替わりフラグ",
     // 成績 (sei2)
     record_shisu: "レコード指数",
-    record_shisu_num: "レコード指数(整数)",
-    zogen_sa: "増減差",
+
     zogen_sa_num: "増減差(整数)",
     yosou_tansho_ninkijun_num: "予想オッズ 単勝人気順",
     yosou_tansho_odds_float: "予想オッズ 小数点第一位まで",
@@ -359,11 +314,9 @@ config {
     kakutei_tansho_ninkijun_num: "確定 単勝 人気順 整数型",
     kakutei_tansho_odds: "確定 単勝 オッズ",
     kakutei_tansho_odds_float: "確定 単勝 オッズ 小数点第一位まで",
-    kakutei_chakujun: "確定着順",
+
     kakutei_chakujun_num: "確定着順(整数)",
-    tansho_haraimodoshi: "単勝払戻",
     tansho_haraimodoshi_num: "単勝払戻(整数)",
-    fukusho_haraimodoshi: "複勝払戻",
     fukusho_haraimodoshi_num: "複勝払戻(整数)",
     ijo_kubun_code1: "異常区分コード1",
     ijo_kubun_code1_label: "異常区分コード1(ラベル)",
@@ -372,20 +325,19 @@ config {
     nyusen_juni: "入線順位",
     nyusen_juni_num: "入線順位(整数)",
     record_flag: "レコードフラグ",
-    record_flag_label: "レコードフラグ(ラベル)",
-    soha_time: "走破タイム",
+
     soha_time_float: "走破タイム(秒換算)",
     soha_time_label: "走破タイム(xx分xx.x秒)",
-    chakusa_code1: "着差コード1",
+
     chakusa_code1_num: "着差コード1(整数)",
     chakusa_code2: "着差コード2",
     chakusa_code2_label: "着差コード2(ラベル)",
     chakusa_label: "着差(ラベル)",
-    time_sa: "タイム差",
+
     time_sa_float: "タイム差(小数点)",
-    zenhan_3f: "前半3F",
+
     zenhan_3f_float: "前半3F(小数点)",
-    kohan_3f: "後半3F",
+
     kohan_3f_float: "後半3F(小数点)",
     corner1_juni: "1角順位",
     corner1_juni_label: "1角順位(ラベル)",
@@ -1066,12 +1018,12 @@ SELECT
   z.kaisai_kaiji AS kaiji,
   z.kaisai_kaiji AS nichiji, -- (注: 元のSQL通り kaiji を nichiji にも割り当て)
   z.wakuban,
-  z.race_num AS race_bango,
+
   SAFE_CAST(z.race_num AS INT64) AS race_bango_num,
   z.umaban,
   SAFE_CAST(z.umaban AS INT64) AS umaban_num,
   z.bamei,
-  z.rating,
+
   SAFE_CAST(z.rating AS FLOAT64) / 10 AS rating_float,
   z.seibetsu_code,
   CASE z.seibetsu_code
@@ -1080,9 +1032,9 @@ SELECT
     WHEN '2' THEN 'せん'
     ELSE NULL
   END AS seibetsu_code_label,
-  z.barei,
+
   SAFE_CAST(z.barei AS INT64) AS barei_num,
-  z.futan_juryo,
+
   SAFE_CAST(z.futan_juryo AS FLOAT64) / 10 AS futan_juryo_float,
   z.blinker_shiyo_kubun,
   CASE
@@ -1182,22 +1134,16 @@ SELECT
   z.chokyo_den_oikiri_6f_d2 AS chokyo_den_oikiri_6f,
   SAFE_CAST(z.chokyo_den_oikiri_6f_d2 AS FLOAT64) AS chokyo_den_oikiri_6f_float,
 
-  z.chokyo_den_oikiri_5f_d2 AS chokyo_den_oikiri_5f,
+
   SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) AS chokyo_den_oikiri_5f_float,
 
-  CASE
-    WHEN z.chokyo_den_oikiri_course = '坂' THEN z.chokyo_den_oikiri_5f_d2 -- 坂路は5Fを4Fとして使用
-    ELSE z.chokyo_den_oikiri_4f_d2
-  END AS chokyo_den_oikiri_4f,
+
   CASE
     WHEN z.chokyo_den_oikiri_course = '坂' THEN SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64)
     ELSE SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64)
   END AS chokyo_den_oikiri_4f_float,
 
-  CASE
-    WHEN z.chokyo_den_oikiri_course = '坂' THEN z.chokyo_den_oikiri_4f_d2 -- 坂路は4Fを3Fとして使用
-    ELSE z.chokyo_den_oikiri_3f_d2
-  END AS chokyo_den_oikiri_3f,
+
   CASE
     WHEN z.chokyo_den_oikiri_course = '坂' THEN SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64)
     ELSE SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64)
@@ -1212,7 +1158,7 @@ SELECT
     END, 1
   ) AS chokyo_den_oikiri_2f_float,
 
-  z.chokyo_den_oikiri_1f_d2 AS chokyo_den_oikiri_1f,
+
   SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) AS chokyo_den_oikiri_1f_float,
 
   ROUND(SAFE_CAST(z.chokyo_den_oikiri_8f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_7f_d2 AS FLOAT64), 1) AS chokyo_den_oikiri_lap_8f,
@@ -1456,12 +1402,7 @@ SELECT
 
   z.chokyo_den_oikiri_tanpyo AS chokyo_den_tanpyo,
 
-  z.chokyo_den_oikiri_honsu_course AS chokyo_den_honsu_course,
-  SAFE_CAST(z.chokyo_den_oikiri_honsu_course AS INT64) AS chokyo_den_honsu_course_num,
-  z.chokyo_den_oikiri_honsu_hanro AS chokyo_den_honsu_hanro,
-  SAFE_CAST(z.chokyo_den_oikiri_honsu_hanro AS INT64) AS chokyo_den_honsu_hanro_num,
-  z.chokyo_den_oikiri_honsu_pool AS chokyo_den_honsu_pool,
-  SAFE_CAST(z.chokyo_den_oikiri_honsu_pool AS INT64) AS chokyo_den_honsu_pool_num,
+
 
   -- 調教 (sei2由来) -------------------------------------------------------------
   z.chokyo_sei_flag,
@@ -1511,22 +1452,16 @@ SELECT
   z.chokyo_sei_6f,
   SAFE_CAST(z.chokyo_sei_6f AS FLOAT64) AS chokyo_sei_6f_float,
 
-  z.chokyo_sei_5f,
+
   SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) AS chokyo_sei_5f_float,
 
-  CASE
-    WHEN z.chokyo_sei_course = '坂' THEN z.chokyo_sei_5f -- 坂路は5Fを4Fとして使用
-    ELSE z.chokyo_sei_4f
-  END AS chokyo_sei_4f,
+
   CASE
     WHEN z.chokyo_sei_course = '坂' THEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64)
     ELSE SAFE_CAST(z.chokyo_sei_4f AS FLOAT64)
   END AS chokyo_sei_4f_float,
 
-  CASE
-    WHEN z.chokyo_sei_course = '坂' THEN z.chokyo_sei_4f -- 坂路は4Fを3Fとして使用
-    ELSE z.chokyo_sei_3f
-  END AS chokyo_sei_3f,
+
   CASE
     WHEN z.chokyo_sei_course = '坂' THEN SAFE_CAST(z.chokyo_sei_4f AS FLOAT64)
     ELSE SAFE_CAST(z.chokyo_sei_3f AS FLOAT64)
@@ -1541,7 +1476,7 @@ SELECT
     END, 1
   ) AS chokyo_sei_2f_float,
 
-  z.chokyo_sei_1f,
+
   SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) AS chokyo_sei_1f_float,
 
   ROUND(SAFE_CAST(z.chokyo_sei_8f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_7f AS FLOAT64), 1) AS chokyo_sei_lap_8f,
@@ -1747,22 +1682,16 @@ SELECT
   z.chokyo_den_chokyo1_6f,
   SAFE_CAST(z.chokyo_den_chokyo1_6f AS FLOAT64) AS chokyo_den_chokyo1_6f_float,
 
-  z.chokyo_den_chokyo1_5f,
+
   SAFE_CAST(z.chokyo_den_chokyo1_5f AS FLOAT64) AS chokyo_den_chokyo1_5f_float,
 
-  CASE
-    WHEN z.chokyo_den_chokyo1_course = '坂' THEN z.chokyo_den_chokyo1_5f
-    ELSE z.chokyo_den_chokyo1_4f
-  END AS chokyo_den_chokyo1_4f,
+
   CASE
     WHEN z.chokyo_den_chokyo1_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo1_5f AS FLOAT64)
     ELSE SAFE_CAST(z.chokyo_den_chokyo1_4f AS FLOAT64)
   END AS chokyo_den_chokyo1_4f_float,
 
-  CASE
-    WHEN z.chokyo_den_chokyo1_course = '坂' THEN z.chokyo_den_chokyo1_4f
-    ELSE z.chokyo_den_chokyo1_3f
-  END AS chokyo_den_chokyo1_3f,
+
   CASE
     WHEN z.chokyo_den_chokyo1_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo1_4f AS FLOAT64)
     ELSE SAFE_CAST(z.chokyo_den_chokyo1_3f AS FLOAT64)
@@ -1776,7 +1705,7 @@ SELECT
     END, 1
   ) AS chokyo_den_chokyo1_2f_float,
 
-  z.chokyo_den_chokyo1_1f,
+
   SAFE_CAST(z.chokyo_den_chokyo1_1f AS FLOAT64) AS chokyo_den_chokyo1_1f_float,
 
   z.chokyo_den_chokyo1_ichidori,
@@ -1837,22 +1766,16 @@ SELECT
   z.chokyo_den_chokyo2_6f,
   SAFE_CAST(z.chokyo_den_chokyo2_6f AS FLOAT64) AS chokyo_den_chokyo2_6f_float,
 
-  z.chokyo_den_chokyo2_5f,
+
   SAFE_CAST(z.chokyo_den_chokyo2_5f AS FLOAT64) AS chokyo_den_chokyo2_5f_float,
 
-  CASE
-    WHEN z.chokyo_den_chokyo2_course = '坂' THEN z.chokyo_den_chokyo2_5f
-    ELSE z.chokyo_den_chokyo2_4f
-  END AS chokyo_den_chokyo2_4f,
+
   CASE
     WHEN z.chokyo_den_chokyo2_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo2_5f AS FLOAT64)
     ELSE SAFE_CAST(z.chokyo_den_chokyo2_4f AS FLOAT64)
   END AS chokyo_den_chokyo2_4f_float,
 
-  CASE
-    WHEN z.chokyo_den_chokyo2_course = '坂' THEN z.chokyo_den_chokyo2_4f
-    ELSE z.chokyo_den_chokyo2_3f
-  END AS chokyo_den_chokyo2_3f,
+
   CASE
     WHEN z.chokyo_den_chokyo2_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo2_4f AS FLOAT64)
     ELSE SAFE_CAST(z.chokyo_den_chokyo2_3f AS FLOAT64)
@@ -1866,7 +1789,7 @@ SELECT
     END, 1
   ) AS chokyo_den_chokyo2_2f_float,
 
-  z.chokyo_den_chokyo2_1f,
+
   SAFE_CAST(z.chokyo_den_chokyo2_1f AS FLOAT64) AS chokyo_den_chokyo2_1f_float,
 
   z.chokyo_den_chokyo2_ichidori,
@@ -1927,22 +1850,16 @@ SELECT
   z.chokyo_den_chokyo3_6f,
   SAFE_CAST(z.chokyo_den_chokyo3_6f AS FLOAT64) AS chokyo_den_chokyo3_6f_float,
 
-  z.chokyo_den_chokyo3_5f,
+
   SAFE_CAST(z.chokyo_den_chokyo3_5f AS FLOAT64) AS chokyo_den_chokyo3_5f_float,
 
-  CASE
-    WHEN z.chokyo_den_chokyo3_course = '坂' THEN z.chokyo_den_chokyo3_5f
-    ELSE z.chokyo_den_chokyo3_4f
-  END AS chokyo_den_chokyo3_4f,
+
   CASE
     WHEN z.chokyo_den_chokyo3_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo3_5f AS FLOAT64)
     ELSE SAFE_CAST(z.chokyo_den_chokyo3_4f AS FLOAT64)
   END AS chokyo_den_chokyo3_4f_float,
 
-  CASE
-    WHEN z.chokyo_den_chokyo3_course = '坂' THEN z.chokyo_den_chokyo3_4f
-    ELSE z.chokyo_den_chokyo3_3f
-  END AS chokyo_den_chokyo3_3f,
+
   CASE
     WHEN z.chokyo_den_chokyo3_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo3_4f AS FLOAT64)
     ELSE SAFE_CAST(z.chokyo_den_chokyo3_3f AS FLOAT64)
@@ -1956,7 +1873,7 @@ SELECT
     END, 1
   ) AS chokyo_den_chokyo3_2f_float,
 
-  z.chokyo_den_chokyo3_1f,
+
   SAFE_CAST(z.chokyo_den_chokyo3_1f AS FLOAT64) AS chokyo_den_chokyo3_1f_float,
 
   z.chokyo_den_chokyo3_ichidori,
@@ -1985,32 +1902,8 @@ SELECT
     ELSE NULL
   END AS chokyo_den_chokyo3_yajirushi_label,
   z.chokyo_den_chokyo3_reigai,
-  z.speed_shisu1 AS speed_sisu_last_1,
-  SAFE_CAST(z.speed_shisu1 AS FLOAT64) / 10 AS speed_sisu_last_1_float,
-  z.speed_shisu2 AS speed_sisu_last_2,
-  SAFE_CAST(z.speed_shisu2 AS FLOAT64) / 10 AS speed_sisu_last_2_float,
-  z.speed_shisu3 AS speed_sisu_last_3,
-  SAFE_CAST(z.speed_shisu3 AS FLOAT64) / 10 AS speed_sisu_last_3_float,
-  z.speed_shisu4 AS speed_sisu_last_4,
-  SAFE_CAST(z.speed_shisu4 AS FLOAT64) / 10 AS speed_sisu_last_4_float,
-  z.speed_shisu5 AS speed_sisu_last_5,
-  SAFE_CAST(z.speed_shisu5 AS FLOAT64) / 10 AS speed_sisu_last_5_float,
-  z.rotation1,
-  IF(SAFE_CAST(z.rotation1 AS INT64) IS NOT NULL, CAST(SAFE_CAST(z.rotation1 AS INT64) AS STRING), z.rotation1) AS rotation1_label,
-  z.rotation2,
-  IF(SAFE_CAST(z.rotation2 AS INT64) IS NOT NULL, CAST(SAFE_CAST(z.rotation2 AS INT64) AS STRING), z.rotation2) AS rotation2_label,
-  z.rotation3,
-  IF(SAFE_CAST(z.rotation3 AS INT64) IS NOT NULL, CAST(SAFE_CAST(z.rotation3 AS INT64) AS STRING), z.rotation3) AS rotation3_label,
-  z.rotation4,
-  IF(SAFE_CAST(z.rotation4 AS INT64) IS NOT NULL, CAST(SAFE_CAST(z.rotation4 AS INT64) AS STRING), z.rotation4) AS rotation4_label,
-  z.rotation5,
-  IF(SAFE_CAST(z.rotation5 AS INT64) IS NOT NULL, CAST(SAFE_CAST(z.rotation5 AS INT64) AS STRING), z.rotation5) AS rotation5_label,
-  z.rotation6,
-  IF(SAFE_CAST(z.rotation6 AS INT64) IS NOT NULL, CAST(SAFE_CAST(z.rotation6 AS INT64) AS STRING), z.rotation6) AS rotation6_label,
-  z.rotation7,
-  IF(SAFE_CAST(z.rotation7 AS INT64) IS NOT NULL, CAST(SAFE_CAST(z.rotation7 AS INT64) AS STRING), z.rotation7) AS rotation7_label,
-  z.rotation8,
-  IF(SAFE_CAST(z.rotation8 AS INT64) IS NOT NULL, CAST(SAFE_CAST(z.rotation8 AS INT64) AS STRING), z.rotation8) AS rotation8_label,
+
+
     CASE
     WHEN z.rotation1 IS NOT NULL THEN '連闘'
     WHEN z.rotation2 IS NOT NULL THEN '中1週'
@@ -2083,35 +1976,22 @@ SELECT
     WHEN z.track_code1_label_dirtsiba_zensou = 'ダ' AND z.track_code1_dirtsiba_label = '芝' THEN 'はい'
     ELSE 'いいえ'
   END AS dirt_to_siba_flag,
-  z.record_shisu,
-  SAFE_CAST(z.record_shisu AS INT64) AS record_shisu_num,
-  z.zogen_sa,
+
+
   SAFE_CAST(z.zogen_sa AS INT64) AS zogen_sa_num,
   SAFE_CAST(odds.TanshoNinkijun AS INT64) AS sokuhou_tansho_ninkijun_num,
   SAFE_CAST(odds.TanshoOdds AS FLOAT64) AS sokuhou_tansho_odds_float,
   FORMAT_TIMESTAMP('%H:%M', odds.HappyoTsukihiJifun, 'Asia/Tokyo') AS sokuhou_happyo_tsukihi_jifun,
-  CASE
-    WHEN z.tansho_ninkijun IN ('34', '35') THEN '00'
-    ELSE z.tansho_ninkijun
-  END AS kakutei_tansho_ninkijun,
+
   CASE
     WHEN z.tansho_ninkijun IN ('34', '35') THEN 0
     ELSE SAFE_CAST(z.tansho_ninkijun AS INT64)
   END AS kakutei_tansho_ninkijun_num,
-  z.tansho_odds AS kakutei_tansho_odds,
+
   SAFE_CAST(z.tansho_odds AS FLOAT64) / 10 AS kakutei_tansho_odds_float,
-  z.kakutei_chakujun,
+
   SAFE_CAST(z.kakutei_chakujun AS INT64) AS kakutei_chakujun_num,
-  CASE -- 修正ロジック: 確定着順が '1' の場合のみ払戻金のNULL判定を行い、それ以外は '0'
-    WHEN z.kakutei_chakujun IN ('01') THEN
-      CASE
-        WHEN z.tansho3_umaban IS NOT NULL THEN z.tansho3_haraimodoshikin
-        WHEN z.tansho2_umaban IS NOT NULL THEN z.tansho2_haraimodoshikin
-        WHEN z.tansho1_umaban IS NOT NULL THEN z.tansho1_haraimodoshikin
-        ELSE '0'
-      END
-    ELSE '0'
-  END AS tansho_haraimodoshi,
+
   SAFE_CAST(
     CASE -- 修正ロジック (数値型)
       WHEN z.kakutei_chakujun IN ('01') THEN
@@ -2124,18 +2004,7 @@ SELECT
       ELSE '0'
     END
   AS INT64) AS tansho_haraimodoshi_num,
-  CASE -- 修正ロジック: 確定着順が '1', '2', '3' の場合のみ払戻金のNULL判定を行い、それ以外は '0'
-    WHEN z.kakutei_chakujun IN ('01', '02', '03') THEN
-      CASE
-        WHEN z.fukusho5_umaban IS NOT NULL THEN z.fukusho5_haraimodoshikin
-        WHEN z.fukusho4_umaban IS NOT NULL THEN z.fukusho4_haraimodoshikin
-        WHEN z.fukusho3_umaban IS NOT NULL THEN z.fukusho3_haraimodoshikin
-        WHEN z.fukusho2_umaban IS NOT NULL THEN z.fukusho2_haraimodoshikin
-        WHEN z.fukusho1_umaban IS NOT NULL THEN z.fukusho1_haraimodoshikin
-        ELSE '0'
-      END
-    ELSE '0'
-  END AS fukusho_haraimodoshi,
+
   SAFE_CAST(
     CASE -- 修正ロジック (数値型)
       WHEN z.kakutei_chakujun IN ('01', '02', '03') THEN
@@ -2173,15 +2042,12 @@ SELECT
   END AS ijo_kubun_code2_label,
   z.nyusen_juni,
   SAFE_CAST(z.nyusen_juni AS INT64) AS nyusen_juni_num,
-  z.record_flag,
-  CASE
-    WHEN z.record_flag = '1' THEN 'はい'
-    ELSE 'いいえ'
-  END AS record_flag_label,
-  z.soha_time,
+
+
+
   SUBSTR(z.soha_time, 1, 1) || '分' || SUBSTR(z.soha_time, 2, 2) || '.' || SUBSTR(z.soha_time, 4, 1) || '秒' AS soha_time_label,
   SAFE_CAST(SUBSTR(z.soha_time, 1, 1) AS FLOAT64) * 60 + SAFE_CAST(SUBSTR(z.soha_time, 2, 2) AS FLOAT64) + SAFE_CAST(SUBSTR(z.soha_time, 4, 1) AS FLOAT64) / 10 AS soha_time_float,
-  z.chakusa_code1,
+
   SAFE_CAST(z.chakusa_code1 AS INT64) AS chakusa_code1_num,
   z.chakusa_code2,
   CASE z.chakusa_code2
@@ -2213,11 +2079,11 @@ SELECT
       ELSE ''
     END,
   '') AS chakusa_label,
-  z.time_sa,
+
   SAFE_CAST(z.time_sa AS FLOAT64) / 10 AS time_sa_float,
-  z.zenhan_3f,
+
   SAFE_CAST(z.zenhan_3f AS FLOAT64) / 10 AS zenhan_3f_float,
-  z.kohan_3f,
+
   SAFE_CAST(z.kohan_3f AS FLOAT64) / 10 AS kohan_3f_float,
   z.corner1_juni,
   CASE
