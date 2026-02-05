@@ -1366,6 +1366,7 @@ SELECT
   pl.race_code_kol_partner AS chokyo_den_awase_uma_race_code_kol,
   pl.kyoso_joken_kubun_label AS chokyo_den_awase_uma_class,
 
+  CASE
     WHEN pl.kyoso_joken_rank_int >= 4 -- 相手が2勝クラス(Rank 4)以上
          AND pl.kyoso_joken_rank_int > z.kyoso_joken_rank_int -- 自分よりランクが高い
          AND SAFE_CAST(pl.barei AS INT64) >= SAFE_CAST(z.barei AS INT64) -- 相手が同年齢以上
@@ -1374,8 +1375,6 @@ SELECT
          AND SAFE_CAST(pl.barei AS INT64) = SAFE_CAST(z.barei AS INT64) -- 年齢が同じ
          AND z.kyoso_joken_rank_int > 0
     THEN '同格'
-    WHEN pl.kyoso_joken_rank_int < z.kyoso_joken_rank_int -- 相手のランクが低い
-    THEN '格下'
     ELSE NULL
   END AS chokyo_den_awase_uma_kaku_kubun,
 
