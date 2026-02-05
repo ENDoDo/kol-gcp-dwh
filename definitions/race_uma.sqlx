@@ -843,6 +843,7 @@ WITH
       p.race_code_uma_kol AS race_code_uma_kol_partner,
       SUBSTR(p.race_code_uma_kol, 1, 16) AS race_code_kol_partner,
       d1.kyoso_joken_kubun,
+      p.barei, -- 追加: 併せ相手の年齢
       s2.kakutei_chakujun AS partner_last_race_chakujun,
       CASE d1.kyoso_joken_kubun
         WHEN '00001' THEN '新馬'
@@ -1366,9 +1367,10 @@ SELECT
   pl.kyoso_joken_kubun_label AS chokyo_den_awase_uma_class,
 
   CASE
-    WHEN pl.kyoso_joken_rank_int > z.kyoso_joken_rank_int THEN '格上'
-    WHEN pl.kyoso_joken_rank_int < z.kyoso_joken_rank_int THEN '格下'
-    WHEN pl.kyoso_joken_rank_int = z.kyoso_joken_rank_int AND z.kyoso_joken_rank_int > 0 THEN '同格'
+    WHEN pl.kyoso_joken_rank_int >= 4 -- 相手が2勝クラス(Rank 4)以上
+         AND pl.kyoso_joken_rank_int > z.kyoso_joken_rank_int -- 自分よりランクが高い
+         AND SAFE_CAST(pl.barei AS INT64) >= SAFE_CAST(z.barei AS INT64) -- 相手が同年齢以上
+    THEN '格上'
     ELSE NULL
   END AS chokyo_den_awase_uma_kaku_kubun,
 
