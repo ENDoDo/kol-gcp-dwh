@@ -273,6 +273,10 @@ config {
     chokyo_sei_reigai: "競走成績出走馬データ  追い切り 調教例外",
     chokyo_sei_check_time_1f_flag: "競走成績出走馬データ  追い切り 1F標準タイムクリアフラグ",
     chokyo_sei_check_time_4f_6f_flag: "競走成績出走馬データ  追い切り 4F/6F標準タイムクリアフラグ",
+    chokyo_sei_check_time_wood_4f_5f_flag: "競走成績出走馬データ  追い切り ウッド全体好時計は「はい」該当しない場合はnull",
+    chokyo_sei_check_time_wood_1f_2f_flag: "競走成績出走馬データ  追い切り ウッド終い鋭伸は「はい」該当しない場合はnull",
+    chokyo_den_oikiri_check_time_wood_4f_5f_flag: "調教1～3追い切り ウッド全体好時計は「はい」該当しない場合はnull",
+    chokyo_den_oikiri_check_time_wood_1f_2f_flag: "調教1～3追い切り ウッド終い鋭伸は「はい」該当しない場合はnull",
     // スピード指数・ローテーション
 
     zensou_kankaku: "前走との間隔。rotatin1～8の確定着順をもとに判定 連闘/中1周/中2週/中3週/中4週/中5週/中6週/中7週",
@@ -825,6 +829,21 @@ WITH
         ELSE NULL
       END AS chokyo_den_oikiri_check_time_4f_6f_flag,
 
+      CASE
+        WHEN ((chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW') OR (chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ'))
+             AND (SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_5f_d2, r'[^0-9.]', '') AS FLOAT64) <= 66.9 OR SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_4f_d2, r'[^0-9.]', '') AS FLOAT64) <= 50.9)
+        THEN 'はい'
+        ELSE NULL
+      END AS chokyo_den_oikiri_check_time_wood_4f_5f_flag,
+
+      CASE
+        WHEN ((chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW') OR (chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ'))
+             AND ROUND((SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_3f_d2, r'[^0-9.]', '') AS FLOAT64) - SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64)) - SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64), 1) <= 11.9
+             AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) <= 11.5
+        THEN 'はい'
+        ELSE NULL
+      END AS chokyo_den_oikiri_check_time_wood_1f_2f_flag,
+
       -- 前走データの取得ロジック
       -- PARTITION BY は race_code_uma_kol (馬毎) で行う
       LAG(race_code_kol) OVER (PARTITION BY race_code_uma_kol ORDER BY hasso_date, race_code_kol) AS text_zensou_race_code_kol,
@@ -1351,6 +1370,8 @@ SELECT
   z.chokyo_den_oikiri_kijosha_equal_kishumei_flag,
   z.chokyo_den_oikiri_check_time_1f_flag,
   z.chokyo_den_oikiri_check_time_4f_6f_flag,
+  z.chokyo_den_oikiri_check_time_wood_4f_5f_flag,
+  z.chokyo_den_oikiri_check_time_wood_1f_2f_flag,
   -- 調教1
   CASE
      WHEN z.chokyo_den_oikiri_awase IS NOT NULL AND z.chokyo_den_oikiri_awase != ''
@@ -1583,6 +1604,21 @@ SELECT
     WHEN z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ' AND SAFE_CAST(z.chokyo_sei_6f AS FLOAT64) <= 83.9 THEN 'はい'
     ELSE NULL
   END AS chokyo_sei_check_time_4f_6f_flag,
+
+  CASE
+    WHEN ((z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = 'CW') OR (z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ'))
+         AND (SAFE_CAST(REGEXP_REPLACE(z.chokyo_sei_5f, r'[^0-9.]', '') AS FLOAT64) <= 66.9 OR SAFE_CAST(REGEXP_REPLACE(z.chokyo_sei_4f, r'[^0-9.]', '') AS FLOAT64) <= 50.9)
+    THEN 'はい'
+    ELSE NULL
+  END AS chokyo_sei_check_time_wood_4f_5f_flag,
+
+  CASE
+    WHEN ((z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = 'CW') OR (z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ'))
+         AND ROUND((SAFE_CAST(REGEXP_REPLACE(z.chokyo_sei_3f, r'[^0-9.]', '') AS FLOAT64) - SAFE_CAST(REGEXP_REPLACE(z.chokyo_sei_1f, r'[^0-9.]', '') AS FLOAT64)) - SAFE_CAST(REGEXP_REPLACE(z.chokyo_sei_1f, r'[^0-9.]', '') AS FLOAT64), 1) <= 11.9
+         AND SAFE_CAST(REGEXP_REPLACE(z.chokyo_sei_1f, r'[^0-9.]', '') AS FLOAT64) <= 11.5
+    THEN 'はい'
+    ELSE NULL
+  END AS chokyo_sei_check_time_wood_1f_2f_flag,
 
   CASE
     WHEN (z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = 'CW') OR (z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ') THEN
