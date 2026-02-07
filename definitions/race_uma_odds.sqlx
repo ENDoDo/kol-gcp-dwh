@@ -15,7 +15,8 @@ config {
   },
   bigquery: {
     partitionBy: "DATE(hasso_date_utc)"
-  }
+  },
+  tags: ["odds"]
 }
 
 SELECT
