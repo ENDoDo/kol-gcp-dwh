@@ -87,6 +87,9 @@ graph TD
   - `chokyo_awase_uma_class`, `chokyo_awase_uma_kaku_kubun`: 併せ馬のクラスと、自身との格付け（格上/同格/格下）を判定。
   - `chokyo_awase_uma_kakuue_win_flag`: 格上の併せ馬に対して先着したかどうかをフラグ化。
 
+### `race_uma_odds`
+- リアルタイムオッズ情報 (前日20時、当日6,9,12,15,20時に更新)
+
 ## ディレクトリ構成
 
 ```
