@@ -166,26 +166,6 @@ WITH
 
   -- 4. Unpivot Dividends
   unpivoted AS (
-    -- Tansho
-    SELECT race_code_kol, '単勝' AS kensyu_kubun, tansho1_umaban AS umaban_kumiban, tansho1_haraimodoshikin AS haitou FROM dividends WHERE tansho1_haraimodoshikin IS NOT NULL
-    UNION ALL
-    SELECT race_code_kol, '単勝', tansho2_umaban, tansho2_haraimodoshikin FROM dividends WHERE tansho2_haraimodoshikin IS NOT NULL
-    UNION ALL
-    SELECT race_code_kol, '単勝', tansho3_umaban, tansho3_haraimodoshikin FROM dividends WHERE tansho3_haraimodoshikin IS NOT NULL
-    UNION ALL
-
-    -- Fukusho
-    SELECT race_code_kol, '複勝', fukusho1_umaban, fukusho1_haraimodoshikin FROM dividends WHERE fukusho1_haraimodoshikin IS NOT NULL
-    UNION ALL
-    SELECT race_code_kol, '複勝', fukusho2_umaban, fukusho2_haraimodoshikin FROM dividends WHERE fukusho2_haraimodoshikin IS NOT NULL
-    UNION ALL
-    SELECT race_code_kol, '複勝', fukusho3_umaban, fukusho3_haraimodoshikin FROM dividends WHERE fukusho3_haraimodoshikin IS NOT NULL
-    UNION ALL
-    SELECT race_code_kol, '複勝', fukusho4_umaban, fukusho4_haraimodoshikin FROM dividends WHERE fukusho4_haraimodoshikin IS NOT NULL
-    UNION ALL
-    SELECT race_code_kol, '複勝', fukusho5_umaban, fukusho5_haraimodoshikin FROM dividends WHERE fukusho5_haraimodoshikin IS NOT NULL
-    UNION ALL
-
     -- Umaren
     SELECT race_code_kol, '馬連', umaren1_kumiban, umaren1_haraimodoshikin FROM dividends WHERE umaren1_haraimodoshikin IS NOT NULL
     UNION ALL
