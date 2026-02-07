@@ -69,6 +69,7 @@ main:
           body:
             compilationResult: $${compilationResult.body.name}
             invocationConfig:
+              includedTags: $${default(map.get(args, "tags"), [])}
               serviceAccount: "dataform-runner-stg@${var.project_id}.iam.gserviceaccount.com"
         result: workflowInvocation
     # Dataform実行完了を待つロジックが必要だが、非同期呼出のままにするか、Dataform完了をポーリングするか。
@@ -172,6 +173,7 @@ main:
           body:
             compilationResult: $${compilationResult.body.name}
             invocationConfig:
+              includedTags: $${default(map.get(args, "tags"), [])}
               serviceAccount: "dataform-runner@${var.project_id}.iam.gserviceaccount.com"
         result: workflowInvocation
     # Dataform完了待機
