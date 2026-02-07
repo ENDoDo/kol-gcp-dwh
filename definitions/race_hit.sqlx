@@ -167,7 +167,7 @@ WITH
   -- 4. Unpivot Dividends
   unpivoted AS (
     -- Umaren
-    SELECT race_code_kol, '馬連', umaren1_kumiban, umaren1_haraimodoshikin FROM dividends WHERE umaren1_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, '馬連' AS kensyu_kubun, umaren1_kumiban AS umaban_kumiban, umaren1_haraimodoshikin AS haitou FROM dividends WHERE umaren1_haraimodoshikin IS NOT NULL
     UNION ALL
     SELECT race_code_kol, '馬連', umaren2_kumiban, umaren2_haraimodoshikin FROM dividends WHERE umaren2_haraimodoshikin IS NOT NULL
     UNION ALL
