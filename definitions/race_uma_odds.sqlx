@@ -1,0 +1,54 @@
+config {
+  type: "table",
+  description: "レースの単勝オッズ・人気順（速報値）を格納するテーブル",
+  columns: {
+    race_code_uma_kol: "KOL仕様馬毎レースID 年月日8桁+KOL仕様開催場所コード2桁+開催回次2桁+開催日次2桁+レース番号2桁+馬番2桁",
+    hasso_date: "発走日時 (JST)",
+    hasso_date_utc: "発走日時 (UTC)",
+    sokuhou_tansho_ninkijun_num: "速報 単勝人気順",
+    sokuhou_tansho_odds_float: "速報 オッズ 小数点第一位まで",
+    sokuhou_happyo_tsukihi_jifun: "速報 発表 時分",
+    sokuhou_modified: "速報 modified",
+    sokuhou_created: "速報 Created",
+    modified: "データ更新日時",
+    created: "データ作成日時"
+  },
+  bigquery: {
+    partitionBy: "DATE(hasso_date_utc)"
+  }
+}
+
+SELECT
+  -- race_code_uma_kol (18 digits)
+  -- Year(4) + MonthDay(4) + KOL_Basho(2) + Kaiji(2) + Nichiji(2) + RaceNum(2) + Umaban(2)
+  Year || MonthDay ||
+  CASE KeibajyoCode
+    WHEN '01' THEN '08' -- Sapporo to Kyoto(X) No, 08 is correct mapping based on reverse
+    WHEN '02' THEN '09' -- Hakodate
+    WHEN '03' THEN '06' -- Fukushima
+    WHEN '04' THEN '07' -- Niigata
+    WHEN '05' THEN '04' -- Tokyo
+    WHEN '06' THEN '05' -- Nakayama
+    WHEN '07' THEN '02' -- Chukyo
+    WHEN '08' THEN '00' -- Kyoto
+    WHEN '09' THEN '01' -- Hanshin
+    WHEN '10' THEN '03' -- Kokura
+    ELSE KeibajyoCode
+  END ||
+  Kaiji || Nichiji || RaceNum || Umaban AS race_code_uma_kol,
+
+  DATETIME(HassoJikoku, 'Asia/Tokyo') AS hasso_date,
+  HassoJikoku AS hasso_date_utc,
+
+  CAST(TanshoNinkijun AS INT64) AS sokuhou_tansho_ninkijun_num,
+  CAST(TanshoOdds AS FLOAT64) AS sokuhou_tansho_odds_float,
+  FORMAT_TIMESTAMP('%H:%M', HappyoTsukihiJifun, 'Asia/Tokyo') AS sokuhou_happyo_tsukihi_jifun,
+
+  Modified AS sokuhou_modified,
+  Created AS sokuhou_created,
+
+  CURRENT_TIMESTAMP() AS modified,
+  CURRENT_TIMESTAMP() AS created
+
+FROM
+  ${ref("jvd_odds", "races_uma_odds_jvd_new")}
