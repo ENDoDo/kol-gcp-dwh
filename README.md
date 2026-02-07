@@ -1,201 +1,154 @@
 # KOL競馬データ処理・変換パイプライン on GCP
 
-このリポジトリは、GCP上に構築された競馬データパイプラインの**データ変換（Transformation）**部分を担います。
+このリポジトリは、GCP上に構築された競馬データパイプラインの**データ変換（Transformation）**および**データエクスポート（Reverse ETL）**部分を担います。
 
-GCSにアップロードされ、BigQueryの生テーブルに格納されたKOL競馬データをソースとして、**Dataform**を使い分析用のデータマート（`kolbi_analysis.race`）を構築します。
+GCSにアップロードされ、BigQueryの生テーブルに格納されたKOL競馬データをソースとして、**Dataform**を使い分析用のデータマートを構築し、外部システムへ連携します。
 
 このリポジトリでは、主に以下の2点をコードで管理しています。
-1.  **データ変換ロジック**: `dataform/`ディレクトリに格納された、`race`テーブルを生成するためのSQLXファイル。
-2.  **インフラストラクチャ (IaC)**: `terraform/`ディレクトリに格納された、Dataformリポジトリや自動実行ワークフローを定義するTerraformコード。
+1.  **データ変換ロジック**: `definitions/`ディレクトリに格納された、Dataform SQLXファイル。
+2.  **インフラストラクチャ (IaC)**: `terraform/`ディレクトリに格納された、GCPリソース定義。
 
 **Note**: データ取り込み（Ingestion）部分（Cloud FunctionによるGCSからのデータロード）は、このリポジトリの管理範囲外です。
 
-インフラの構築からデータ変換のロジックまで、すべてがコードとして管理されています。
-
 ## アーキテクチャ
+
+本パイプラインには、大きく分けて2つの実行トリガーが存在します。
+
+### 1. ファイルアップロード・トリガー（データ更新時）
+
+KOLから提供されるデータファイルが更新された際に実行されるフローです。
 
 ```mermaid
 graph TD
-    subgraph "データ取り込み (Ingestion)"
-        User[ユーザー] -->|1. ZIPファイルをアップロード| GCS(GCS Bucket<br>kol-keiba-bucket);
-        GCS -->|2. Eventarcがファイル作成イベントを検知| CF(Cloud Function<br>unzip-lzh-function);
-        CF -->|3. 処理を実行<br>・ZIP/LZH展開<br>・パース<br>・Upsert| D[(BigQuery Tables<br>kol_keiba.*)];
-        CF -.->|完了後: バックアップへ移動| Backup(backup/ ディレクトリ<br>30日後に自動削除);
-        CF -.->|エラー時: 待避| Unpacked(unpacked/ ディレクトリ);
+    subgraph "データ取り込み (Ingestion - Scope Out)"
+        User[ユーザー] -->|ZIPアップロード| GCS(GCS Bucket);
+        GCS -->|Eventarc| LoaderCF(Loader Function);
+        LoaderCF -->|ロード| Raw[(BigQuery Raw Tables<br>kol_keiba.*)];
     end
 
     subgraph "データ変換トリガー (Trigger & Debounce)"
-        D -- "テーブル更新検知<br>(kol_den1, kol_den2, etc.)" --> L{Cloud Logging Sink};
+        Raw -- "テーブル更新検知" --> L{Cloud Logging Sink};
         L -- "ログエントリ" --> P(Pub/Sub Topic);
         P -- "メッセージ送信" --> E{Eventarc};
-        E -- "1. トリガー" --> Dis[Dispatcher Function];
-        Dis -- "2. タスク作成 (5分後)" --> Q[Cloud Tasks Queue];
-        Q -- "3. デバウンス実行" --> W{Cloud Workflows};
+        E -- "トリガー" --> Dis[Dispatcher Function];
+        Dis -- "タスク作成 (5分後)" --> Q[Cloud Tasks Queue];
+        Q -- "デバウンス実行" --> W{Cloud Workflows};
     end
 
     subgraph "データ変換 (Transformation)"
-        Git[GitHub<br>mainブランチ] -- コードソース --> R{Dataform Repository};
-        W -- "Dataform実行開始" --> R;
-        R -- "変換クエリ(race.sqlx)を実行" --> G["BigQuery Mart Table<br>(kolbi_analysis.race)"];
-        D -- ソースとして参照 --> G;
+        W -- "Dataform実行" --> R{Dataform Repository};
+        R -- "SQLX実行" --> Mart[(BigQuery Mart Tables<br>kolbi_analysis.*)];
     end
 
-    subgraph "データエクスポート & API連携 (Export)"
-        G -->|定期/手動実行| ExportCF{Export Cloud Functions};
-        ExportCF -->|csvエクスポート| FTP[スマート競馬 FTP Server];
-        ExportCF -->|更新通知| Bubble[Bubble API Endpoint];
+    subgraph "データエクスポート (Reverse ETL)"
+        Mart -->|完了後| ExportCF{Export Cloud Functions};
+        ExportCF -->|CSV| FTP[FTP Server];
+        ExportCF -->|通知| Bubble[Bubble API];
     end
-
-    style GCS fill:#D5E8D4,stroke:#82B366
-    style G fill:#DAE8FC,stroke:#6C8EBF
-    style W fill:#FFE6CC,stroke:#D79B00
-    style Dis fill:#E1D5E7,stroke:#9673A6
-    style Q fill:#E1D5E7,stroke:#9673A6
 ```
 
-1.  **データ取り込み**: ユーザーがKOLデータを含むZIPファイルをGCSにアップロードすると、Cloud Functionが起動し、BigQueryの`kolbi_keiba`データセットに生データを書き込みます。
-2.  **データ変換トリガー (デバウンス機能付き)**: BigQueryのテーブル更新を検知すると、Eventarcが `Dispatcher Function` を呼び出します。Dispatcherは `Cloud Tasks` に「5分後にWorkflowsを実行するタスク」を作成します。**5分以内に連続して更新があった場合、新たなタスク作成は無視され（デバウンス）、最後の1回（厳密には最初の検知から5分後）だけWorkflowsが実行されます。**
-3.  **データ変換**: Cloud WorkflowsはDataformのワークフローを開始します。Dataformは`kolbi_keiba`の生データを参照して、`kolbi_analysis.race`を含むプロジェクト内のすべてのテーブルを生成・更新します。
-4.  **データエクスポート**: `export_schedules`, `export_races`, `export_race_uma_details` 等のCloud Functionsが、変換済みデータをFTPサーバーへCSVとしてアップロードし、同時にBubbleアプリのAPIエンドポイントへ更新通知（CSV URLの送信）を行います。
+### 2. スケジュール・トリガー（リアルタイムオッズ更新）
+
+オッズ情報など、時間経過とともに変化するデータを定期的に更新するフローです。
+
+```mermaid
+graph TD
+    subgraph "スケジュール実行"
+        Scheduler[Cloud Scheduler<br>odds-update] -- "cron: 0 6,9,12,15,20 * * *" --> W{Cloud Workflows};
+    end
+
+    subgraph "データ変換"
+        W -- "Dataform実行<br>(tags: odds)" --> R{Dataform Repository};
+        R -- "SQLX実行<br>(race_uma_oddsのみ)" --> Odds[(race_uma_odds)];
+    end
+```
 
 ## 技術スタック
 
 - **クラウド**: Google Cloud Platform
-  - **コンピューティング**: Cloud Functions (第2世代), Cloud Workflows
-  - **非同期処理**: Cloud Tasks (デバウンス用)
-  - **ストレージ**: Cloud Storage (GCS)
+  - **コンピューティング**: Cloud Functions (Gen2), Cloud Workflows, Cloud Scheduler
+  - **非同期処理**: Cloud Tasks
   - **DWH**: BigQuery
   - **データ変換**: Dataform
   - **イベント**: Eventarc, Pub/Sub, Cloud Logging
-  - **ID管理**: IAM, Secret Manager
 - **IaC**: Terraform
-- **バージョン管理**: GitHub
-- **言語**: Python (Cloud Functions), SQL (Dataform), YAML (Cloud Workflows)
+- **言語**: Python (Functions), SQLX (Dataform), YAML (Workflows)
 
 ## 重要なテーブル定義
 
+`definitions/` 配下で定義されている主要なテーブルです。
+
 ### `race.sqlx`
-- KOLの出馬表データ(den1, sei1)を結合し、レースに関する情報を整形したマスターテーブル。
-- 競馬場コードやトラックコードなどをJRA-VAN仕様に正規化。
+- レース単位のマスターテーブル。
+- 開催情報、コース条件、天候などを集約。
 
 ### `race_uma.sqlx`
 - 出走馬ごとの詳細データを統合した分析用ワイドテーブル。
-- `kol_den2` (出馬表詳細), `kol_sei1`, `kol_sei2` (成績), `kol_ket` (血統) などを結合。
+- 成績、過去走、血統、調教データを結合。
 - **特徴的なロジック**:
-  - `chokyo_awase_*`: 調教テキストから併せ馬の情報を正規表現で抽出。
-  - `chokyo_awase_uma_race_code_kol`: 併せ馬の直近のレースIDを特定。
-  - `chokyo_awase_uma_class`, `chokyo_awase_uma_kaku_kubun`: 併せ馬のクラスと、自身との格付け（格上/同格/格下）を判定。
-  - `chokyo_awase_uma_kakuue_win_flag`: 格上の併せ馬に対して先着したかどうかをフラグ化。
+  - **調教併せ馬判定**: パートナー馬の特定と、クラス格付け（格上/同格/格下）判定。
 
-### `race_uma_odds`
-- リアルタイムオッズ情報 (前日20時、当日6,9,12,15,20時に更新)
+### `race_uma_odds.sqlx`
+- **リアルタイムオッズ情報**。
+- `races_uma_odds_jvd_new` をソースとし、KOL仕様のレースID等を付与。
+- **更新頻度**: 毎日 06:00, 09:00, 12:00, 15:00, 20:00 (JST)。
+
+### `race_hit.sqlx`
+- 的中判定・配当金テーブル。
+- 単勝・複勝を除く券種の配当情報を保持。
 
 ## ディレクトリ構成
 
 ```
 .
-├── terraform/      # GCPインフラを定義するTerraformコード
-│   ├── dataform.tf
-│   ├── workflows.tf # Cloud Workflowsの定義
-│   ├── triggers.tf  # Eventarc, Pub/Sub, Logging Sinkの定義
-│   ├── dispatcher.tf # デバウンス用Dispatcher関数の定義
+├── definitions/        # Dataform SQLXファイル
+│   ├── sources/        # データソースdeclarations
+│   ├── race.sqlx
+│   ├── race_uma.sqlx
+│   ├── race_uma_odds.sqlx
 │   └── ...
-├── functions/      # Cloud Functionsのソースコード
-│   ├── dispatcher/ # Dataformトリガー用Dispatcher
+├── functions/          # Cloud Functions ソースコード
+│   ├── dispatcher/     # Dataform起動用Dispatcher
+│   ├── export_races/   # レース情報エクスポート
+│   ├── export_schedules/ # スケジュール情報エクスポート
+│   └── export_race_uma_details/ # 馬詳細情報エクスポート
+├── terraform/          # GCPインフラ定義
+│   ├── main.tf
+│   ├── scheduler.tf    # Cloud Scheduler定義
+│   ├── workflows.tf    # Cloud Workflows定義
 │   └── ...
-├── package.json
-├── dataform.json
-└── definitions/
-    ├── sources/
-    │   └── sources.js
-    └── race.sqlx
+├── dataform.json       # Dataform設定
+└── README.md
 ```
 
 ## セットアップとデプロイ手順
 
 ### 1. 前提条件
-
-- Google Cloud SDK (gcloud CLI) がインストール済みであること。
-- Terraform がインストール済みであること。
-- GCPプロジェクトで課金が有効になっていること。
-- GitHubリポジトリ (`https://github.com/ENDoDo/kol-gcp-dataform`) への書き込み権限があること。
+- Google Cloud SDK (gcloud CLI)
+- Terraform
+- GitHub Personal Access Token (PAT)
 
 ### 2. 環境設定
+GitHub PATやBubble/FTPの認証情報は **Secret Manager** に以下の名前で登録する必要があります。
+- `github-token`: Dataform用GitHub Token
+- `kol_ftp_bubble_username`, `kol_ftp_bubble_password`: FTP認証
+- `kol_bubble_workflow_api_key`: Bubble API Token
 
-```bash
-# GCPにログイン
-gcloud auth login
-
-# 使用するプロジェクトIDを設定
-gcloud config set project smartkeiba
-
-# アプリケーションのデフォルト認証情報を設定
-gcloud auth application-default login
-```
-
-### 3. GitHub Personal Access Token (PAT) の設定
-
-DataformがGitHubリポジトリにアクセスするために、認証用のトークンをSecret Managerに設定します。
-
-1.  GitHubで、リポジトリ (`repo`) スコープを持つPersonal Access Token (Classic) を作成します。
-2.  GCPコンソールでSecret Managerに移動し、`github-token` という名前のシークレットを作成します。
-3.  作成したシークレットに、GitHubのPATをシークレットの値として追加します。
-
-### 4. Bubble API / FTP 連携設定
-
-以下のシークレットも同様にSecret Managerに設定する必要があります。
-
--   `kol_ftp_bubble_username`: FTPユーザー名
--   `kol_ftp_bubble_password`: FTPパスワード
--   `kol_bubble_workflow_api_key`: Bubble API Bearer Token
-
-### 5. インフラのデプロイ
-
-本プロジェクトでは Terraform Workspace を使用して環境（Staging / Production）を管理しています。
-
-#### Staging環境
+### 3. インフラのデプロイ (Terraform)
 
 ```bash
 cd terraform
 
-# ワークスペースの切り替え（作成がまだの場合は terraform workspace new stg）
+# Staging環境
 terraform workspace select stg
-
-# 初期化
-terraform init
-
-# デプロイ (stg.tfvarsを使用)
 terraform apply -var-file="stg.tfvars"
-```
 
-#### Production環境
-
-```bash
-cd terraform
-
-# ワークスペースの切り替え（作成がまだの場合は terraform workspace new prd）
+# Production環境
 terraform workspace select prd
-
-# 初期化
-terraform init
-
-# デプロイ (prd.tfvarsを使用)
 terraform apply -var-file="prd.tfvars"
 ```
 
-`apply`が完了すると、環境に応じたGCSバケット、Cloud Function、Dataformリポジトリ、Cloud Workflowsなどが構築・更新されます。
-特にDataform Workflowは、Staging環境では `dataform-trigger-workflow-stg`、Production環境では `dataform-trigger-workflow` がメインで使用されますが、Terraformの構成上、両方のリソース定義が含まれる場合があります。
+## 運用時の注意点
 
-## パイプラインの実行方法
-
-1.  **データ取り込み**: KOLデータを含む`.zip`ファイルを、Terraformが作成したGCSバケット (`kol-keiba-bucket`) にアップロードします。Cloud Functionが自動で起動し、BigQueryの`kolbi_keiba`データセットにデータが格納されます。
-2.  **データ変換**: BigQueryテーブルの更新が完了すると、**約5分間のデバウンス（待機・重複排除）期間**を経て、Dataformのワークフローが実行されます。これにより、複数のファイルがアップロードされた場合でも、ワークフローの実行は1回にまとめられます。
-
-## クリーンアップ
-
-作成したすべてのGCPリソースを削除するには、以下のコマンドを実行します。
-
-```bash
-cd terraform
-terraform destroy
-```
+- **自動デプロイ**: `main` ブランチへのマージ時、Dataformリポジトリは自動的に更新されますが、Terraformの変更（スケジューラや関数の設定変更）は手動で `apply` する必要があります。
+- **デバウンス**: ファイルアップロード時のトリガーは、連続したアップロードをまとめて処理するため、最後のファイル検知から約5分後に処理が開始されます。
