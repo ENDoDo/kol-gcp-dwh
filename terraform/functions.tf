@@ -266,3 +266,95 @@ resource "google_cloud_run_service_iam_member" "workflows_invoker_races" {
 output "export_races_function_uri" {
   value = google_cloudfunctions2_function.export_races.service_config[0].uri
 }
+
+# -----------------------------------------------------------------------------
+# レース単勝オッズエクスポート用 Cloud Function
+# -----------------------------------------------------------------------------
+
+# --- サービスアカウント ---
+resource "google_service_account" "export_race_uma_odds_sa" {
+  account_id   = "export-race-uma-odds-sa${local.env_suffix}"
+  display_name = "SA for Race Uma Odds Export Function${local.env_suffix}"
+  project      = var.project_id
+}
+
+# --- SA用 IAM ロール ---
+resource "google_project_iam_member" "export_race_uma_odds_bq_editor" {
+  project = var.project_id
+  role    = "roles/bigquery.dataEditor"
+  member  = "serviceAccount:${google_service_account.export_race_uma_odds_sa.email}"
+}
+
+resource "google_project_iam_member" "export_race_uma_odds_bq_job_user" {
+  project = var.project_id
+  role    = "roles/bigquery.jobUser"
+  member  = "serviceAccount:${google_service_account.export_race_uma_odds_sa.email}"
+}
+
+# --- ソースコードのアーカイブ ---
+data "archive_file" "export_race_uma_odds_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/../functions/export_race_uma_odds"
+  output_path = "${path.module}/../functions/export_race_uma_odds.zip"
+}
+
+# --- ソースコードのアップロード ---
+resource "google_storage_bucket_object" "export_race_uma_odds_object" {
+  name   = "export_race_uma_odds-${data.archive_file.export_race_uma_odds_zip.output_md5}.zip"
+  bucket = google_storage_bucket.function_source_bucket.name
+  source = data.archive_file.export_race_uma_odds_zip.output_path
+}
+
+# --- Cloud Function Gen2 ---
+resource "google_cloudfunctions2_function" "export_race_uma_odds" {
+  name        = "export-race-uma-odds-function${local.env_suffix}"
+  location    = var.region
+  description = "Exports race uma odds updates to FTP"
+  project     = var.project_id
+
+  build_config {
+    runtime     = "python311"
+    entry_point = "export_race_uma_odds"
+    source {
+      storage_source {
+        bucket = google_storage_bucket.function_source_bucket.name
+        object = google_storage_bucket_object.export_race_uma_odds_object.name
+      }
+    }
+  }
+
+  service_config {
+    max_instance_count = 1
+    available_memory   = "512M"
+    timeout_seconds    = 540
+    environment_variables = {
+      PROJECT_ID  = var.project_id
+      DATASET_ID  = terraform.workspace == "prd" ? var.prd_schema : var.stg_schema
+      SECRET_USER = "projects/56638639323/secrets/kol_ftp_bubble_username"
+      SECRET_PASS = "projects/56638639323/secrets/kol_ftp_bubble_password"
+      FTP_DIRECTORY = terraform.workspace == "prd" ? "/production" : "/development"
+      # BUBBLE_API_URL = terraform.workspace == "prd" ? "https://member.kol-bi.jp/version-test/api/1.1/wf/import_race_uma_odds" : "https://temp-toreyomi-20260115.bubbleapps.io/version-test/api/1.1/wf/import_race_uma_odds"
+      BUBBLE_API_KEY_SECRET_ID = "projects/56638639323/secrets/kol_bubble_workflow_api_key"
+      CSV_BASE_URL = "https://kol-bi.jp/umasiri.dev"
+    }
+    service_account_email = google_service_account.export_race_uma_odds_sa.email
+  }
+
+  depends_on = [
+      google_project_iam_member.export_race_uma_odds_bq_editor,
+      google_project_iam_member.export_race_uma_odds_bq_job_user
+  ]
+}
+
+# Workflows SAにCloud Function呼び出し権限を付与
+resource "google_cloud_run_service_iam_member" "workflows_invoker_race_uma_odds" {
+  project  = var.project_id
+  location = var.region
+  service  = google_cloudfunctions2_function.export_race_uma_odds.service_config[0].service
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.workflows_sa.email}"
+}
+
+output "export_race_uma_odds_function_uri" {
+  value = google_cloudfunctions2_function.export_race_uma_odds.service_config[0].uri
+}
