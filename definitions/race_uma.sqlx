@@ -312,9 +312,7 @@ config {
     shirushi_kubun_rank: "人気区分内順位",
     shirushi_shirushi_label: "予想印ラベル",
     shirushi_shirushi_num: "予想印数値",
-    sokuhou_tansho_ninkijun_num: "速報 単勝人気順",
-    sokuhou_tansho_odds_float: "速報 オッズ 小数点第一位まで",
-    sokuhou_happyo_tsukihi_jifun: "速報 発表 時分",
+
     kakutei_tansho_ninkijun: "確定 単勝 人気順",
     kakutei_tansho_ninkijun_num: "確定 単勝 人気順 整数型",
     kakutei_tansho_odds: "確定 単勝 オッズ",
@@ -2023,9 +2021,7 @@ SELECT
 
 
   SAFE_CAST(z.zogen_sa AS INT64) AS zogen_sa_num,
-  SAFE_CAST(odds.TanshoNinkijun AS INT64) AS sokuhou_tansho_ninkijun_num,
-  SAFE_CAST(odds.TanshoOdds AS FLOAT64) AS sokuhou_tansho_odds_float,
-  FORMAT_TIMESTAMP('%H:%M', odds.HappyoTsukihiJifun, 'Asia/Tokyo') AS sokuhou_happyo_tsukihi_jifun,
+
 
   CASE
     WHEN z.tansho_ninkijun IN ('34', '35') THEN 0
