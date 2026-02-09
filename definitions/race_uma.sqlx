@@ -103,6 +103,7 @@ config {
     chokyo_den_awase_uma_race_code_uma_kol: "出馬表出走馬データ 調教併せ馬 併せ当時のKOL仕様馬毎レースID",
     chokyo_den_awase_uma_race_code_kol: "出馬表出走馬データ 調教併せ馬 併せ当時のKOL仕様レースID",
     chokyo_den_awase_uma_class: "出馬表出走馬データ 調教併せ馬 併せ当時のkyoso_joken_kubun_labelをもとに対応",
+    chokyo_den_awase_uma_barei: "出馬表出走馬データ 調教併せ馬 併せ当時の馬齢 整数型",
     chokyo_den_awase_uma_kaku_kubun: "出馬表出走馬データ 調教併せ馬 併せ当時の馬のクラスとの比較区分 格上/同格/格下",
     chokyo_den_awase_uma_kakuue_win_flag: "出馬表出走馬データ 調教併せ馬 格上に対して先着した場合は「はい」該当しない場合はnull",
     chokyo_den_awase_time_sa_float: "出馬表出走馬データ 調教併せのテキストからタイム差を抽出(「秒」は除く)",
@@ -1386,6 +1387,7 @@ SELECT
   pl.race_code_uma_kol_partner AS chokyo_den_awase_uma_race_code_uma_kol,
   pl.race_code_kol_partner AS chokyo_den_awase_uma_race_code_kol,
   pl.kyoso_joken_kubun_label AS chokyo_den_awase_uma_class,
+  SAFE_CAST(pl.barei AS INT64) AS chokyo_den_awase_uma_barei,
 
   CASE
     WHEN pl.kyoso_joken_rank_int >= 4 -- 相手が2勝クラス(Rank 4)以上
