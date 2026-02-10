@@ -14,6 +14,7 @@ config {
     race_code_uma_jvd: "JRA-VAN仕様馬毎レースID",
     race_code_kol: "KOL仕様レースID",
     race_code_jvd: "JRA-VAN仕様レースID",
+    schedule_id: "発走日8文字 YYYYMMDD",
     keibajo_code_jvd: "JRA-VAN仕様競馬場コード",
     keibajo_code_kol: "KOL仕様競馬場コード",
     hasso_date: "発走日時",
