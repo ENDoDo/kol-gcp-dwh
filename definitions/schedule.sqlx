@@ -14,7 +14,7 @@ config {
     period1_start_utc: "発走日時(UTC) date型 YYYY:MM:DD 00:00:00",
     period2_end: "発走日時 date型 YYYY:MM:DD 23:59:59",
     period2_end_utc: "発走日時(UTC) date型 YYYY:MM:DD 23:59:59",
-    main_race_names: "当日に開催されるメインレース名（オープン競走）。スペースとカンマ区切りのリスト型。グレードが高い順に表示。",
+    main_race_names: "当日に開催されるメインレース名。カンマ区切りの文字列型。グレードが高い順に表示。(例)フェアリーステークス(GⅢ),淀短距離ステークス,架空のレース",
     keibajo_names: "当日に開催される競馬場名。カンマ区切りの文字列型。競馬場コード昇順で表示。(例)札幌,函館,中山",
     modified: "データ更新日時",
     created: "データ作成日時"
@@ -30,7 +30,7 @@ WITH
     SELECT
       SUBSTR(race_code_kol, 1, 8) AS date_id,
       -- グレード順（NULLの場合は最後）にレース名を結合
-      STRING_AGG(race_name, ' , ' ORDER BY COALESCE(grade_code, '9') ASC, race_code_kol ASC) AS main_race_names
+      STRING_AGG(race_name, ',' ORDER BY COALESCE(grade_code, '9') ASC, race_code_kol ASC) AS main_race_names
     FROM
       ${ref("race")}
     WHERE
