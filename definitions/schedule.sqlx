@@ -13,6 +13,7 @@ config {
     period1_start: "発走日時 date型 YYYY:MM:DD 00:00:00",
     period2_end: "発走日時 date型 YYYY:MM:DD 23:59:59",
     main_race_names: "当日に開催されるメインレース名（オープン競走）。スペースとカンマ区切りのリスト型。グレードが高い順に表示。",
+    keibajo_names: "当日に開催される競馬場名。カンマ区切りの文字列型。競馬場コード昇順で表示。(例)札幌,函館,中山",
     modified: "データ更新日時",
     created: "データ作成日時"
   },
@@ -36,6 +37,27 @@ WITH
       AND kyosomei_15moji != ''
     GROUP BY
       date_id
+  ),
+  -- 日ごとに開催される競馬場を取得
+  daily_keibajo AS (
+    SELECT
+      SUBSTR(race_code_kol, 1, 8) AS date_id,
+      keibajo_code_jvd,
+      keibajo_name
+    FROM
+      ${ref("race")}
+    GROUP BY
+      1, 2, 3
+  ),
+  -- 競馬場名をコード順に結合
+  keibajo_metrics AS (
+    SELECT
+      date_id,
+      STRING_AGG(keibajo_name, ',' ORDER BY keibajo_code_jvd) AS keibajo_names
+    FROM
+      daily_keibajo
+    GROUP BY
+      date_id
   )
 
 -- kol_den1テーブルから開催年月日を抽出し、各種日付形式に変換する
@@ -52,6 +74,8 @@ SELECT
   DATETIME_ADD(PARSE_DATETIME('%Y%m%d %H:%M:%S', d1.kaisai_nengappi || ' 23:59:59'), INTERVAL 9 HOUR) AS period2_end,
   -- メインレース名リスト
   mr.main_race_names,
+  -- 開催競馬場リスト
+  km.keibajo_names,
   -- データ更新日時
   CURRENT_TIMESTAMP() AS modified,
   -- データ作成日時
@@ -62,6 +86,10 @@ LEFT JOIN
   main_races AS mr
 ON
   d1.kaisai_nengappi = mr.date_id
+LEFT JOIN
+  keibajo_metrics AS km
+ON
+  d1.kaisai_nengappi = km.date_id
 WHERE
   d1.kaisai_nengappi >= '20230101'
 -- 発走日ごとにグループ化
@@ -71,4 +99,5 @@ GROUP BY
   month_day,
   period1_start,
   period2_end,
-  main_race_names
+  main_race_names,
+  keibajo_names
