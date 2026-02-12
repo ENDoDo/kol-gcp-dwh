@@ -1743,7 +1743,8 @@ SELECT
     CASE
       WHEN z.chokyo_den_chokyo1_basho = 'プール' THEN NULL
       WHEN z.chokyo_den_chokyo1_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo1_3f AS FLOAT64)
-      ELSE SAFE_CAST(z.chokyo_den_chokyo1_3f AS FLOAT64) - SAFE_CAST(z.chokyo_den_chokyo1_1f AS FLOAT64)
+      -- それ以外の場合: NULL
+      ELSE NULL
     END, 1
   ) AS chokyo_den_chokyo1_2f_float,
 
@@ -1827,7 +1828,8 @@ SELECT
     CASE
       WHEN z.chokyo_den_chokyo2_basho = 'プール' THEN NULL
       WHEN z.chokyo_den_chokyo2_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo2_3f AS FLOAT64)
-      ELSE SAFE_CAST(z.chokyo_den_chokyo2_3f AS FLOAT64) - SAFE_CAST(z.chokyo_den_chokyo2_1f AS FLOAT64)
+      -- それ以外の場合: NULL
+      ELSE NULL
     END, 1
   ) AS chokyo_den_chokyo2_2f_float,
 
@@ -1911,7 +1913,8 @@ SELECT
     CASE
       WHEN z.chokyo_den_chokyo3_basho = 'プール' THEN NULL
       WHEN z.chokyo_den_chokyo3_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo3_3f AS FLOAT64)
-      ELSE SAFE_CAST(z.chokyo_den_chokyo3_3f AS FLOAT64) - SAFE_CAST(z.chokyo_den_chokyo3_1f AS FLOAT64)
+      -- それ以外の場合: NULL
+      ELSE NULL
     END, 1
   ) AS chokyo_den_chokyo3_2f_float,
 
