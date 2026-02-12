@@ -1616,7 +1616,6 @@ SELECT
 
   CASE
     WHEN ((z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = 'CW') OR (z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ'))
-         AND ROUND((SAFE_CAST(REGEXP_REPLACE(z.chokyo_sei_3f, r'[^0-9.]', '') AS FLOAT64) - SAFE_CAST(REGEXP_REPLACE(z.chokyo_sei_1f, r'[^0-9.]', '') AS FLOAT64)) - SAFE_CAST(REGEXP_REPLACE(z.chokyo_sei_1f, r'[^0-9.]', '') AS FLOAT64), 1) <= 11.9
          AND SAFE_CAST(REGEXP_REPLACE(z.chokyo_sei_1f, r'[^0-9.]', '') AS FLOAT64) <= 11.5
     THEN 'はい'
     ELSE NULL
