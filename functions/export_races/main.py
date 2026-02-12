@@ -104,8 +104,9 @@ def export_races(request):
 
         # CSV出力用フィールド定義 (race.sqlxに基づく)
         fieldnames = [
-            "race_code_kol", "race_code_jvd", "hasso_date", "kaiji", "nichiji",
-            "race_bango", "race_bango_num", "race_name", "kyori_kubun",
+            "race_code_kol", "race_code_jvd", "schedule_id",
+            "hasso_date", "hasso_date_utc", "kaiji", "nichiji",
+            "race_bango_num", "race_name", "kyori_kubun",
             "keibajo_code_jvd", "keibajo_code_kol", "keibajo_name",
             "chuo_chiho_kubun", "chuo_chiho_kubun_label", "kyosomei_15moji",
             "kyosomei_7moji", "grade_code", "grade_code_label", "jpn_flag",

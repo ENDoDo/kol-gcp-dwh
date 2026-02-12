@@ -116,7 +116,11 @@ def export_schedules(request):
                 "year": row["year"],
                 "month_day": row["month_day"],
                 "period1_start": row["period1_start"],
+                "period1_start_utc": row["period1_start_utc"],
                 "period2_end": row["period2_end"],
+                "period2_end_utc": row["period2_end_utc"],
+                "main_race_names": row["main_race_names"],
+                "keibajo_names": row["keibajo_names"],
                 "modified": row["modified"],
                 "created": row["created"]
             }
@@ -127,7 +131,11 @@ def export_schedules(request):
                 "year": row["year"],
                 "month_day": row["month_day"],
                 "period1_start": row["period1_start"],
-                "period2_end": row["period2_end"]
+                "period1_start_utc": row["period1_start_utc"],
+                "period2_end": row["period2_end"],
+                "period2_end_utc": row["period2_end_utc"],
+                "main_race_names": row["main_race_names"],
+                "keibajo_names": row["keibajo_names"]
             }
 
             current_hash = calculate_hash(hash_data)
@@ -192,7 +200,7 @@ def export_schedules(request):
                     logger.info(f"CSVを生成中... ({filename})")
                     csv_buffer = io.StringIO()
                     # スキーマに合わせたフィールド順序
-                    fieldnames = ["id", "year", "month_day", "period1_start", "period2_end", "modified", "created"]
+                    fieldnames = ["id", "year", "month_day", "period1_start", "period1_start_utc", "period2_end", "period2_end_utc", "main_race_names", "keibajo_names", "modified", "created"]
                     writer = csv.DictWriter(csv_buffer, fieldnames=fieldnames)
                     writer.writeheader()
                     writer.writerows(chunk)

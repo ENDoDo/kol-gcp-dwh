@@ -119,7 +119,7 @@ def export_race_uma_odds(request):
         for row in rows:
             row_data = {field: row[field] for field in fieldnames}
 
-            # ハッシュ計算用データ（変更検知対象のみ）
+            # ハッシュ計算用データ（sokuhou_modified, sokuhou_created, modified, created は毎回変わるため除外）
             hash_data = {
                 "race_code_uma_kol": row_data["race_code_uma_kol"],
                 "hasso_date": row_data["hasso_date"],
