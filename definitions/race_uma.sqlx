@@ -1173,8 +1173,8 @@ SELECT
     CASE
       WHEN z.chokyo_den_oikiri_basho = 'プール' THEN NULL
       WHEN z.chokyo_den_oikiri_course = '坂' THEN SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) -- 坂路は3Fを使用(実質2F)
-      -- それ以外の場合: 3F - 1F
-      ELSE SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64)
+      -- それ以外の場合: NULL
+      ELSE NULL
     END, 1
   ) AS chokyo_den_oikiri_2f_float,
 
@@ -1499,8 +1499,8 @@ SELECT
     CASE
       WHEN z.chokyo_sei_basho = 'プール' THEN NULL
       WHEN z.chokyo_sei_course = '坂' THEN SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) -- 坂路は3Fを使用(実質2F)
-      -- それ以外の場合: 3F - 1F
-      ELSE SAFE_CAST(z.chokyo_sei_3f AS FLOAT64) - SAFE_CAST(z.chokyo_sei_1f AS FLOAT64)
+      -- それ以外の場合: NULL
+      ELSE NULL
     END, 1
   ) AS chokyo_sei_2f_float,
 
