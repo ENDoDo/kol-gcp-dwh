@@ -165,6 +165,26 @@ resource "google_dataform_repository_workflow_config" "workflow_stg" {
       schema   = var.stg_schema
       name     = "schedule"
     }
+    included_targets {
+      database = var.project_id
+      schema   = var.stg_schema
+      name     = "race_hit"
+    }
+    included_targets {
+      database = var.project_id
+      schema   = var.stg_schema
+      name     = "race_uma_odds"
+    }
+    included_targets {
+      database = var.project_id
+      schema   = var.stg_schema
+      name     = "cross_ketto_f_chokyo_course"
+    }
+    included_targets {
+      database = var.project_id
+      schema   = var.stg_schema
+      name     = "cross_kijosha_chokyoshi"
+    }
     service_account = google_service_account.dataform.email
   }
 
@@ -239,6 +259,26 @@ resource "google_dataform_repository_workflow_config" "workflow_prd" {
       database = var.project_id
       schema   = var.prd_schema
       name     = "schedule"
+    }
+    included_targets {
+      database = var.project_id
+      schema   = var.prd_schema
+      name     = "race_hit"
+    }
+    included_targets {
+      database = var.project_id
+      schema   = var.prd_schema
+      name     = "race_uma_odds"
+    }
+    included_targets {
+      database = var.project_id
+      schema   = var.prd_schema
+      name     = "cross_ketto_f_chokyo_course"
+    }
+    included_targets {
+      database = var.project_id
+      schema   = var.prd_schema
+      name     = "cross_kijosha_chokyoshi"
     }
     service_account = google_service_account.dataform.email
   }
