@@ -325,8 +325,9 @@ resource "google_cloudfunctions2_function" "export_race_uma_odds" {
 
   service_config {
     max_instance_count = 1
-    available_memory   = "512M"
-    timeout_seconds    = 540
+    available_memory   = "1Gi"
+    available_cpu      = "1"
+    timeout_seconds    = 3600
     environment_variables = {
       PROJECT_ID  = var.project_id
       DATASET_ID  = terraform.workspace == "prd" ? var.prd_schema : var.stg_schema

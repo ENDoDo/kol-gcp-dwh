@@ -429,5 +429,3 @@ FROM
   ${ref("race_uma")} AS ru
   LEFT JOIN ${ref("race")} AS r
   ON ru.race_code_jvd = r.race_code_jvd
-WHERE
-  ru.kakutei_chakujun_num >= 1
