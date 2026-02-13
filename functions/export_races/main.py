@@ -218,35 +218,34 @@ def export_races(request):
                     ftp.storbinary(f"STOR {filename}", bio)
                     logger.info(f"{filename} のアップロードに成功しました。")
 
-                    # Bubble APIへの通知 (一時的にコメントアウト)
-                    # if BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
-                    #     try:
-                    #         if ftp_directory:
-                    #             dir_path = ftp_directory.strip("/")
-                    #             csv_url = f"{CSV_BASE_URL}/{dir_path}/{filename}"
-                    #         else:
-                    #             csv_url = f"{CSV_BASE_URL}/{filename}"
-                    #
-                    #         logger.info(f"通知対象CSV URL: {csv_url}")
-                    #         api_key = get_secret(BUBBLE_API_KEY_SECRET_ID)
-                    #         headers = {
-                    #             "Content-Type": "application/json",
-                    #             "Authorization": f"Bearer {api_key}"
-                    #         }
-                    #         payload = {
-                    #             "csv_url": csv_url
-                    #         }
-                    #         logger.info(f"Bubble APIへリクエストを送信します: URL={BUBBLE_API_URL}")
-                    #         response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
-                    #         response.raise_for_status()
-                    #         logger.info(f"Bubble APIへの通知に成功しました ({filename}): {response.json()}")
-                    #     except Exception as e:
-                    #         logger.error(f"Bubble APIへの通知に失敗しました ({filename}): {e}")
-                    # else:
-                    #     if i == 0:
-                    #          logger.info("Bubble API設定がされていないため、通知をスキップします。")
-                    if i == 0:
-                        logger.info("Bubble API通知は一時的に無効化されています。")
+                    # Bubble APIへの通知
+                    if BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
+                        try:
+                            if ftp_directory:
+                                dir_path = ftp_directory.strip("/")
+                                csv_url = f"{CSV_BASE_URL}/{dir_path}/{filename}"
+                            else:
+                                csv_url = f"{CSV_BASE_URL}/{filename}"
+
+                            logger.info(f"通知対象CSV URL: {csv_url}")
+                            api_key = get_secret(BUBBLE_API_KEY_SECRET_ID)
+                            headers = {
+                                "Content-Type": "application/json",
+                                "Authorization": f"Bearer {api_key}"
+                            }
+                            payload = {
+                                "csv_url": csv_url
+                            }
+                            logger.info(f"Bubble APIへリクエストを送信します: URL={BUBBLE_API_URL}")
+                            response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
+                            response.raise_for_status()
+                            logger.info(f"Bubble APIへの通知に成功しました ({filename}): {response.json()}")
+                        except Exception as e:
+                            logger.error(f"Bubble APIへの通知に失敗しました ({filename}): {e}")
+                            # 続行する
+                    else:
+                        if i == 0: # ログ過多防止のため初回のみログ出力
+                             logger.info("Bubble API設定がされていないため、通知をスキップします。")
 
         except Exception as e:
             logger.error(f"FTPアップロードに失敗しました: {e}")
