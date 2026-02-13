@@ -154,11 +154,7 @@ resource "google_dataform_repository_workflow_config" "workflow_stg" {
       schema   = var.stg_schema
       name     = "race_uma"
     }
-    included_targets {
-      database = var.project_id
-      schema   = var.stg_schema
-      name     = "race_uma_chokyo"
-    }
+
     included_targets {
       database = var.project_id
       schema   = var.stg_schema
@@ -233,11 +229,7 @@ resource "google_dataform_repository_workflow_config" "workflow_prd" {
       schema   = var.prd_schema
       name     = "race_uma"
     }
-    included_targets {
-      database = var.project_id
-      schema   = var.prd_schema
-      name     = "race_uma_chokyo"
-    }
+
     included_targets {
       database = var.project_id
       schema   = var.prd_schema
