@@ -38,8 +38,8 @@ SELECT
   END ||
   Kaiji || Nichiji || RaceNum || Umaban AS race_code_uma_kol,
 
-  DATETIME(HassoJikoku, 'Asia/Tokyo') AS hasso_date,
-  HassoJikoku AS hasso_date_utc,
+  DATETIME(HassoJikoku) AS hasso_date,
+  DATETIME_ADD(DATETIME(HassoJikoku), INTERVAL -9 HOUR) AS hasso_date_utc,
 
   CAST(TanshoNinkijun AS INT64) AS sokuhou_tansho_ninkijun_num,
   CAST(TanshoOdds AS FLOAT64) AS sokuhou_tansho_odds_float,
