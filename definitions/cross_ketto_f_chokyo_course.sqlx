@@ -36,6 +36,7 @@ FROM
 WHERE
   ketto1_f_hanshoku_toroku_bango IS NOT NULL
   AND chokyo_sei_basho_course_label IS NOT NULL
+  AND kakutei_chakujun_num >= 1
   AND hasso_date >= DATE_TRUNC(DATE_SUB(CURRENT_DATE('Asia/Tokyo'), INTERVAL 3 YEAR), YEAR)
   AND hasso_date < DATE_TRUNC(CURRENT_DATE('Asia/Tokyo'), YEAR)
 GROUP BY
