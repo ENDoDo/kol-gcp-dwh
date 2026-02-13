@@ -214,47 +214,39 @@ def export_schedules(request):
             logger.error(f"FTPアップロードに失敗しました: {e}")
             return f"FTPアップロード失敗: {e}", 500
 
-        # 6. Bubble APIへの通知
-        if BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
-            try:
-                logger.info("Bubble APIへの通知を開始します...")
-                api_key = get_secret(BUBBLE_API_KEY_SECRET_ID)
-
-                # エクスポートされた最後のファイルを使用 (通常は最新のデータを含む)
-                # ファイル名が filename 変数に残っているはず
-                # 複数ファイルの場合は最後のパート
-
-                # FTPディレクトリの考慮
-                ftp_directory = os.environ.get("FTP_DIRECTORY")
-                if ftp_directory:
-                    # /production などの場合、先頭の/を除去するか、結合に注意
-                    # CSV_BASE_URL が https://kol-bi.jp/umasiri.dev で FTP_DIRECTORY が /development の場合
-                    # https://kol-bi.jp/umasiri.dev/development/filename.csv となるようにする
-                    dir_path = ftp_directory.strip("/")
-                    csv_url = f"{CSV_BASE_URL}/{dir_path}/{filename}"
-                else:
-                    csv_url = f"{CSV_BASE_URL}/{filename}"
-
-                logger.info(f"通知対象CSV URL: {csv_url}")
-
-                headers = {
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {api_key}"
-                }
-                payload = {
-                    "csv_url": csv_url
-                }
-
-                logger.info(f"Bubble APIへリクエストを送信します: URL={BUBBLE_API_URL}")
-                response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
-                response.raise_for_status()
-                logger.info(f"Bubble APIへの通知に成功しました: {response.json()}")
-
-            except Exception as e:
-                logger.error(f"Bubble APIへの通知に失敗しました: {e}")
-                # API通知失敗は致命的なエラーとして扱わず、ログ出力にとどめる
-        else:
-            logger.info("Bubble API設定がされていないため、通知をスキップします。")
+        # 6. Bubble APIへの通知 (一時的にコメントアウト)
+        # if BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
+        #     try:
+        #         logger.info("Bubble APIへの通知を開始します...")
+        #         api_key = get_secret(BUBBLE_API_KEY_SECRET_ID)
+        #
+        #         ftp_directory = os.environ.get("FTP_DIRECTORY")
+        #         if ftp_directory:
+        #             dir_path = ftp_directory.strip("/")
+        #             csv_url = f"{CSV_BASE_URL}/{dir_path}/{filename}"
+        #         else:
+        #             csv_url = f"{CSV_BASE_URL}/{filename}"
+        #
+        #         logger.info(f"通知対象CSV URL: {csv_url}")
+        #
+        #         headers = {
+        #             "Content-Type": "application/json",
+        #             "Authorization": f"Bearer {api_key}"
+        #         }
+        #         payload = {
+        #             "csv_url": csv_url
+        #         }
+        #
+        #         logger.info(f"Bubble APIへリクエストを送信します: URL={BUBBLE_API_URL}")
+        #         response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
+        #         response.raise_for_status()
+        #         logger.info(f"Bubble APIへの通知に成功しました: {response.json()}")
+        #
+        #     except Exception as e:
+        #         logger.error(f"Bubble APIへの通知に失敗しました: {e}")
+        # else:
+        #     logger.info("Bubble API設定がされていないため、通知をスキップします。")
+        logger.info("Bubble API通知は一時的に無効化されています。")
 
         # 7. 状態管理テーブルの更新
         logger.info("状態管理テーブルを更新中...")
