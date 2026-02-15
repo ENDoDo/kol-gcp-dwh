@@ -91,6 +91,9 @@ config {
     chokyo_den_oikiri_7f_float: "調教タイム 7F (小数点)",
     chokyo_den_oikiri_6f: "調教タイム 6F",
     chokyo_den_oikiri_6f_float: "調教タイム 6F (小数点)",
+    chokyo_den_oikiri_5f_float: "調教タイム 5F (小数点)",
+    chokyo_den_oikiri_4f_float: "調教タイム 4F (小数点)",
+    chokyo_den_oikiri_3f_float: "調教タイム 3F (小数点)",
 
     chokyo_den_oikiri_2f_float: "調教タイム 2F推定値 (小数点)",
 
