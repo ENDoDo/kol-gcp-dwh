@@ -155,30 +155,27 @@ terraform apply -var-file="prd.tfvars"
 
 ## Bubble API連携の制御
 
-各エクスポート用 Cloud Function (`export_schedules`, `export_races`, `export_race_uma_details`, `export_race_uma_odds`) による Bubble API への通知処理は、Terraform の変数で制御可能です。
+各エクスポート用 Cloud Function (`export_schedules`, `export_races`, `export_race_uma_details`, `export_race_uma_odds`) による Bubble API への通知処理は、Terraform の変数 `enable_bubble_api` で制御可能です。
 
-- **変数名**: `enable_bubble_api`
-- **デフォルト値**: `true` (有効)
+### 設定の切り替え
 
-### 通知をすべて停止する場合
+デプロイコマンドを共通化するため、有効・無効の切り替えは各環境の `tfvars` ファイル（`stg.tfvars`, `prd.tfvars`）の書き換えによって行います。
 
-デプロイ時に一時的にすべての環境（または特定の環境）で通知を止めたい場合は、以下のいずれかの方法で行います。
+- **有効にする場合**: `enable_bubble_api = true` とするか、行自体を削除します（デフォルトが `true` のため）。
+- **無効にする場合**: `enable_bubble_api = false` と記述します。
 
-#### A. `tfvars` ファイルで指定 (推奨)
+### デプロイコマンド (共通)
 
-環境ごとの設定ファイル (`stg.tfvars`, `prd.tfvars`) に以下を記述します。
-現在、**Staging環境 (`stg.tfvars`) では `false` に設定されています。**
-
-```hcl
-enable_bubble_api = false
-```
-
-#### B. `terraform apply` の引数で指定
+有効・無効に関わらず、常に以下のコマンドでデプロイを行います。
 
 ```bash
-# STG環境で通知を無効化してデプロイ
+# Staging環境
 terraform workspace select stg
-terraform apply -var-file="stg.tfvars" -var="enable_bubble_api=false"
+terraform apply -var-file="stg.tfvars"
+
+# Production環境
+terraform workspace select prd
+terraform apply -var-file="prd.tfvars"
 ```
 
 ### 内部仕様

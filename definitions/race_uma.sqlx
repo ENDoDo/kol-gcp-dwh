@@ -315,9 +315,7 @@ config {
     shirushi_shirushi_label: "予想印ラベル",
     shirushi_shirushi_num: "予想印数値",
 
-    kakutei_tansho_ninkijun: "確定 単勝 人気順",
     kakutei_tansho_ninkijun_num: "確定 単勝 人気順 整数型",
-    kakutei_tansho_odds: "確定 単勝 オッズ",
     kakutei_tansho_odds_float: "確定 単勝 オッズ 小数点第一位まで",
 
     kakutei_chakujun_num: "確定着順(整数)",

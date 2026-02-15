@@ -267,7 +267,7 @@ def export_race_uma_details(request):
             "corner4_ichidori", "corner4_ichidori_label",
             "comment_kishu_kyusha", "comment_next", "comment_last",
             "yosou_tansho_ninkijun_num", "yosou_tansho_odds_float",
-            "kakutei_tansho_ninkijun", "kakutei_tansho_ninkijun_num", "kakutei_tansho_odds", "kakutei_tansho_odds_float",
+            "kakutei_tansho_ninkijun_num", "kakutei_tansho_odds_float",
             # raceテーブル由来
             "race_name", "kyori_kubun", "keibajo_name",
             "chuo_chiho_kubun", "chuo_chiho_kubun_label",

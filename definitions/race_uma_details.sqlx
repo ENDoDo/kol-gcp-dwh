@@ -365,9 +365,7 @@ config {
     comment_last: "前走コメント",
     yosou_tansho_ninkijun_num: "予想単勝人気順(数値)",
     yosou_tansho_odds_float: "予想単勝オッズ(数値)",
-    kakutei_tansho_ninkijun: "確定 単勝 人気順",
     kakutei_tansho_ninkijun_num: "確定 単勝 人気順 整数型",
-    kakutei_tansho_odds: "確定 単勝 オッズ",
     kakutei_tansho_odds_float: "確定 単勝 オッズ 小数点第一位まで",
     // --- raceテーブル由来のカラム ---
     race_name: "レース名。オープン競走では競走名とグレード、それ以外では条件を組み合わせて生成",
