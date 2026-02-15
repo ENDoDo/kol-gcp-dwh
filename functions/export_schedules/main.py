@@ -27,6 +27,7 @@ FTP_HOST = "smartkb.mixh.jp"
 BUBBLE_API_URL = os.environ.get("BUBBLE_API_URL")
 BUBBLE_API_KEY_SECRET_ID = os.environ.get("BUBBLE_API_KEY_SECRET_ID")
 CSV_BASE_URL = os.environ.get("CSV_BASE_URL", "https://kol-bi.jp/umasiri.dev")
+ENABLE_BUBBLE_API = str(os.environ.get("ENABLE_BUBBLE_API", "true")).lower() == "true"
 
 def get_secret(secret_id):
     """Secret Managerからシークレット値を取得する"""
@@ -215,7 +216,7 @@ def export_schedules(request):
             return f"FTPアップロード失敗: {e}", 500
 
         # 6. Bubble APIへの通知
-        if BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
+        if ENABLE_BUBBLE_API and BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
             try:
                 logger.info("Bubble APIへの通知を開始します...")
                 api_key = get_secret(BUBBLE_API_KEY_SECRET_ID)
@@ -245,7 +246,10 @@ def export_schedules(request):
             except Exception as e:
                 logger.error(f"Bubble APIへの通知に失敗しました: {e}")
         else:
-            logger.info("Bubble API設定がされていないため、通知をスキップします。")
+            if not ENABLE_BUBBLE_API:
+                 logger.info("ENABLE_BUBBLE_APIがfalseのため、通知をスキップします。")
+            else:
+                 logger.info("Bubble API設定がされていないため、通知をスキップします。")
 
         # 7. 状態管理テーブルの更新
         logger.info("状態管理テーブルを更新中...")
