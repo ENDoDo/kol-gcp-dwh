@@ -152,3 +152,27 @@ terraform apply -var-file="prd.tfvars"
 
 - **自動デプロイ**: `main` ブランチへのマージ時、Dataformリポジトリは自動的に更新されますが、Terraformの変更（スケジューラや関数の設定変更）は手動で `apply` する必要があります。
 - **デバウンス**: ファイルアップロード時のトリガーは、連続したアップロードをまとめて処理するため、最後のファイル検知から約5分後に処理が開始されます。
+
+## Bubble API連携の有効化・無効化
+
+各エクスポートFunction (`export_schedules`, `export_races`, `export_race_uma_details`, `export_race_uma_odds`) からBubble APIへの通知機能を、Terraform変数 `enable_bubble_api` で制御できます。
+
+- **デフォルト**: `true` (有効)
+
+### 無効化する方法
+
+Bubble APIへの通知を一時的に止めたい場合や、開発環境で不要な場合は、以下のいずれかの方法で無効化してデプロイしてください。
+
+**1. コマンドライン引数で指定する場合**
+
+```bash
+terraform apply -var="enable_bubble_api=false"
+```
+
+**2. tfvarsファイルで指定する場合**
+
+`stg.tfvars` や `prd.tfvars` に以下を追記します。
+
+```hcl
+enable_bubble_api = false
+```
