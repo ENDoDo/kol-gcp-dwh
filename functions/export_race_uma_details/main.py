@@ -80,7 +80,9 @@ def export_race_uma_details(request):
                             created, modified,
                             shirushi_hanro_4f_flag, shirushi_hanro_1f_flag, shirushi_wood_4f_flag, shirushi_wood_1f_flag,
                             shirushi_awase_senchaku_flag, shirushi_point, shirushi_kubun_yosou_tansho_ninkijun, shirushi_kubun_rank,
-                            shirushi_shirushi_label, shirushi_shirushi_num, torikeshi_tosu_num, toroku_tosu_num
+                            shirushi_shirushi_label, shirushi_shirushi_num, torikeshi_tosu_num, toroku_tosu_num,
+                            yosou_tansho_ninkijun_num,
+                            yosou_tansho_odds_float
                         ) FROM UNNEST([t]))
                     ))) as current_hash
                 FROM `{PROJECT_ID}.{DATASET_ID}.race_uma_details` t
