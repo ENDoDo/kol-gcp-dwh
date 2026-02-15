@@ -14,8 +14,8 @@ locals {
 # race_uma_odds 更新用 Cloud Scheduler (06, 09, 12, 15, 20:00 JST)
 resource "google_cloud_scheduler_job" "odds_update" {
   name             = "odds-update-${local.env_suffix}"
-  description      = "race_uma_odds update (06:00, 09:00, 12:00, 15:00, 20:00 JST)"
-  schedule         = "0 6,9,12,15,20 * * *"
+  description      = "race_uma_odds update (09:30, 12:30, 15:30, 18:30, 20:30 JST)"
+  schedule         = "30 9,12,15,18,20 * * *"
   time_zone        = "Asia/Tokyo"
   attempt_deadline = "320s"
   region           = var.region
