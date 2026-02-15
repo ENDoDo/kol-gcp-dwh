@@ -153,26 +153,36 @@ terraform apply -var-file="prd.tfvars"
 - **自動デプロイ**: `main` ブランチへのマージ時、Dataformリポジトリは自動的に更新されますが、Terraformの変更（スケジューラや関数の設定変更）は手動で `apply` する必要があります。
 - **デバウンス**: ファイルアップロード時のトリガーは、連続したアップロードをまとめて処理するため、最後のファイル検知から約5分後に処理が開始されます。
 
-## Bubble API連携の有効化・無効化
+## Bubble API連携の制御
 
-各エクスポートFunction (`export_schedules`, `export_races`, `export_race_uma_details`, `export_race_uma_odds`) からBubble APIへの通知機能を、Terraform変数 `enable_bubble_api` で制御できます。
+各エクスポート用 Cloud Function (`export_schedules`, `export_races`, `export_race_uma_details`, `export_race_uma_odds`) による Bubble API への通知処理は、Terraform の変数で制御可能です。
 
-- **デフォルト**: `true` (有効)
+- **変数名**: `enable_bubble_api`
+- **デフォルト値**: `true` (有効)
 
-### 無効化する方法
+### 通知をすべて停止する場合
 
-Bubble APIへの通知を一時的に止めたい場合や、開発環境で不要な場合は、以下のいずれかの方法で無効化してデプロイしてください。
+デプロイ時に一時的にすべての環境（または特定の環境）で通知を止めたい場合は、以下のいずれかの方法で行います。
 
-**1. コマンドライン引数で指定する場合**
+#### A. `tfvars` ファイルで指定 (推奨)
 
-```bash
-terraform apply -var="enable_bubble_api=false"
-```
-
-**2. tfvarsファイルで指定する場合**
-
-`stg.tfvars` や `prd.tfvars` に以下を追記します。
+環境ごとの設定ファイル (`stg.tfvars`, `prd.tfvars`) に以下を記述します。
+現在、**Staging環境 (`stg.tfvars`) では `false` に設定されています。**
 
 ```hcl
 enable_bubble_api = false
 ```
+
+#### B. `terraform apply` の引数で指定
+
+```bash
+# STG環境で通知を無効化してデプロイ
+terraform workspace select stg
+terraform apply -var-file="stg.tfvars" -var="enable_bubble_api=false"
+```
+
+### 内部仕様
+
+1.  Terraform が `ENABLE_BUBBLE_API` という環境変数を Cloud Functions に渡します。
+2.  Python コード内で `os.environ.get("ENABLE_BUBBLE_API")` を確認します。
+3.  値が `false` の場合、API リクエストを送信せずに処理を完了し、その旨をログに出力します。
