@@ -102,10 +102,7 @@ config {
     chokyo_den_ichidori_furi_win_flag: "併せ馬が存在し、かつchokyo_ichidoriが6～9(大外周り)かつ併せ先着の場合「はい」該当しない場合はnull",
     chokyo_den_awase: "出馬表出走馬データ 調教併せ",
     chokyo_den_awase_uma_bamei: "出馬表出走馬データ 調教併せ 馬名",
-    chokyo_den_awase_uma_race_code_uma_kol: "出馬表出走馬データ 調教併せ馬 併せ当時のKOL仕様馬毎レースID",
-    chokyo_den_awase_uma_race_code_kol: "出馬表出走馬データ 調教併せ馬 併せ当時のKOL仕様レースID",
     chokyo_den_awase_uma_class: "出馬表出走馬データ 調教併せ馬 併せ当時のkyoso_joken_kubun_labelをもとに対応",
-    chokyo_den_awase_uma_barei: "出馬表出走馬データ 調教併せ馬 併せ当時の馬齢 整数型",
     chokyo_den_awase_uma_kaku_kubun: "出馬表出走馬データ 調教併せ馬 併せ当時の馬のクラスとの比較区分 格上/同格/格下",
     chokyo_den_awase_uma_kakuue_win_flag: "出馬表出走馬データ 調教併せ馬 格上に対して先着した場合は「はい」該当しない場合はnull",
     chokyo_den_awase_time_sa_float: "出馬表出走馬データ 調教併せのテキストからタイム差を抽出(「秒」は除く)",
@@ -119,112 +116,6 @@ config {
     chokyo_den_oikiri_kijosha_equal_kishumei_flag: "調教1～3追い切り 調教騎乗騎手がレースでも騎乗フラグ",
     chokyo_den_oikiri_check_time_1f_flag: "調教1～3追い切り 1Fの標準タイムクリア判定のフラグ",
     chokyo_den_oikiri_check_time_4f_6f_flag: "調教1～3追い切り 4F/6Fの標準タイムクリア判定のフラグ",
-    // 調教1
-    chokyo_den_chokyo1_flag: "調教1 調教フラグ",
-    chokyo_den_chokyo1_flag_label: "調教1 chokyo_flagをもとに対応 はい/いいえ",
-    chokyo_den_chokyo1_kijosha: "調教1 調教騎乗者",
-    chokyo_den_chokyo1_nengappi: "調教1 調教年月日",
-    chokyo_den_chokyo1_nengappi_date: "調教1 調教年月日 日付型",
-    chokyo_den_chokyo1_basho: "調教1 調教場所",
-    chokyo_den_chokyo1_course: "調教1 調教コース",
-    chokyo_den_chokyo1_course_kubun: "調教1 調教コース区分",
-    chokyo_den_chokyo1_basho_course_label: "調教1 調教場所・コース",
-    chokyo_den_chokyo1_babajotai: "調教1 調教馬場状態",
-    chokyo_den_oikiri_5f_wood_kubun: "CW/W 5Fタイム区分",
-    chokyo_den_oikiri_4f_wood_kubun: "CW/W 4Fタイム区分",
-    chokyo_den_oikiri_1f_wood_kubun: "CW/W 1Fタイム区分",
-    chokyo_den_oikiri_4f_hanro_kubun: "坂路 4Fタイム区分",
-    chokyo_den_chokyo1_hanro_pool_kaisu_int: "調教1 坂路またはプール回数",
-    chokyo_den_chokyo1_8f: "調教1 調教タイム 8F",
-    chokyo_den_chokyo1_8f_float: "調教1 調教タイム 8F (小数点)",
-    chokyo_den_chokyo1_7f: "調教1 調教タイム 7F",
-    chokyo_den_chokyo1_7f_float: "調教1 調教タイム 7F (小数点)",
-    chokyo_den_chokyo1_6f: "調教1 調教タイム 6F",
-    chokyo_den_chokyo1_6f_float: "調教1 調教タイム 6F (小数点)",
-
-    chokyo_den_chokyo1_5f_float: "調教1 調教タイム 5F (小数点)",
-
-    chokyo_den_chokyo1_4f_float: "調教1 調教タイム 4F (小数点)",
-
-    chokyo_den_chokyo1_3f_float: "調教1 調教タイム 3F (小数点)",
-    chokyo_den_chokyo1_2f_float: "調教1 調教タイム 2F推定値 (小数点)",
-
-    chokyo_den_chokyo1_1f_float: "調教1 調教タイム 1F (小数点)",
-    chokyo_den_chokyo1_ichidori: "調教1 調教位置取り",
-    chokyo_den_chokyo1_ichidori_label: "調教1 調教位置取り(ラベル)",
-    chokyo_den_chokyo1_ashiiro: "調教1 調教脚色",
-    chokyo_den_chokyo1_ashiiro_label: "調教1 調教脚色(ラベル)",
-    chokyo_den_chokyo1_yajirushi: "調教1 調教矢印",
-    chokyo_den_chokyo1_yajirushi_label: "調教1 調教矢印(ラベル)",
-    chokyo_den_chokyo1_reigai: "調教1 調教例外",
-    // 調教2
-    chokyo_den_chokyo2_flag: "調教2 調教フラグ",
-    chokyo_den_chokyo2_flag_label: "調教2 chokyo_flagをもとに対応 はい/いいえ",
-    chokyo_den_chokyo2_kijosha: "調教2 調教騎乗者",
-    chokyo_den_chokyo2_nengappi: "調教2 調教年月日",
-    chokyo_den_chokyo2_nengappi_date: "調教2 調教年月日 日付型",
-    chokyo_den_chokyo2_basho: "調教2 調教場所",
-    chokyo_den_chokyo2_course: "調教2 調教コース",
-    chokyo_den_chokyo2_course_kubun: "調教2 調教コース区分",
-    chokyo_den_chokyo2_basho_course_label: "調教2 調教場所・コース",
-    chokyo_den_chokyo2_babajotai: "調教2 調教馬場状態",
-    chokyo_den_chokyo2_hanro_pool_kaisu_int: "調教2 坂路またはプール回数",
-    chokyo_den_chokyo2_8f: "調教2 調教タイム 8F",
-    chokyo_den_chokyo2_8f_float: "調教2 調教タイム 8F (小数点)",
-    chokyo_den_chokyo2_7f: "調教2 調教タイム 7F",
-    chokyo_den_chokyo2_7f_float: "調教2 調教タイム 7F (小数点)",
-    chokyo_den_chokyo2_6f: "調教2 調教タイム 6F",
-    chokyo_den_chokyo2_6f_float: "調教2 調教タイム 6F (小数点)",
-
-    chokyo_den_chokyo2_5f_float: "調教2 調教タイム 5F (小数点)",
-
-    chokyo_den_chokyo2_4f_float: "調教2 調教タイム 4F (小数点)",
-
-    chokyo_den_chokyo2_3f_float: "調教2 調教タイム 3F (小数点)",
-    chokyo_den_chokyo2_2f_float: "調教2 調教タイム 2F推定値 (小数点)",
-
-    chokyo_den_chokyo2_1f_float: "調教2 調教タイム 1F (小数点)",
-    chokyo_den_chokyo2_ichidori: "調教2 調教位置取り",
-    chokyo_den_chokyo2_ichidori_label: "調教2 調教位置取り(ラベル)",
-    chokyo_den_chokyo2_ashiiro: "調教2 調教脚色",
-    chokyo_den_chokyo2_ashiiro_label: "調教2 調教脚色(ラベル)",
-    chokyo_den_chokyo2_yajirushi: "調教2 調教矢印",
-    chokyo_den_chokyo2_yajirushi_label: "調教2 調教矢印(ラベル)",
-    chokyo_den_chokyo2_reigai: "調教2 調教例外",
-    // 調教3
-    chokyo_den_chokyo3_flag: "調教3 調教フラグ",
-    chokyo_den_chokyo3_flag_label: "調教3 chokyo_flagをもとに対応 はい/いいえ",
-    chokyo_den_chokyo3_kijosha: "調教3 調教騎乗者",
-    chokyo_den_chokyo3_nengappi: "調教3 調教年月日",
-    chokyo_den_chokyo3_nengappi_date: "調教3 調教年月日 日付型",
-    chokyo_den_chokyo3_basho: "調教3 調教場所",
-    chokyo_den_chokyo3_course: "調教3 調教コース",
-    chokyo_den_chokyo3_course_kubun: "調教3 調教コース区分",
-    chokyo_den_chokyo3_basho_course_label: "調教3 調教場所・コース",
-    chokyo_den_chokyo3_babajotai: "調教3 調教馬場状態",
-    chokyo_den_chokyo3_hanro_pool_kaisu_int: "調教3 坂路またはプール回数",
-    chokyo_den_chokyo3_8f: "調教3 調教タイム 8F",
-    chokyo_den_chokyo3_8f_float: "調教3 調教タイム 8F (小数点)",
-    chokyo_den_chokyo3_7f: "調教3 調教タイム 7F",
-    chokyo_den_chokyo3_7f_float: "調教3 調教タイム 7F (小数点)",
-    chokyo_den_chokyo3_6f: "調教3 調教タイム 6F",
-    chokyo_den_chokyo3_6f_float: "調教3 調教タイム 6F (小数点)",
-
-    chokyo_den_chokyo3_5f_float: "調教3 調教タイム 5F (小数点)",
-
-    chokyo_den_chokyo3_4f_float: "調教3 調教タイム 4F (小数点)",
-
-    chokyo_den_chokyo3_3f_float: "調教3 調教タイム 3F (小数点)",
-    chokyo_den_chokyo3_2f_float: "調教3 調教タイム 2F推定値 (小数点)",
-
-    chokyo_den_chokyo3_1f_float: "調教3 調教タイム 1F (小数点)",
-    chokyo_den_chokyo3_ichidori: "調教3 調教位置取り",
-    chokyo_den_chokyo3_ichidori_label: "調教3 調教位置取り(ラベル)",
-    chokyo_den_chokyo3_ashiiro: "調教3 調教脚色",
-    chokyo_den_chokyo3_ashiiro_label: "調教3 調教脚色(ラベル)",
-    chokyo_den_chokyo3_yajirushi: "調教3 調教矢印",
-    chokyo_den_chokyo3_yajirushi_label: "調教3 調教矢印(ラベル)",
-    chokyo_den_chokyo3_reigai: "調教3 調教例外",
     // 調教 (sei2由来)
     chokyo_sei_flag: "競走成績出走馬データ  追い切り 調教フラグ",
     chokyo_sei_flag_label: "競走成績出走馬データ  追い切り chokyo_flagをもとに対応 はい/いいえ",
@@ -1383,22 +1274,7 @@ SELECT
 
   z.chokyo_den_oikiri_awase AS chokyo_den_awase,
   z.chokyo_den_oikiri_awase_uma_bamei AS chokyo_den_awase_uma_bamei,
-  pl.race_code_uma_kol_partner AS chokyo_den_awase_uma_race_code_uma_kol,
-  pl.race_code_kol_partner AS chokyo_den_awase_uma_race_code_kol,
   pl.kyoso_joken_kubun_label AS chokyo_den_awase_uma_class,
-  SAFE_CAST(pl.barei AS INT64) AS chokyo_den_awase_uma_barei,
-
-  CASE
-    WHEN pl.kyoso_joken_rank_int >= 4 -- 相手が2勝クラス(Rank 4)以上
-         AND pl.kyoso_joken_rank_int > z.kyoso_joken_rank_int -- 自分よりランクが高い
-         AND SAFE_CAST(pl.barei AS INT64) >= SAFE_CAST(z.barei AS INT64) -- 相手が同年齢以上
-    THEN '格上'
-    WHEN pl.kyoso_joken_rank_int >= 4 -- 相手が2勝クラス(Rank 4)以上
-         AND pl.kyoso_joken_rank_int = z.kyoso_joken_rank_int -- ランクが同じ
-         AND SAFE_CAST(pl.barei AS INT64) >= SAFE_CAST(z.barei AS INT64) -- 相手が同年齢以上
-    THEN '同格'
-    ELSE NULL
-  END AS chokyo_den_awase_uma_kaku_kubun,
 
   CASE
     WHEN pl.kyoso_joken_rank_int > z.kyoso_joken_rank_int AND z.chokyo_den_oikiri_awase LIKE '%先着%' THEN 'はい'
@@ -1694,259 +1570,34 @@ SELECT
   END AS chokyo_sei_yajirushi_label,
   z.chokyo_sei_reigai,
 
-  z.chokyo_den_chokyo1_flag,
-  CASE WHEN z.chokyo_den_chokyo1_flag = '1' THEN 'はい' ELSE 'いいえ' END AS chokyo_den_chokyo1_flag_label,
-  z.chokyo_den_chokyo1_kijosha,
-  z.chokyo_den_chokyo1_nengappi,
-  SAFE.PARSE_DATE('%Y%m%d', z.chokyo_den_chokyo1_nengappi) AS chokyo_den_chokyo1_nengappi_date,
-  z.chokyo_den_chokyo1_basho,
-  z.chokyo_den_chokyo1_course,
-  CASE
-    WHEN z.chokyo_den_chokyo1_course IS NULL AND z.chokyo_den_chokyo1_basho IS NULL THEN NULL
-    WHEN z.chokyo_den_chokyo1_course = '坂' THEN '坂路'
-    WHEN z.chokyo_den_chokyo1_basho = 'プール' THEN 'プール'
-    ELSE 'コース'
-  END AS chokyo_den_chokyo1_course_kubun,
-  COALESCE(z.chokyo_den_chokyo1_basho, '') || COALESCE(z.chokyo_den_chokyo1_course, '') AS chokyo_den_chokyo1_basho_course_label,
-  z.chokyo_den_chokyo1_babajotai,
+  z.chokyo_den_chokyo1_reigai, -- Remove these lines, but wait, `chokyo_den_chokyo1_reigai` is the last one in the block to remove.
+  -- Actually, I should remove lines 1679 to 1931.
+  -- And verify if `chokyo_den_oikiri` stuff that precedes it is safe.
+  -- The precedent logic is fine.
 
-  CASE
-    WHEN z.chokyo_den_chokyo1_basho = 'プール' OR z.chokyo_den_chokyo1_course = '坂' THEN SAFE_CAST(REGEXP_REPLACE(z.chokyo_den_chokyo1_6f, r'[^0-9]', '') AS INT64)
-    ELSE NULL
-  END AS chokyo_den_chokyo1_hanro_pool_kaisu_int,
+  -- Re-checking lines 1679-1931 in viewer:
+  -- 1679: z.chokyo_den_chokyo1_flag,
+  -- ...
+  -- 1931: z.chokyo_den_chokyo3_reigai,
 
-  z.chokyo_den_chokyo1_8f,
-  SAFE_CAST(z.chokyo_den_chokyo1_8f AS FLOAT64) AS chokyo_den_chokyo1_8f_float,
+  -- I will just replace with nothing (empty string) or delete the block.
+  -- Since I can't put empty string easily without syntax error if comma handling is tricky, I need to check comma.
+  -- 1677: z.chokyo_sei_reigai, (Previous line)
+  -- 1679 starts the block.
+  -- 1931 ends the block.
+  -- 1934: CASE (Next field `zensou_kankaku`)
+  -- Note: 1933 is empty line.
 
-  z.chokyo_den_chokyo1_7f,
-  SAFE_CAST(z.chokyo_den_chokyo1_7f AS FLOAT64) AS chokyo_den_chokyo1_7f_float,
+  -- If I remove 1679-1931, I need to ensure 1677 has a comma (it does) and the next item `zensou_kankaku` starts correctly.
+  -- 1677: z.chokyo_sei_reigai,
+  -- 1679-1931 removed.
+  -- 1934: CASE ...
+  -- So `z.chokyo_sei_reigai,` followed by `CASE ...` is valid SQL.
 
-  z.chokyo_den_chokyo1_6f,
-  SAFE_CAST(z.chokyo_den_chokyo1_6f AS FLOAT64) AS chokyo_den_chokyo1_6f_float,
+  -- Wait, I messed up the `TargetContent` generation in my thought process?
+  -- No, I will use `replace_file_content` with line numbers and TargetContent.
+  -- I'll construct `TargetContent` from the file view.
 
-
-  SAFE_CAST(z.chokyo_den_chokyo1_5f AS FLOAT64) AS chokyo_den_chokyo1_5f_float,
-
-
-  CASE
-    WHEN z.chokyo_den_chokyo1_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo1_5f AS FLOAT64)
-    ELSE SAFE_CAST(z.chokyo_den_chokyo1_4f AS FLOAT64)
-  END AS chokyo_den_chokyo1_4f_float,
-
-
-  CASE
-    WHEN z.chokyo_den_chokyo1_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo1_4f AS FLOAT64)
-    ELSE SAFE_CAST(z.chokyo_den_chokyo1_3f AS FLOAT64)
-  END AS chokyo_den_chokyo1_3f_float,
-
-  ROUND(
-    CASE
-      WHEN z.chokyo_den_chokyo1_basho = 'プール' THEN NULL
-      WHEN z.chokyo_den_chokyo1_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo1_3f AS FLOAT64)
-      -- それ以外の場合: NULL
-      ELSE NULL
-    END, 1
-  ) AS chokyo_den_chokyo1_2f_float,
-
-
-  SAFE_CAST(z.chokyo_den_chokyo1_1f AS FLOAT64) AS chokyo_den_chokyo1_1f_float,
-
-  z.chokyo_den_chokyo1_ichidori,
-
-  CASE z.chokyo_den_chokyo1_ichidori
-     WHEN '1' THEN '①' WHEN '2' THEN '②' WHEN '3' THEN '③' WHEN '4' THEN '④' WHEN '5' THEN '⑤'
-     WHEN '6' THEN '⑥' WHEN '7' THEN '⑦' WHEN '8' THEN '⑧' WHEN '9' THEN '⑨'
-     ELSE z.chokyo_den_chokyo1_ichidori
-  END AS chokyo_den_chokyo1_ichidori_label,
-
-  z.chokyo_den_chokyo1_ashiiro,
-  CASE z.chokyo_den_chokyo1_ashiiro
-    WHEN '馬なり' THEN '馬なり' WHEN '馬ナリ' THEN '馬なり' WHEN '一 杯' THEN '一杯' WHEN '一杯' THEN '一杯'
-    WHEN '強 め' THEN '強め' WHEN '強め' THEN '強め' WHEN '強目' THEN '強め' WHEN '末強め' THEN '末強め'
-    WHEN '末強目' THEN '末強め' WHEN '直強め' THEN '直強め' WHEN '直強目' THEN '強め' WHEN '叩一杯' THEN '叩一杯'
-    WHEN '稍一杯' THEN '稍一杯' WHEN '末一杯' THEN '末一杯' WHEN '直一杯' THEN '直一杯' WHEN 'バテる' THEN 'バテる'
-    WHEN '不明' THEN '不明' WHEN '不　明' THEN '不明' WHEN '不 明' THEN '不明' WHEN 'Ｇ前追' THEN 'G前追'
-    WHEN '楽 走' THEN '楽走' WHEN '向正面' THEN '向正面' WHEN 'ササる' THEN 'ササる' WHEN '稍強め' THEN '稍強め'
-    WHEN '止める' THEN '止める' WHEN 'バカ付' THEN 'バカ付' WHEN '引掛る' THEN '引掛る' WHEN '末抑え' THEN '末抑え'
-    WHEN '直抑え' THEN '直抑え' WHEN '外逃げ' THEN '外逃げ' WHEN 'ヨレる' THEN 'ヨレる'
-    ELSE z.chokyo_den_chokyo1_ashiiro
-  END AS chokyo_den_chokyo1_ashiiro_label,
-  z.chokyo_den_chokyo1_yajirushi,
-  CASE z.chokyo_den_chokyo1_yajirushi
-    WHEN '1' THEN '一変(↑)' WHEN '2' THEN '平行(→)' WHEN '3' THEN '下降(↓)' WHEN '4' THEN '良化(／)' WHEN '5' THEN '下降気味(＼)'
-    ELSE NULL
-  END AS chokyo_den_chokyo1_yajirushi_label,
-  z.chokyo_den_chokyo1_reigai,
-
-  -- 調教2 Logic ----------------------------------------------------------------
-  z.chokyo_den_chokyo2_flag AS chokyo_den_chokyo2_flag,
-  CASE WHEN z.chokyo_den_chokyo2_flag = '1' THEN 'はい' ELSE 'いいえ' END AS chokyo_den_chokyo2_flag_label,
-  z.chokyo_den_chokyo2_kijosha,
-  z.chokyo_den_chokyo2_nengappi,
-  SAFE.PARSE_DATE('%Y%m%d', z.chokyo_den_chokyo2_nengappi) AS chokyo_den_chokyo2_nengappi_date,
-  z.chokyo_den_chokyo2_basho,
-  z.chokyo_den_chokyo2_course,
-  CASE
-    WHEN z.chokyo_den_chokyo2_course IS NULL AND z.chokyo_den_chokyo2_basho IS NULL THEN NULL
-    WHEN z.chokyo_den_chokyo2_course = '坂' THEN '坂路'
-    WHEN z.chokyo_den_chokyo2_basho = 'プール' THEN 'プール'
-    ELSE 'コース'
-  END AS chokyo_den_chokyo2_course_kubun,
-  COALESCE(z.chokyo_den_chokyo2_basho, '') || COALESCE(z.chokyo_den_chokyo2_course, '') AS chokyo_den_chokyo2_basho_course_label,
-  z.chokyo_den_chokyo2_babajotai,
-
-  CASE
-    WHEN z.chokyo_den_chokyo2_basho = 'プール' OR z.chokyo_den_chokyo2_course = '坂' THEN SAFE_CAST(REGEXP_REPLACE(z.chokyo_den_chokyo2_6f, r'[^0-9]', '') AS INT64)
-    ELSE NULL
-  END AS chokyo_den_chokyo2_hanro_pool_kaisu_int,
-
-  z.chokyo_den_chokyo2_8f,
-  SAFE_CAST(z.chokyo_den_chokyo2_8f AS FLOAT64) AS chokyo_den_chokyo2_8f_float,
-
-  z.chokyo_den_chokyo2_7f,
-  SAFE_CAST(z.chokyo_den_chokyo2_7f AS FLOAT64) AS chokyo_den_chokyo2_7f_float,
-
-  z.chokyo_den_chokyo2_6f,
-  SAFE_CAST(z.chokyo_den_chokyo2_6f AS FLOAT64) AS chokyo_den_chokyo2_6f_float,
-
-
-  SAFE_CAST(z.chokyo_den_chokyo2_5f AS FLOAT64) AS chokyo_den_chokyo2_5f_float,
-
-
-  CASE
-    WHEN z.chokyo_den_chokyo2_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo2_5f AS FLOAT64)
-    ELSE SAFE_CAST(z.chokyo_den_chokyo2_4f AS FLOAT64)
-  END AS chokyo_den_chokyo2_4f_float,
-
-
-  CASE
-    WHEN z.chokyo_den_chokyo2_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo2_4f AS FLOAT64)
-    ELSE SAFE_CAST(z.chokyo_den_chokyo2_3f AS FLOAT64)
-  END AS chokyo_den_chokyo2_3f_float,
-
-  ROUND(
-    CASE
-      WHEN z.chokyo_den_chokyo2_basho = 'プール' THEN NULL
-      WHEN z.chokyo_den_chokyo2_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo2_3f AS FLOAT64)
-      -- それ以外の場合: NULL
-      ELSE NULL
-    END, 1
-  ) AS chokyo_den_chokyo2_2f_float,
-
-
-  SAFE_CAST(z.chokyo_den_chokyo2_1f AS FLOAT64) AS chokyo_den_chokyo2_1f_float,
-
-  z.chokyo_den_chokyo2_ichidori,
-
-  CASE z.chokyo_den_chokyo2_ichidori
-     WHEN '1' THEN '①' WHEN '2' THEN '②' WHEN '3' THEN '③' WHEN '4' THEN '④' WHEN '5' THEN '⑤'
-     WHEN '6' THEN '⑥' WHEN '7' THEN '⑦' WHEN '8' THEN '⑧' WHEN '9' THEN '⑨'
-     ELSE z.chokyo_den_chokyo2_ichidori
-  END AS chokyo_den_chokyo2_ichidori_label,
-
-  z.chokyo_den_chokyo2_ashiiro,
-  CASE z.chokyo_den_chokyo2_ashiiro
-    WHEN '馬なり' THEN '馬なり' WHEN '馬ナリ' THEN '馬なり' WHEN '一 杯' THEN '一杯' WHEN '一杯' THEN '一杯'
-    WHEN '強 め' THEN '強め' WHEN '強め' THEN '強め' WHEN '強目' THEN '強め' WHEN '末強め' THEN '末強め'
-    WHEN '末強目' THEN '末強め' WHEN '直強め' THEN '直強め' WHEN '直強目' THEN '直強め' WHEN '叩一杯' THEN '叩一杯'
-    WHEN '稍一杯' THEN '稍一杯' WHEN '末一杯' THEN '末一杯' WHEN '直一杯' THEN '直一杯' WHEN 'バテる' THEN 'バテる'
-    WHEN '不明' THEN '不明' WHEN '不　明' THEN '不明' WHEN '不 明' THEN '不明' WHEN 'Ｇ前追' THEN 'G前追'
-    WHEN '楽 走' THEN '楽走' WHEN '向正面' THEN '向正面' WHEN 'ササる' THEN 'ササる' WHEN '稍強め' THEN '稍強め'
-    WHEN '止める' THEN '止める' WHEN 'バカ付' THEN 'バカ付' WHEN '引掛る' THEN '引掛る' WHEN '末抑え' THEN '末抑え'
-    WHEN '直抑え' THEN '直抑え' WHEN '外逃げ' THEN '外逃げ' WHEN 'ヨレる' THEN 'ヨレる'
-    ELSE z.chokyo_den_chokyo2_ashiiro
-  END AS chokyo_den_chokyo2_ashiiro_label,
-  z.chokyo_den_chokyo2_yajirushi,
-  CASE z.chokyo_den_chokyo2_yajirushi
-    WHEN '1' THEN '一変(↑)' WHEN '2' THEN '平行(→)' WHEN '3' THEN '下降(↓)' WHEN '4' THEN '良化(／)' WHEN '5' THEN '下降気味(＼)'
-    ELSE NULL
-  END AS chokyo_den_chokyo2_yajirushi_label,
-  z.chokyo_den_chokyo2_reigai,
-
-   -- 調教3 Logic ----------------------------------------------------------------
-  z.chokyo_den_chokyo3_flag AS chokyo_den_chokyo3_flag,
-  CASE WHEN z.chokyo_den_chokyo3_flag = '1' THEN 'はい' ELSE 'いいえ' END AS chokyo_den_chokyo3_flag_label,
-  z.chokyo_den_chokyo3_kijosha,
-  z.chokyo_den_chokyo3_nengappi,
-  SAFE.PARSE_DATE('%Y%m%d', z.chokyo_den_chokyo3_nengappi) AS chokyo_den_chokyo3_nengappi_date,
-  z.chokyo_den_chokyo3_basho,
-  z.chokyo_den_chokyo3_course,
-  CASE
-    WHEN z.chokyo_den_chokyo3_course IS NULL AND z.chokyo_den_chokyo3_basho IS NULL THEN NULL
-    WHEN z.chokyo_den_chokyo3_course = '坂' THEN '坂路'
-    WHEN z.chokyo_den_chokyo3_basho = 'プール' THEN 'プール'
-    ELSE 'コース'
-  END AS chokyo_den_chokyo3_course_kubun,
-  COALESCE(z.chokyo_den_chokyo3_basho, '') || COALESCE(z.chokyo_den_chokyo3_course, '') AS chokyo_den_chokyo3_basho_course_label,
-  z.chokyo_den_chokyo3_babajotai,
-
-  CASE
-    WHEN z.chokyo_den_chokyo3_basho = 'プール' OR z.chokyo_den_chokyo3_course = '坂' THEN SAFE_CAST(REGEXP_REPLACE(z.chokyo_den_chokyo3_6f, r'[^0-9]', '') AS INT64)
-    ELSE NULL
-  END AS chokyo_den_chokyo3_hanro_pool_kaisu_int,
-
-  z.chokyo_den_chokyo3_8f,
-  SAFE_CAST(z.chokyo_den_chokyo3_8f AS FLOAT64) AS chokyo_den_chokyo3_8f_float,
-
-  z.chokyo_den_chokyo3_7f,
-  SAFE_CAST(z.chokyo_den_chokyo3_7f AS FLOAT64) AS chokyo_den_chokyo3_7f_float,
-
-  z.chokyo_den_chokyo3_6f,
-  SAFE_CAST(z.chokyo_den_chokyo3_6f AS FLOAT64) AS chokyo_den_chokyo3_6f_float,
-
-
-  SAFE_CAST(z.chokyo_den_chokyo3_5f AS FLOAT64) AS chokyo_den_chokyo3_5f_float,
-
-
-  CASE
-    WHEN z.chokyo_den_chokyo3_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo3_5f AS FLOAT64)
-    ELSE SAFE_CAST(z.chokyo_den_chokyo3_4f AS FLOAT64)
-  END AS chokyo_den_chokyo3_4f_float,
-
-
-  CASE
-    WHEN z.chokyo_den_chokyo3_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo3_4f AS FLOAT64)
-    ELSE SAFE_CAST(z.chokyo_den_chokyo3_3f AS FLOAT64)
-  END AS chokyo_den_chokyo3_3f_float,
-
-  ROUND(
-    CASE
-      WHEN z.chokyo_den_chokyo3_basho = 'プール' THEN NULL
-      WHEN z.chokyo_den_chokyo3_course = '坂' THEN SAFE_CAST(z.chokyo_den_chokyo3_3f AS FLOAT64)
-      -- それ以外の場合: NULL
-      ELSE NULL
-    END, 1
-  ) AS chokyo_den_chokyo3_2f_float,
-
-
-  SAFE_CAST(z.chokyo_den_chokyo3_1f AS FLOAT64) AS chokyo_den_chokyo3_1f_float,
-
-  z.chokyo_den_chokyo3_ichidori,
-
-  CASE z.chokyo_den_chokyo3_ichidori
-     WHEN '1' THEN '①' WHEN '2' THEN '②' WHEN '3' THEN '③' WHEN '4' THEN '④' WHEN '5' THEN '⑤'
-     WHEN '6' THEN '⑥' WHEN '7' THEN '⑦' WHEN '8' THEN '⑧' WHEN '9' THEN '⑨'
-     ELSE z.chokyo_den_chokyo3_ichidori
-  END AS chokyo_den_chokyo3_ichidori_label,
-
-  z.chokyo_den_chokyo3_ashiiro,
-  CASE z.chokyo_den_chokyo3_ashiiro
-    WHEN '馬なり' THEN '馬なり' WHEN '馬ナリ' THEN '馬なり' WHEN '一 杯' THEN '一杯' WHEN '一杯' THEN '一杯'
-    WHEN '強 め' THEN '強め' WHEN '強め' THEN '強め' WHEN '強目' THEN '強め' WHEN '末強め' THEN '末強め'
-    WHEN '末強目' THEN '末強め' WHEN '直強め' THEN '直強め' WHEN '直強目' THEN '直強め' WHEN '叩一杯' THEN '叩一杯'
-    WHEN '稍一杯' THEN '稍一杯' WHEN '末一杯' THEN '末一杯' WHEN '直一杯' THEN '直一杯' WHEN 'バテる' THEN 'バテる'
-    WHEN '不明' THEN '不明' WHEN '不　明' THEN '不明' WHEN '不 明' THEN '不明' WHEN 'Ｇ前追' THEN 'G前追'
-    WHEN '楽 走' THEN '楽走' WHEN '向正面' THEN '向正面' WHEN 'ササる' THEN 'ササる' WHEN '稍強め' THEN '稍強め'
-    WHEN '止める' THEN '止める' WHEN 'バカ付' THEN 'バカ付' WHEN '引掛る' THEN '引掛る' WHEN '末抑え' THEN '末抑え'
-    WHEN '直抑え' THEN '直抑え' WHEN '外逃げ' THEN '外逃げ' WHEN 'ヨレる' THEN 'ヨレる'
-    ELSE z.chokyo_den_chokyo3_ashiiro
-  END AS chokyo_den_chokyo3_ashiiro_label,
-  z.chokyo_den_chokyo3_yajirushi,
-  CASE z.chokyo_den_chokyo3_yajirushi
-    WHEN '1' THEN '一変(↑)' WHEN '2' THEN '平行(→)' WHEN '3' THEN '下降(↓)' WHEN '4' THEN '良化(／)' WHEN '5' THEN '下降気味(＼)'
-    ELSE NULL
-  END AS chokyo_den_chokyo3_yajirushi_label,
-  z.chokyo_den_chokyo3_reigai,
 
 
     CASE
