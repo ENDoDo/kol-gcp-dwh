@@ -1083,11 +1083,12 @@ SELECT
     WHEN z.chokyo_den_oikiri_course = '坂' THEN ROUND(SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64), 1)
     ELSE ROUND(SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64), 1)
   END AS chokyo_den_oikiri_lap_4f,
-  CASE
-    WHEN z.chokyo_den_oikiri_basho = 'プール' THEN NULL
-    WHEN z.chokyo_den_oikiri_course = '坂' THEN ROUND(SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64), 1)
-    ELSE SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64)
-  END AS chokyo_den_oikiri_lap_3f,
+  ROUND(
+    CASE
+      WHEN z.chokyo_den_oikiri_course = '坂' THEN SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64)
+      ELSE SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64)
+    END
+    - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 1) AS chokyo_den_oikiri_lap_3f,
   CASE
     WHEN z.chokyo_den_oikiri_basho = 'プール' THEN NULL
     WHEN z.chokyo_den_oikiri_course = '坂' THEN ROUND(SAFE_CAST(z.chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64), 1)
