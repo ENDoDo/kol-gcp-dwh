@@ -246,7 +246,7 @@ WITH
       -- Cast haitou to INT64 here
       SAFE_CAST(r.haitou AS INT64) AS haitou,
       -- Use SAFE_CAST to ensure integer comparison (e.g. "03" vs "3")
-      ARRAY_AGG(COALESCE(ru.shirushi_shirushi_label, '×') ORDER BY offset) AS shirushi_list_raw
+      ARRAY_AGG(ru.shirushi_shirushi_label ORDER BY offset) AS shirushi_list_raw
     FROM split_kumiban r
     CROSS JOIN UNNEST(r.umaban_list) AS u WITH OFFSET AS offset
     LEFT JOIN race_info ru
