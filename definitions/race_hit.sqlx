@@ -260,14 +260,14 @@ WITH
     SELECT
       *,
       -- Helper: Check if a mark exists in the list
-      (SELECT COUNTIF(m = '◎') FROM UNNEST(shirushi_list_raw)) > 0 AS has_nijimaru,
-      (SELECT COUNTIF(m = '○') FROM UNNEST(shirushi_list_raw)) > 0 AS has_maru,
-      (SELECT COUNTIF(m = '▲') FROM UNNEST(shirushi_list_raw)) > 0 AS has_kuro_sankaku,
+      (SELECT COUNTIF(m = '◎') FROM UNNEST(shirushi_list_raw) AS m) > 0 AS has_nijimaru,
+      (SELECT COUNTIF(m = '○') FROM UNNEST(shirushi_list_raw) AS m) > 0 AS has_maru,
+      (SELECT COUNTIF(m = '▲') FROM UNNEST(shirushi_list_raw) AS m) > 0 AS has_kuro_sankaku,
       -- Helper: Count marks in specific sets
-      (SELECT COUNTIF(m IN ('○', '▲', '△', '★', '×')) FROM UNNEST(shirushi_list_raw)) AS count_o_to_x,
-      (SELECT COUNTIF(m IN ('▲', '△', '★', '×')) FROM UNNEST(shirushi_list_raw)) AS count_a_to_x,
-      (SELECT COUNTIF(m IN ('△', '★', '×')) FROM UNNEST(shirushi_list_raw)) AS count_d_to_x,
-      (SELECT COUNTIF(m IN ('◎', '○', '▲', '△', '★', '×')) FROM UNNEST(shirushi_list_raw)) AS count_all_valid
+      (SELECT COUNTIF(m IN ('○', '▲', '△', '★', '×')) FROM UNNEST(shirushi_list_raw) AS m) AS count_o_to_x,
+      (SELECT COUNTIF(m IN ('▲', '△', '★', '×')) FROM UNNEST(shirushi_list_raw) AS m) AS count_a_to_x,
+      (SELECT COUNTIF(m IN ('△', '★', '×')) FROM UNNEST(shirushi_list_raw) AS m) AS count_d_to_x,
+      (SELECT COUNTIF(m IN ('◎', '○', '▲', '△', '★', '×')) FROM UNNEST(shirushi_list_raw) AS m) AS count_all_valid
     FROM joined_shirushi
   ),
 
