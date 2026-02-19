@@ -255,6 +255,22 @@ WITH
     GROUP BY 1, 2, 3, 4, 5
   ),
 
+  -- 7. Filter by combinations based on User's requirements
+  filtered_shirushi AS (
+    SELECT
+      *,
+      -- Helper: Check if a mark exists in the list
+      (SELECT COUNTIF(m = '◎') FROM UNNEST(shirushi_list_raw)) > 0 AS has_nijimaru,
+      (SELECT COUNTIF(m = '○') FROM UNNEST(shirushi_list_raw)) > 0 AS has_maru,
+      (SELECT COUNTIF(m = '▲') FROM UNNEST(shirushi_list_raw)) > 0 AS has_kuro_sankaku,
+      -- Helper: Count marks in specific sets
+      (SELECT COUNTIF(m IN ('○', '▲', '△', '★', '×')) FROM UNNEST(shirushi_list_raw)) AS count_o_to_x,
+      (SELECT COUNTIF(m IN ('▲', '△', '★', '×')) FROM UNNEST(shirushi_list_raw)) AS count_a_to_x,
+      (SELECT COUNTIF(m IN ('△', '★', '×')) FROM UNNEST(shirushi_list_raw)) AS count_d_to_x,
+      (SELECT COUNTIF(m IN ('◎', '○', '▲', '△', '★', '×')) FROM UNNEST(shirushi_list_raw)) AS count_all_valid
+    FROM joined_shirushi
+  ),
+
   -- Create distinct race info first to avoid duplication when joining
   distinct_race_info AS (
     SELECT DISTINCT
@@ -292,8 +308,32 @@ SELECT
   j.formatted_kumiban AS umaban_kumiban, -- Use formatted version
   j.haitou,
   ARRAY_TO_STRING(j.shirushi_list_raw, '-') AS yosou_shirushi
-FROM joined_shirushi j
+FROM filtered_shirushi j
 JOIN distinct_race_info r ON j.race_code_kol = r.race_code_kol
 LEFT JOIN den1 d ON j.race_code_kol = d.race_code_kol
 WHERE
   r.kaisai_nengappi >= '2023-01-01'
+  AND (
+    CASE j.kensyu_kubun
+      WHEN '馬連' THEN
+        (j.has_nijimaru AND j.count_o_to_x >= 1)
+        OR (j.has_maru AND j.count_a_to_x >= 1)
+        OR (j.has_kuro_sankaku AND j.count_d_to_x >= 1)
+      WHEN 'ワイド' THEN
+        (j.has_nijimaru AND j.count_o_to_x >= 1)
+        OR (j.has_maru AND j.count_a_to_x >= 1)
+      WHEN '馬単' THEN
+        (j.shirushi_list_raw[SAFE_OFFSET(0)] = '◎' AND j.shirushi_list_raw[SAFE_OFFSET(1)] IN ('○', '▲', '△', '★', '×'))
+        OR (j.shirushi_list_raw[SAFE_OFFSET(0)] = '○' AND j.shirushi_list_raw[SAFE_OFFSET(1)] IN ('▲', '△', '★', '×'))
+        OR (j.shirushi_list_raw[SAFE_OFFSET(0)] = '▲' AND j.shirushi_list_raw[SAFE_OFFSET(1)] IN ('△', '★', '×'))
+      WHEN '3連複' THEN
+        (j.has_nijimaru AND j.count_o_to_x >= 2)
+        OR (j.has_maru AND j.count_a_to_x >= 2)
+        OR (j.has_kuro_sankaku AND j.count_d_to_x >= 2)
+      WHEN '3連単' THEN
+        (j.shirushi_list_raw[SAFE_OFFSET(0)] IN ('◎', '○'))
+        AND (j.shirushi_list_raw[SAFE_OFFSET(1)] IN ('◎', '○', '▲', '△', '★', '×'))
+        AND (j.shirushi_list_raw[SAFE_OFFSET(2)] IN ('◎', '○', '▲', '△', '★', '×'))
+      ELSE FALSE
+    END
+  )
