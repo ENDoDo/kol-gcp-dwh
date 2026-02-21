@@ -23,19 +23,7 @@ SELECT
   -- race_code_uma_kol (18 digits)
   -- Year(4) + MonthDay(4) + KOL_Basho(2) + Kaiji(2) + Nichiji(2) + RaceNum(2) + Umaban(2)
   Year || MonthDay ||
-  CASE KeibajyoCode
-    WHEN '01' THEN '08' -- Sapporo to Kyoto(X) No, 08 is correct mapping based on reverse
-    WHEN '02' THEN '09' -- Hakodate
-    WHEN '03' THEN '06' -- Fukushima
-    WHEN '04' THEN '07' -- Niigata
-    WHEN '05' THEN '04' -- Tokyo
-    WHEN '06' THEN '05' -- Nakayama
-    WHEN '07' THEN '02' -- Chukyo
-    WHEN '08' THEN '00' -- Kyoto
-    WHEN '09' THEN '01' -- Hanshin
-    WHEN '10' THEN '03' -- Kokura
-    ELSE KeibajyoCode
-  END ||
+  KeibajyoCode ||
   Kaiji || Nichiji || RaceNum || Umaban AS race_code_uma_kol,
 
   DATETIME(HassoJikoku) AS hasso_date,
