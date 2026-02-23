@@ -31,7 +31,7 @@ SELECT
 
   CAST(TanshoNinkijun AS INT64) AS sokuhou_tansho_ninkijun_num,
   CAST(TanshoOdds AS FLOAT64) AS sokuhou_tansho_odds_float,
-  DATETIME(HappyoTsukihiJifun, 'Asia/Tokyo') AS sokuhou_happyo_tsukihi_jifun,
+  DATETIME(HappyoTsukihiJifun) AS sokuhou_happyo_tsukihi_jifun,
 
   Modified AS sokuhou_modified,
   Created AS sokuhou_created,
