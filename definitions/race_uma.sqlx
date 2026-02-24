@@ -1027,7 +1027,10 @@ SELECT
     WHEN z.chokyo_den_oikiri_basho = 'プール' THEN 'プール'
     ELSE 'コース'
   END AS chokyo_den_oikiri_course_kubun,
-  COALESCE(z.chokyo_den_oikiri_basho, '') || COALESCE(z.chokyo_den_oikiri_course, '') AS chokyo_den_oikiri_basho_course_label,
+  CASE
+    WHEN z.chokyo_den_oikiri_basho IS NULL AND z.chokyo_den_oikiri_course IS NULL THEN NULL
+    ELSE COALESCE(z.chokyo_den_oikiri_basho, '') || COALESCE(z.chokyo_den_oikiri_course, '')
+  END AS chokyo_den_oikiri_basho_course_label,
   z.chokyo_den_oikiri_babajotai,
 
   -- 調教タイム関連フィールド (chokyo_den_oikiri_course の略語 '坂', 'P' を使用)
