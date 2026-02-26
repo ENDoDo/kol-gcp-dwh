@@ -301,10 +301,22 @@ def export_race_uma_details(request):
                         logger.info(f"Bubble APIへリクエストを送信します: URL={BUBBLE_API_URL}")
                         response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
                         response.raise_for_status()
-                        logger.info(f"Bubble APIへの通知に成功しました ({filename}): {response.json()}")
+
+                        resp_json = response.json()
+                        logger.info(f"Bubble APIへの通知に成功しました ({filename}): {resp_json}")
+
+                        # インポート成功可否のチェック
+                        if resp_json.get("response", {}).get("is_import_success") == "no":
+                            error_text = resp_json.get("response", {}).get("error_text", "Unknown error")
+                            logger.error(f"Bubble Import Failed ({filename}): {error_text}")
+                            raise Exception(f"Bubble Import Failed: {error_text}")
+
                     except Exception as e:
+                        # インポート失敗の場合は例外を再送出してワークフローを停止させる
+                        if "Bubble Import Failed" in str(e):
+                            raise e
                         logger.error(f"Bubble APIへの通知に失敗しました ({filename}): {e}")
-                        # 続行する
+                        # その他のエラーは従来通りログ出力のみで続行
                 else:
                     if current_part_num == 1: # ログ過多防止のため初回のみログ出力
                         if not ENABLE_BUBBLE_API:

@@ -241,7 +241,15 @@ def export_schedules(request):
                 logger.info(f"Bubble APIへリクエストを送信します: URL={BUBBLE_API_URL}")
                 response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
                 response.raise_for_status()
-                logger.info(f"Bubble APIへの通知に成功しました: {response.json()}")
+
+                resp_json = response.json()
+                logger.info(f"Bubble APIへの通知に成功しました: {resp_json}")
+
+                # インポート成功可否のチェック
+                if resp_json.get("response", {}).get("is_import_success") == "no":
+                    error_text = resp_json.get("response", {}).get("error_text", "Unknown error")
+                    logger.error(f"Bubble Import Failed: {error_text}")
+                    raise Exception(f"Bubble Import Failed: {error_text}")
 
             except Exception as e:
                 logger.error(f"Bubble APIへの通知に失敗しました: {e}")
