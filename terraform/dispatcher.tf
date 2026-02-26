@@ -68,11 +68,11 @@ resource "google_cloudfunctions2_function" "dispatcher_function" {
     available_memory   = "256Mi"
     timeout_seconds    = 60
     environment_variables = {
-      PROJECT_ID      = var.project_id
-      REGION          = var.region
-      QUEUE_NAME      = google_cloud_tasks_queue.dataform_trigger_queue.name
-      WORKFLOW_NAME   = terraform.workspace == "prd" ? google_workflows_workflow.dataform_trigger_workflow_prd[0].name : google_workflows_workflow.dataform_trigger_workflow_stg[0].name
-      DEBOUNCE_SECONDS = "300" # 5 minutes
+      PROJECT_ID                     = var.project_id
+      REGION                         = var.region
+      QUEUE_NAME                     = google_cloud_tasks_queue.dataform_trigger_queue.name
+      WORKFLOW_NAME                  = terraform.workspace == "prd" ? google_workflows_workflow.dataform_trigger_workflow_prd[0].name : google_workflows_workflow.dataform_trigger_workflow_stg[0].name
+      DEBOUNCE_SECONDS               = "300" # 5 minutes
       WORKFLOW_SERVICE_ACCOUNT_EMAIL = google_service_account.workflows_sa.email
     }
     service_account_email = google_service_account.dispatcher_sa.email

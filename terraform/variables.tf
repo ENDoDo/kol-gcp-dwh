@@ -53,3 +53,10 @@ variable "enable_bubble_api" {
   type        = bool
   default     = true
 }
+
+# GCSバケットへのアップロードを許可するユーザーのメールアドレスリスト
+variable "client_upload_users" {
+  description = "List of user email addresses granted upload access to the GCS bucket."
+  type        = list(string)
+  default     = []
+}

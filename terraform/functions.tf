@@ -68,22 +68,22 @@ resource "google_cloudfunctions2_function" "export_schedules" {
     available_memory   = "512M"
     timeout_seconds    = 540
     environment_variables = {
-      PROJECT_ID  = var.project_id
-      DATASET_ID  = terraform.workspace == "prd" ? var.prd_schema : var.stg_schema
-      SECRET_USER = "projects/56638639323/secrets/kol_ftp_bubble_username"
-      SECRET_PASS = "projects/56638639323/secrets/kol_ftp_bubble_password"
-      FTP_DIRECTORY = terraform.workspace == "prd" ? "/production" : "/development"
-      BUBBLE_API_URL = terraform.workspace == "prd" ? "https://member.kol-bi.jp/api/1.1/wf/import_schedule" : "https://temp-toreyomi-20260215.bubbleapps.io/version-test/api/1.1/wf/import_schedule"
+      PROJECT_ID               = var.project_id
+      DATASET_ID               = terraform.workspace == "prd" ? var.prd_schema : var.stg_schema
+      SECRET_USER              = "projects/56638639323/secrets/kol_ftp_bubble_username"
+      SECRET_PASS              = "projects/56638639323/secrets/kol_ftp_bubble_password"
+      FTP_DIRECTORY            = terraform.workspace == "prd" ? "/production" : "/development"
+      BUBBLE_API_URL           = terraform.workspace == "prd" ? "https://member.kol-bi.jp/api/1.1/wf/import_schedule" : "https://temp-toreyomi-20260215.bubbleapps.io/version-test/api/1.1/wf/import_schedule"
       BUBBLE_API_KEY_SECRET_ID = "projects/56638639323/secrets/kol_bubble_workflow_api_key"
-      CSV_BASE_URL = "https://kol-bi.jp/umasiri.dev"
-      ENABLE_BUBBLE_API = var.enable_bubble_api
+      CSV_BASE_URL             = "https://kol-bi.jp/umasiri.dev"
+      ENABLE_BUBBLE_API        = var.enable_bubble_api
     }
     service_account_email = google_service_account.export_schedules_sa.email
   }
 
   depends_on = [
-      google_project_iam_member.export_schedules_bq_editor,
-      google_project_iam_member.export_schedules_bq_job_user
+    google_project_iam_member.export_schedules_bq_editor,
+    google_project_iam_member.export_schedules_bq_job_user
   ]
 }
 
@@ -158,28 +158,28 @@ resource "google_cloudfunctions2_function" "export_race_uma_details" {
   }
 
   service_config {
-    max_instance_count = 5
+    max_instance_count               = 5
     max_instance_request_concurrency = 10
-    available_memory   = "8192M" # メモリ不足解消のため増強
-    available_cpu      = "4"     # 4GB以上のメモリには2CPU以上が必要、8GBなら4CPU推奨
-    timeout_seconds    = 3600
+    available_memory                 = "8192M" # メモリ不足解消のため増強
+    available_cpu                    = "4"     # 4GB以上のメモリには2CPU以上が必要、8GBなら4CPU推奨
+    timeout_seconds                  = 3600
     environment_variables = {
-      PROJECT_ID  = var.project_id
-      DATASET_ID  = terraform.workspace == "prd" ? var.prd_schema : var.stg_schema
-      SECRET_USER = "projects/56638639323/secrets/kol_ftp_bubble_username"
-      SECRET_PASS = "projects/56638639323/secrets/kol_ftp_bubble_password"
-      FTP_DIRECTORY = terraform.workspace == "prd" ? "/production" : "/development"
-      BUBBLE_API_URL = terraform.workspace == "prd" ? "https://member.kol-bi.jp/api/1.1/wf/import_race_uma_detail" : "https://temp-toreyomi-20260215.bubbleapps.io/version-test/api/1.1/wf/import_race_uma_detail"
+      PROJECT_ID               = var.project_id
+      DATASET_ID               = terraform.workspace == "prd" ? var.prd_schema : var.stg_schema
+      SECRET_USER              = "projects/56638639323/secrets/kol_ftp_bubble_username"
+      SECRET_PASS              = "projects/56638639323/secrets/kol_ftp_bubble_password"
+      FTP_DIRECTORY            = terraform.workspace == "prd" ? "/production" : "/development"
+      BUBBLE_API_URL           = terraform.workspace == "prd" ? "https://member.kol-bi.jp/api/1.1/wf/import_race_uma_detail" : "https://temp-toreyomi-20260215.bubbleapps.io/version-test/api/1.1/wf/import_race_uma_detail"
       BUBBLE_API_KEY_SECRET_ID = "projects/56638639323/secrets/kol_bubble_workflow_api_key"
-      CSV_BASE_URL = "https://kol-bi.jp/umasiri.dev"
-      ENABLE_BUBBLE_API = var.enable_bubble_api
+      CSV_BASE_URL             = "https://kol-bi.jp/umasiri.dev"
+      ENABLE_BUBBLE_API        = var.enable_bubble_api
     }
     service_account_email = google_service_account.export_race_uma_details_sa.email
   }
 
   depends_on = [
-      google_project_iam_member.export_race_uma_details_bq_editor,
-      google_project_iam_member.export_race_uma_details_bq_job_user
+    google_project_iam_member.export_race_uma_details_bq_editor,
+    google_project_iam_member.export_race_uma_details_bq_job_user
   ]
 }
 
@@ -238,22 +238,22 @@ resource "google_cloudfunctions2_function" "export_races" {
     available_memory   = "512M"
     timeout_seconds    = 540
     environment_variables = {
-      PROJECT_ID  = var.project_id
-      DATASET_ID  = terraform.workspace == "prd" ? var.prd_schema : var.stg_schema
-      SECRET_USER = "projects/56638639323/secrets/kol_ftp_bubble_username"
-      SECRET_PASS = "projects/56638639323/secrets/kol_ftp_bubble_password"
-      FTP_DIRECTORY = terraform.workspace == "prd" ? "/production" : "/development"
-      BUBBLE_API_URL = terraform.workspace == "prd" ? "https://member.kol-bi.jp/api/1.1/wf/import_race" : "https://temp-toreyomi-20260215.bubbleapps.io/version-test/api/1.1/wf/import_race"
+      PROJECT_ID               = var.project_id
+      DATASET_ID               = terraform.workspace == "prd" ? var.prd_schema : var.stg_schema
+      SECRET_USER              = "projects/56638639323/secrets/kol_ftp_bubble_username"
+      SECRET_PASS              = "projects/56638639323/secrets/kol_ftp_bubble_password"
+      FTP_DIRECTORY            = terraform.workspace == "prd" ? "/production" : "/development"
+      BUBBLE_API_URL           = terraform.workspace == "prd" ? "https://member.kol-bi.jp/api/1.1/wf/import_race" : "https://temp-toreyomi-20260215.bubbleapps.io/version-test/api/1.1/wf/import_race"
       BUBBLE_API_KEY_SECRET_ID = "projects/56638639323/secrets/kol_bubble_workflow_api_key"
-      CSV_BASE_URL = "https://kol-bi.jp/umasiri.dev"
-      ENABLE_BUBBLE_API = var.enable_bubble_api
+      CSV_BASE_URL             = "https://kol-bi.jp/umasiri.dev"
+      ENABLE_BUBBLE_API        = var.enable_bubble_api
     }
     service_account_email = google_service_account.export_schedules_sa.email # 同じSAを使用
   }
 
   depends_on = [
-      google_project_iam_member.export_schedules_bq_editor,
-      google_project_iam_member.export_schedules_bq_job_user
+    google_project_iam_member.export_schedules_bq_editor,
+    google_project_iam_member.export_schedules_bq_job_user
   ]
 }
 
@@ -332,22 +332,22 @@ resource "google_cloudfunctions2_function" "export_race_uma_odds" {
     available_cpu      = "1"
     timeout_seconds    = 3600
     environment_variables = {
-      PROJECT_ID  = var.project_id
-      DATASET_ID  = terraform.workspace == "prd" ? var.prd_schema : var.stg_schema
-      SECRET_USER = "projects/56638639323/secrets/kol_ftp_bubble_username"
-      SECRET_PASS = "projects/56638639323/secrets/kol_ftp_bubble_password"
-      FTP_DIRECTORY = terraform.workspace == "prd" ? "/production" : "/development"
-      BUBBLE_API_URL = terraform.workspace == "prd" ? "https://member.kol-bi.jp/api/1.1/wf/import_race_uma_odds" : "https://temp-toreyomi-20260215.bubbleapps.io/version-test/api/1.1/wf/import_race_uma_odds"
+      PROJECT_ID               = var.project_id
+      DATASET_ID               = terraform.workspace == "prd" ? var.prd_schema : var.stg_schema
+      SECRET_USER              = "projects/56638639323/secrets/kol_ftp_bubble_username"
+      SECRET_PASS              = "projects/56638639323/secrets/kol_ftp_bubble_password"
+      FTP_DIRECTORY            = terraform.workspace == "prd" ? "/production" : "/development"
+      BUBBLE_API_URL           = terraform.workspace == "prd" ? "https://member.kol-bi.jp/api/1.1/wf/import_race_uma_odds" : "https://temp-toreyomi-20260215.bubbleapps.io/version-test/api/1.1/wf/import_race_uma_odds"
       BUBBLE_API_KEY_SECRET_ID = "projects/56638639323/secrets/kol_bubble_workflow_api_key"
-      CSV_BASE_URL = "https://kol-bi.jp/umasiri.dev"
-      ENABLE_BUBBLE_API = var.enable_bubble_api
+      CSV_BASE_URL             = "https://kol-bi.jp/umasiri.dev"
+      ENABLE_BUBBLE_API        = var.enable_bubble_api
     }
     service_account_email = google_service_account.export_race_uma_odds_sa.email
   }
 
   depends_on = [
-      google_project_iam_member.export_race_uma_odds_bq_editor,
-      google_project_iam_member.export_race_uma_odds_bq_job_user
+    google_project_iam_member.export_race_uma_odds_bq_editor,
+    google_project_iam_member.export_race_uma_odds_bq_job_user
   ]
 }
 

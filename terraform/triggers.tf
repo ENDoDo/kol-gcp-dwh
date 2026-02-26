@@ -57,9 +57,9 @@ resource "google_pubsub_topic_iam_member" "sink_publisher" {
 # --- Eventarc トリガー ---
 # Pub/SubトピックにメッセージがパブリッシュされたときにCloud Workflowをトリガー
 resource "google_eventarc_trigger" "workflow_trigger" {
-  name     = "dataform-workflow-trigger${local.env_suffix}"
-  location = var.region
-  project  = var.project_id
+  name            = "dataform-workflow-trigger${local.env_suffix}"
+  location        = var.region
+  project         = var.project_id
   service_account = google_service_account.workflows_sa.email # Workflows用SAまたは専用SAを使用
 
   matching_criteria {

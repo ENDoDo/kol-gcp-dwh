@@ -105,8 +105,8 @@ resource "google_dataform_repository" "repository_stg" {
   name     = "${var.dataform_repository_id}-stg"
 
   git_remote_settings {
-    url                               = "https://github.com/ENDoDo/kol-gcp-dataform.git"
-    default_branch                    = "main"
+    url                                 = "https://github.com/ENDoDo/kol-gcp-dataform.git"
+    default_branch                      = "main"
     authentication_token_secret_version = "projects/56638639323/secrets/github-token/versions/latest"
   }
   depends_on = [
@@ -117,11 +117,11 @@ resource "google_dataform_repository" "repository_stg" {
 }
 
 resource "google_dataform_repository_release_config" "release_config_stg" {
-  count      = terraform.workspace != "prd" ? 1 : 0
-  provider   = google-beta.beta
-  project    = google_dataform_repository.repository_stg[0].project
-  region     = google_dataform_repository.repository_stg[0].region
-  repository = google_dataform_repository.repository_stg[0].name
+  count         = terraform.workspace != "prd" ? 1 : 0
+  provider      = google-beta.beta
+  project       = google_dataform_repository.repository_stg[0].project
+  region        = google_dataform_repository.repository_stg[0].region
+  repository    = google_dataform_repository.repository_stg[0].name
   name          = "production-release-stg"
   git_commitish = "main"
 
@@ -135,11 +135,11 @@ resource "google_dataform_repository_release_config" "release_config_stg" {
 }
 
 resource "google_dataform_repository_workflow_config" "workflow_stg" {
-  count      = terraform.workspace != "prd" ? 1 : 0
-  provider   = google-beta.beta
-  project    = google_dataform_repository.repository_stg[0].project
-  region     = google_dataform_repository.repository_stg[0].region
-  repository = google_dataform_repository.repository_stg[0].name
+  count          = terraform.workspace != "prd" ? 1 : 0
+  provider       = google-beta.beta
+  project        = google_dataform_repository.repository_stg[0].project
+  region         = google_dataform_repository.repository_stg[0].region
+  repository     = google_dataform_repository.repository_stg[0].name
   name           = "daily-race-table-update-stg"
   release_config = google_dataform_repository_release_config.release_config_stg[0].id
 
@@ -188,7 +188,7 @@ resource "google_dataform_repository_workflow_config" "workflow_stg" {
     service_account = google_service_account.dataform.email
   }
 
-  time_zone     = "Asia/Tokyo"
+  time_zone = "Asia/Tokyo"
 }
 
 # --- Dataform Repository and Configurations (Production) ---
@@ -200,8 +200,8 @@ resource "google_dataform_repository" "repository_prd" {
   name     = var.dataform_repository_id # kol-dataform-repo
 
   git_remote_settings {
-    url                               = "https://github.com/ENDoDo/kol-gcp-dataform.git"
-    default_branch                    = "main"
+    url                                 = "https://github.com/ENDoDo/kol-gcp-dataform.git"
+    default_branch                      = "main"
     authentication_token_secret_version = "projects/56638639323/secrets/github-token/versions/latest"
   }
   depends_on = [
@@ -212,11 +212,11 @@ resource "google_dataform_repository" "repository_prd" {
 }
 
 resource "google_dataform_repository_release_config" "release_config_prd" {
-  count      = terraform.workspace == "prd" ? 1 : 0
-  provider   = google-beta.beta
-  project    = google_dataform_repository.repository_prd[0].project
-  region     = google_dataform_repository.repository_prd[0].region
-  repository = google_dataform_repository.repository_prd[0].name
+  count         = terraform.workspace == "prd" ? 1 : 0
+  provider      = google-beta.beta
+  project       = google_dataform_repository.repository_prd[0].project
+  region        = google_dataform_repository.repository_prd[0].region
+  repository    = google_dataform_repository.repository_prd[0].name
   name          = "production-release"
   git_commitish = "main"
 
@@ -230,11 +230,11 @@ resource "google_dataform_repository_release_config" "release_config_prd" {
 }
 
 resource "google_dataform_repository_workflow_config" "workflow_prd" {
-  count      = terraform.workspace == "prd" ? 1 : 0
-  provider   = google-beta.beta
-  project    = google_dataform_repository.repository_prd[0].project
-  region     = google_dataform_repository.repository_prd[0].region
-  repository = google_dataform_repository.repository_prd[0].name
+  count          = terraform.workspace == "prd" ? 1 : 0
+  provider       = google-beta.beta
+  project        = google_dataform_repository.repository_prd[0].project
+  region         = google_dataform_repository.repository_prd[0].region
+  repository     = google_dataform_repository.repository_prd[0].name
   name           = "daily-race-table-update"
   release_config = google_dataform_repository_release_config.release_config_prd[0].id
 
@@ -283,7 +283,7 @@ resource "google_dataform_repository_workflow_config" "workflow_prd" {
     service_account = google_service_account.dataform.email
   }
 
-  time_zone     = "Asia/Tokyo"
+  time_zone = "Asia/Tokyo"
 }
 
 # Dataformサービスエージェントの権限設定に必要なプロジェクト情報を取得
