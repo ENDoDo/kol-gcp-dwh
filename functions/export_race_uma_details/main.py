@@ -141,7 +141,7 @@ def export_race_uma_details(request):
             "chokyoshi_tracen_kubun", "chokyoshi_tracen_kubun_label",
             # 調教 (追い切り)
             "chokyo_den_oikiri_flag", "chokyo_den_oikiri_flag_label", "chokyo_den_oikiri_kijosha",
-            "chokyo_den_oikiri_nengappi_date", "chokyo_den_oikiri_nengappi",
+            "chokyo_den_oikiri_nengappi_date", "chokyo_den_oikiri_nengappi_label", "chokyo_den_oikiri_nengappi",
             "chokyo_den_oikiri_basho", "chokyo_den_oikiri_course", "chokyo_den_oikiri_course_kubun", "chokyo_den_oikiri_basho_course_label",
             "chokyo_den_oikiri_babajotai", "chokyo_den_oikiri_hanro_pool_kaisu_int",
             "chokyo_den_oikiri_8f", "chokyo_den_oikiri_8f_float",

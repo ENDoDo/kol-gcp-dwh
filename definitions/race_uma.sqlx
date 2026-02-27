@@ -437,24 +437,21 @@ WITH
         ELSE NULL
       END AS chokyo_den_oikiri_reigai,
       CASE
-        WHEN d2.chokyo1_flag = '1' THEN d2.chokyo_awase
-        WHEN d2.chokyo2_flag = '1' THEN d2.chokyo_awase
-        WHEN d2.chokyo3_flag = '1' THEN d2.chokyo_awase
+        WHEN d2.chokyo2_flag = '1' AND d2.chokyo_awase_flag = '2' THEN d2.chokyo_awase
+        WHEN d2.chokyo3_flag = '1' AND d2.chokyo_awase_flag = '3' THEN d2.chokyo_awase
         ELSE NULL
       END AS chokyo_den_oikiri_awase,
       REGEXP_EXTRACT(
         CASE
-          WHEN d2.chokyo1_flag = '1' THEN d2.chokyo_awase
-          WHEN d2.chokyo2_flag = '1' THEN d2.chokyo_awase
-          WHEN d2.chokyo3_flag = '1' THEN d2.chokyo_awase
+          WHEN d2.chokyo2_flag = '1' AND d2.chokyo_awase_flag = '2' THEN d2.chokyo_awase
+          WHEN d2.chokyo3_flag = '1' AND d2.chokyo_awase_flag = '3' THEN d2.chokyo_awase
           ELSE NULL
         END,
         r'^(.+?)に'
       ) AS chokyo_den_oikiri_awase_uma_bamei,
       CASE
-        WHEN d2.chokyo1_flag = '1' THEN d2.chokyo_awase_flag
-        WHEN d2.chokyo2_flag = '1' THEN d2.chokyo_awase_flag
-        WHEN d2.chokyo3_flag = '1' THEN d2.chokyo_awase_flag
+        WHEN d2.chokyo2_flag = '1' AND d2.chokyo_awase_flag = '2' THEN d2.chokyo_awase_flag
+        WHEN d2.chokyo3_flag = '1' AND d2.chokyo_awase_flag = '3' THEN d2.chokyo_awase_flag
         ELSE NULL
       END AS chokyo_den_oikiri_awase_flag,
       CASE
