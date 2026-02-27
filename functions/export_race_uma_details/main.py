@@ -123,7 +123,7 @@ def export_race_uma_details(request):
             "race_bango_num", "waku_kubun", "wakuban", "umaban", "umaban_num", "umaban_even",
             # 馬情報
             "bamei", "seibetsu_code", "seibetsu_code_label", "barei_num",
-            "futan_juryo_float", "blinker_shiyo_kubun", "blinker_shiyo_kubun_label", "rating_float",
+            "futan_juryo_float", "blinker_shiyo_kubun", "blinker_shiyo_kubun_label", "rating_float", "rating_rank",
             # 馬主・血統
             "banushimei", "banushimei_ryakusho", "ketto_toroku_bango_kol",
             "ketto1_f_hanshoku_toroku_bango", "ketto1_f_bamei",

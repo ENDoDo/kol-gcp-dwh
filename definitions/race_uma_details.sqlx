@@ -40,6 +40,7 @@ config {
     blinker_shiyo_kubun_label: "ブリンカー使用 はい/いいえ",
 
     rating_float: "レイティング 小数点第一位まで",
+    rating_rank: "レイティング順位。最高値が1位、同値は同じ順位で次をスキップ",
     // 馬主・血統
     banushimei: "馬主名",
     banushimei_ryakusho: "馬主名略称",

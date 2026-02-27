@@ -40,6 +40,7 @@ config {
     blinker_shiyo_kubun_label: "ブリンカー使用 はい/いいえ",
 
     rating_float: "レイティング 小数点第一位まで",
+    rating_rank: "レイティング順位。最高値が1位、同値は同じ順位で次をスキップ",
     // 馬主・血統
     banushimei: "馬主名",
     banushimei_ryakusho: "馬主名略称",
@@ -932,6 +933,14 @@ SELECT
   z.bamei,
 
   SAFE_CAST(z.rating AS FLOAT64) / 10 AS rating_float,
+  IF(
+    SAFE_CAST(z.rating AS FLOAT64) IS NOT NULL,
+    RANK() OVER (
+      PARTITION BY z.race_code_kol
+      ORDER BY SAFE_CAST(z.rating AS FLOAT64) DESC
+    ),
+    NULL
+  ) AS rating_rank,
   z.seibetsu_code,
   CASE z.seibetsu_code
     WHEN '0' THEN '牡'
