@@ -59,7 +59,7 @@ graph TD
 
     subgraph "データ変換"
         W -- "Dataform実行<br>(tags: odds)" --> R{Dataform Repository};
-        R -- "SQLX実行<br>(race_uma_oddsのみ)" --> Odds[(race_uma_odds)];
+        R -- "SQLX実行" --> Mart[(BigQuery Mart Tables)];
     end
 ```
 
@@ -88,10 +88,6 @@ graph TD
 - **特徴的なロジック**:
   - **調教併せ馬判定**: パートナー馬の特定と、クラス格付け（格上/同格/格下）判定。
 
-### `race_uma_odds.sqlx`
-- **リアルタイムオッズ情報**。
-- `races_uma_odds_jvd_new` をソースとし、KOL仕様のレースID等を付与。
-- **更新頻度**: 毎日 06:00, 09:00, 12:00, 15:00, 20:00 (JST)。
 
 ### `race_hit.sqlx`
 - 的中判定・配当金テーブル。
@@ -105,7 +101,6 @@ graph TD
 │   ├── sources/        # データソースdeclarations
 │   ├── race.sqlx
 │   ├── race_uma.sqlx
-│   ├── race_uma_odds.sqlx
 │   └── ...
 ├── functions/          # Cloud Functions ソースコード
 │   ├── dispatcher/     # Dataform起動用Dispatcher
