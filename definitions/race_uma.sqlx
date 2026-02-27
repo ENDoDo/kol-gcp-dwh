@@ -665,7 +665,7 @@ WITH
     LEFT JOIN
       ${ref("kol_com1")} AS c1 ON d2.race_code_uma_kol = c1.race_code_uma_kol
     LEFT JOIN
-      ${ref("races_uma_odds_kol")} AS o1 ON d2.race_code_uma_kol = o1.RaceUmaCode
+      races_uma_odds_kol AS o1 ON d2.race_code_uma_kol = o1.RaceUmaCode
   ),
 
 -- CTE Step2: ウィンドウ関数を使い、馬ごとに1つ前のレース情報を取得
@@ -1591,37 +1591,7 @@ SELECT
   END AS chokyo_sei_yajirushi_label,
   z.chokyo_sei_reigai,
 
-  z.chokyo_den_chokyo1_reigai, -- Remove these lines, but wait, `chokyo_den_chokyo1_reigai` is the last one in the block to remove.
-  -- Actually, I should remove lines 1679 to 1931.
-  -- And verify if `chokyo_den_oikiri` stuff that precedes it is safe.
-  -- The precedent logic is fine.
-
-  -- Re-checking lines 1679-1931 in viewer:
-  -- 1679: z.chokyo_den_chokyo1_flag,
-  -- ...
-  -- 1931: z.chokyo_den_chokyo3_reigai,
-
-  -- I will just replace with nothing (empty string) or delete the block.
-  -- Since I can't put empty string easily without syntax error if comma handling is tricky, I need to check comma.
-  -- 1677: z.chokyo_sei_reigai, (Previous line)
-  -- 1679 starts the block.
-  -- 1931 ends the block.
-  -- 1934: CASE (Next field `zensou_kankaku`)
-  -- Note: 1933 is empty line.
-
-  -- If I remove 1679-1931, I need to ensure 1677 has a comma (it does) and the next item `zensou_kankaku` starts correctly.
-  -- 1677: z.chokyo_sei_reigai,
-  -- 1679-1931 removed.
-  -- 1934: CASE ...
-  -- So `z.chokyo_sei_reigai,` followed by `CASE ...` is valid SQL.
-
-  -- Wait, I messed up the `TargetContent` generation in my thought process?
-  -- No, I will use `replace_file_content` with line numbers and TargetContent.
-  -- I'll construct `TargetContent` from the file view.
-
-
-
-    CASE
+  CASE
     WHEN z.rotation1 IS NOT NULL THEN '連闘'
     WHEN z.rotation2 IS NOT NULL THEN '中1週'
     WHEN z.rotation3 IS NOT NULL THEN '中2週'
@@ -1855,8 +1825,5 @@ LEFT JOIN
 LEFT JOIN
   shirushi_final AS sc
   ON z.race_code_uma_kol = sc.race_code_uma_kol
-LEFT JOIN
-  ${ref("races_uma_odds_jvd_new")} AS odds
-  ON odds.RaceUmaCode = z.race_code_uma_kol
 WHERE
   z.hasso_date >= '2023-01-01'
