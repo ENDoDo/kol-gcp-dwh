@@ -1275,23 +1275,27 @@ SELECT
 
   z.chokyo_den_oikiri_awase AS chokyo_den_awase,
   z.chokyo_den_oikiri_awase_uma_bamei AS chokyo_den_awase_uma_bamei,
-  pl.kyoso_joken_kubun_label AS chokyo_den_awase_uma_class,
+  CASE WHEN z.chokyo_den_oikiri_awase IS NOT NULL THEN pl.kyoso_joken_kubun_label ELSE NULL END AS chokyo_den_awase_uma_class,
   CASE
-    -- 格上：相手が2勝クラス以上 かつ 自分より格上 かつ 年齢が同い年以上
-    WHEN pl.kyoso_joken_rank_int >= 4
-         AND pl.kyoso_joken_rank_int > z.kyoso_joken_rank_int
-         AND SAFE_CAST(pl.barei AS INT64) >= SAFE_CAST(z.barei AS INT64)
-    THEN '格上'
-    -- 同格：相手が2勝クラス以上 かつ 併せ馬と同格 かつ 年齢が同い年以上
-    WHEN pl.kyoso_joken_rank_int >= 4
-         AND pl.kyoso_joken_rank_int = z.kyoso_joken_rank_int
-         AND SAFE_CAST(pl.barei AS INT64) >= SAFE_CAST(z.barei AS INT64)
-    THEN '同格'
+    WHEN z.chokyo_den_oikiri_awase IS NOT NULL THEN
+      CASE
+        -- 格上：相手が2勝クラス以上 かつ 自分より格上 かつ 年齢が同い年以上
+        WHEN pl.kyoso_joken_rank_int >= 4
+             AND pl.kyoso_joken_rank_int > z.kyoso_joken_rank_int
+             AND SAFE_CAST(pl.barei AS INT64) >= SAFE_CAST(z.barei AS INT64)
+        THEN '格上'
+        -- 同格：相手が2勝クラス以上 かつ 併せ馬と同格 かつ 年齢が同い年以上
+        WHEN pl.kyoso_joken_rank_int >= 4
+             AND pl.kyoso_joken_rank_int = z.kyoso_joken_rank_int
+             AND SAFE_CAST(pl.barei AS INT64) >= SAFE_CAST(z.barei AS INT64)
+        THEN '同格'
+        ELSE NULL
+      END
     ELSE NULL
   END AS chokyo_den_awase_uma_kaku_kubun,
 
   CASE
-    WHEN pl.kyoso_joken_rank_int > z.kyoso_joken_rank_int AND z.chokyo_den_oikiri_awase LIKE '%先着%' THEN 'はい'
+    WHEN z.chokyo_den_oikiri_awase IS NOT NULL AND pl.kyoso_joken_rank_int > z.kyoso_joken_rank_int AND z.chokyo_den_oikiri_awase LIKE '%先着%' THEN 'はい'
     ELSE NULL
   END AS chokyo_den_awase_uma_kakuue_win_flag,
 
