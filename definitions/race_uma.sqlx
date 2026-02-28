@@ -662,7 +662,7 @@ WITH
     LEFT JOIN
       ${ref("kol_sei1")} AS s1 ON SUBSTR(d2.race_code_uma_kol, 1, 16) = s1.race_code_kol
     LEFT JOIN
-      ${ref("kol_ket")} AS k ON d2.ketto_toroku_bango = k.ketto_toroku_bango_kol
+      ${ref("kol_uma_ketto")} AS k ON d2.ketto_toroku_bango = k.ketto_toroku_bango_uma
     LEFT JOIN
       ${ref("kol_com1")} AS c1 ON d2.race_code_uma_kol = c1.race_code_uma_kol
     LEFT JOIN
