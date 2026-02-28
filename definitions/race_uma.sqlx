@@ -867,7 +867,7 @@ WITH
       IF(shirushi_hanro_1f_flag_int = 1, 'はい', NULL) AS shirushi_hanro_1f_flag,
       IF(shirushi_wood_4f_flag_int = 1, 'はい', NULL) AS shirushi_wood_4f_flag,
       IF(shirushi_wood_1f_flag_int = 1, 'はい', NULL) AS shirushi_wood_1f_flag,
-      IF(shirushi_point > 0 AND chokyo_den_oikiri_awase LIKE '%先着%', 'はい', NULL) AS shirushi_awase_senchaku_flag,
+      IF(chokyo_den_oikiri_awase LIKE '%先着%', 'はい', NULL) AS shirushi_awase_senchaku_flag,
       CASE
         WHEN yosou_tansho_ninkijun_num BETWEEN 1 AND 3 THEN '1～3'
         WHEN yosou_tansho_ninkijun_num BETWEEN 4 AND 6 THEN '4～6'
