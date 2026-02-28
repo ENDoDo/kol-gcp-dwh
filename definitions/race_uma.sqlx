@@ -1304,7 +1304,12 @@ SELECT
   END AS chokyo_den_awase_uma_kaku_kubun,
 
   CASE
-    WHEN z.chokyo_den_oikiri_awase IS NOT NULL AND pl.kyoso_joken_rank_int > z.kyoso_joken_rank_int AND z.chokyo_den_oikiri_awase LIKE '%先着%' THEN 'はい'
+    WHEN z.chokyo_den_oikiri_awase IS NOT NULL
+         AND pl.kyoso_joken_rank_int >= 4 -- 2勝クラス以上
+         AND pl.kyoso_joken_rank_int > z.kyoso_joken_rank_int
+         AND SAFE_CAST(pl.barei AS INT64) >= SAFE_CAST(z.barei AS INT64) -- 同い年以上
+         AND z.chokyo_den_oikiri_awase LIKE '%先着%'
+    THEN 'はい'
     ELSE NULL
   END AS chokyo_den_awase_uma_kakuue_win_flag,
 

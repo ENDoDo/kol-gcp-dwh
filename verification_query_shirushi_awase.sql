@@ -14,7 +14,7 @@ SELECT
     ELSE 'その他'
   END AS validation_status
 FROM
-  `${ref("race_uma")}` -- Dataform環境で実行する場合
+  `smartkeiba.kolbi_analysis.race_uma` -- BigQuery コンソールで実行する場合
 WHERE
   chokyo_den_awase_kubun = '併せ先着'
 ORDER BY
