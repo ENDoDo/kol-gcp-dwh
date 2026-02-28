@@ -34,3 +34,8 @@ declare({
   schema: source_schema,
   name: "kol_com1"
 });
+
+declare({
+  schema: source_schema,
+  name: "kol_uma_ketto"
+});
