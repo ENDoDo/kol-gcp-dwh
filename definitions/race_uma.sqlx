@@ -1,13 +1,13 @@
 -- =================================================================
 -- race_uma.sqlx
--- 説明: kol_den2, kol_sei1, kol_sei2, kol_ket, kol_den1を結合し、出走馬に関する情報を整形するテーブル。
+-- 説明: kol_den2, kol_sei1, kol_sei2, kol_uma_ketto, kol_den1を結合し、出走馬に関する情報を整形するテーブル。
 --       KOL仕様のコードをJRA-VAN仕様に変換し、各種ラベルやフラグ、計算済みのフィールドを付与する。
 -- =================================================================
 
 -- Dataform設定ブロック
 config {
   type: "table",
-  description: "KOLの出馬表(den2), 成績(sei1, sei2), 血統(ket), レース(den1)データを結合し、出走馬に関する情報を整形したマスターテーブル。",
+  description: "KOLの出馬表(den2), 成績(sei1, sei2), 血統(uma_ketto), レース(den1)データを結合し、出走馬に関する情報を整形したマスターテーブル。",
   columns: {
     // ID / コード
     race_code_uma_kol: "KOL仕様馬毎レースID",
