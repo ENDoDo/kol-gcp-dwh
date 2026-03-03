@@ -245,7 +245,7 @@ def export_races(request):
                             logger.info(f"Bubble APIへの通知に成功しました ({filename}): {resp_json}")
 
                             # インポート成功可否のチェック
-                            if resp_json.get("response", {}).get("is_import_success") == "no":
+                            if resp_json.get("response", {}).get("is_import_success") is False:
                                 error_text = resp_json.get("response", {}).get("error_text", "Unknown error")
                                 logger.error(f"Bubble Import Failed ({filename}): {error_text}")
                                 raise Exception(f"Bubble Import Failed: {error_text}")
