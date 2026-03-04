@@ -103,36 +103,19 @@ def export_races(request):
         updates = []
         state_updates = []
 
-        # CSV出力用フィールド定義 (race.sqlxに基づく)
-        fieldnames = [
-            "race_code_kol", "race_code_jvd", "schedule_id",
-            "hasso_date", "hasso_date_utc", "kaiji", "nichiji",
-            "race_bango_num", "race_name", "kyori_kubun",
-            "keibajo_code_jvd", "keibajo_code_kol", "keibajo_name",
-            "chuo_chiho_kubun", "chuo_chiho_kubun_label", "kyosomei_15moji",
-            "kyosomei_7moji", "grade_code", "grade_code_label", "jpn_flag",
-            "jpn_flag_label", "bettei_barei_handicap_summary_code",
-            "bettei_barei_handicap_summary_code_label", "bettei_barei_handicap_detail",
-            "kyoso_joken_age_limit", "kyoso_joken_age_limit_label",
-            "kyoso_joken_kubun", "kyoso_joken_kubun_label", "heichi_shogai_kubun",
-            "heichi_shogai_kubun_label", "track_code1_dirtsiba",
-            "track_code1_dirtsiba_label", "track_code2_LRS", "track_code2_LRS_label",
-            "track_code3_inout", "track_code3_inout_label", "course_kubun",
-            "course_kubun_label", "kyori", "toroku_tosu_num", "torikeshi_tosu_num",
-            "tenko_code", "tenko_code_label", "babajotai_code", "babajotai_code_label",
-            "pace_yosou", "pace_yosou_label", "pace_kekka", "pace_kekka_label",
-            "race_tanpyo", "juryo_handicap_flag", "keibajo_komawari_curve4_flag",
-            "keibajo_omawari_curve4_flag", "keibajo_straight_short_flag",
-            "keibajo_straight_long_flag", "created", "modified"
-        ]
+        # テーブルスキーマから出力用フィールドを自動取得
+        table_ref = f"{PROJECT_ID}.{DATASET_ID}.race"
+        table_info = bq_client.get_table(table_ref)
+        fieldnames = [field.name for field in table_info.schema]
 
         for row in rows:
             row_data = {field: row[field] for field in fieldnames}
 
             # ハッシュ計算用データ（タイムスタンプは除外）
             hash_data = row_data.copy()
-            del hash_data["created"]
-            del hash_data["modified"]
+            for key in ["created", "modified"]:
+                if key in hash_data:
+                    del hash_data[key]
 
             current_hash = calculate_hash(hash_data)
             old_hash = row["old_hash"]

@@ -109,35 +109,20 @@ def export_schedules(request):
         updates = []
         state_updates = []
 
+        # テーブルスキーマから出力用フィールドを自動取得
+        table_ref = f"{PROJECT_ID}.{DATASET_ID}.schedule"
+        table_info = bq_client.get_table(table_ref)
+        fieldnames = [field.name for field in table_info.schema]
+
         for row in rows:
-            # ハッシュ化のために行データを辞書として再構築
-            # sqlx定義に基づくschedulesのスキーマ: id, year, month_day, period1_start, period2_end, modified, created
-            row_data = {
-                "id": row["id"],
-                "year": row["year"],
-                "month_day": row["month_day"],
-                "period1_start": row["period1_start"],
-                "period1_start_utc": row["period1_start_utc"],
-                "period2_end": row["period2_end"],
-                "period2_end_utc": row["period2_end_utc"],
-                "main_race_names": row["main_race_names"],
-                "keibajo_names": row["keibajo_names"],
-                "modified": row["modified"],
-                "created": row["created"]
-            }
+            # 行データを辞書として再構築
+            row_data = {field: row[field] for field in fieldnames}
 
             # ハッシュ計算用データ（タイムスタンプは毎回変わるため除外）
-            hash_data = {
-                "id": row["id"],
-                "year": row["year"],
-                "month_day": row["month_day"],
-                "period1_start": row["period1_start"],
-                "period1_start_utc": row["period1_start_utc"],
-                "period2_end": row["period2_end"],
-                "period2_end_utc": row["period2_end_utc"],
-                "main_race_names": row["main_race_names"],
-                "keibajo_names": row["keibajo_names"]
-            }
+            hash_data = row_data.copy()
+            for key in ["created", "modified"]:
+                if key in hash_data:
+                    del hash_data[key]
 
             current_hash = calculate_hash(hash_data)
             old_hash = row["old_hash"]
@@ -200,8 +185,8 @@ def export_schedules(request):
 
                     logger.info(f"CSVを生成中... ({filename})")
                     csv_buffer = io.StringIO()
-                    # スキーマに合わせたフィールド順序
-                    fieldnames = ["id", "year", "month_day", "period1_start", "period1_start_utc", "period2_end", "period2_end_utc", "main_race_names", "keibajo_names", "modified", "created"]
+                    # 動的に取得したfieldnamesを使用
+                    # fieldnames = ["id", "year", "month_day", "period1_start", "period1_start_utc", "period2_end", "period2_end_utc", "main_race_names", "keibajo_names", "modified", "created"]
                     writer = csv.DictWriter(csv_buffer, fieldnames=fieldnames)
                     writer.writeheader()
                     writer.writerows(chunk)
