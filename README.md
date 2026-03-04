@@ -136,11 +136,11 @@ cd terraform
 
 # Staging環境
 terraform workspace select stg
-terraform apply -var-file="stg.tfvars"
+terraform apply -var-file="stg.tfvars" -auto-approve
 
 # Production環境
 terraform workspace select prd
-terraform apply -var-file="prd.tfvars"
+terraform apply -var-file="prd.tfvars" -auto-approve
 ```
 
 ## 運用時の注意点
@@ -166,11 +166,11 @@ terraform apply -var-file="prd.tfvars"
 ```bash
 # Staging環境
 terraform workspace select stg
-terraform apply -var-file="stg.tfvars"
+terraform apply -var-file="stg.tfvars" -auto-approve
 
 # Production環境
 terraform workspace select prd
-terraform apply -var-file="prd.tfvars"
+terraform apply -var-file="prd.tfvars" -auto-approve
 ```
 
 ### 内部仕様
