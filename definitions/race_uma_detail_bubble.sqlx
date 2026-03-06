@@ -13,4 +13,4 @@ config {
   }
 }
 
-${race_uma_detail_common.query}
+${race_uma_detail_common.query(ref)}
