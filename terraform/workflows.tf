@@ -116,20 +116,20 @@ main:
           auth:
             type: OIDC
         result: exportRacesResult
-    - callExportRaceUmaDetailsFunction:
+    - callExportRaceUmaDetailBubbleFunction:
         call: http.post
         args:
           url: "${google_cloudfunctions2_function.export_race_uma_detail_bubble.service_config[0].uri}"
           timeout: 1800
           auth:
             type: OIDC
-        result: exportRaceUmaDetailsResult
+        result: exportRaceUmaDetailBubbleResult
     - returnResult:
         return:
           dataform: $${dataformStatus.body}
           exportSchedule: $${exportScheduleResult.body}
           exportRaces: $${exportRacesResult.body}
-          exportRaceUmaDetails: $${exportRaceUmaDetailsResult.body}
+          exportRaceUmaDetailBubble: $${exportRaceUmaDetailBubbleResult.body}
 EOF
 }
 
@@ -212,19 +212,19 @@ main:
           auth:
             type: OIDC
         result: exportRacesResult
-    - callExportRaceUmaDetailsFunction:
+    - callExportRaceUmaDetailBubbleFunction:
         call: http.post
         args:
           url: "${google_cloudfunctions2_function.export_race_uma_detail_bubble.service_config[0].uri}"
           timeout: 1800
           auth:
             type: OIDC
-        result: exportRaceUmaDetailsResult
+        result: exportRaceUmaDetailBubbleResult
     - returnResult:
         return:
           dataform: $${dataformStatus.body}
           exportSchedule: $${exportScheduleResult.body}
           exportRaces: $${exportRacesResult.body}
-          exportRaceUmaDetails: $${exportRaceUmaDetailsResult.body}
+          exportRaceUmaDetailBubble: $${exportRaceUmaDetailBubbleResult.body}
 EOF
 }
