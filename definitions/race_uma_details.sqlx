@@ -315,9 +315,10 @@ config {
     modified: "データ更新日時"
   },
   bigquery: {
-    partitionBy: "DATE(hasso_date_utc)"
+    partitionBy: "DATE(hasso_date)"
   }
 }
+
 
 -- CTE: race_umaとraceテーブルを結合
 -- メインクエリ: カラムを選択し、重複を除外
