@@ -107,7 +107,7 @@ output "export_schedules_function_uri" {
 
 # --- サービスアカウント ---
 resource "google_service_account" "export_race_uma_detail_bubble_sa" {
-  account_id   = "export-race-uma-details-sa${local.env_suffix}"
+  account_id   = "export-race-uma-bubble-sa${local.env_suffix}"
   display_name = "SA for Race Uma Details Export Function${local.env_suffix}"
   project      = var.project_id
 }
