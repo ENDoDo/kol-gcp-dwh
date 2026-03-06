@@ -188,11 +188,9 @@ def export_race_uma_details(request):
                             raise Exception(f"Bubble Import Failed: {error_text}")
 
                     except Exception as e:
-                        # インポート失敗の場合は例外を再送出してワークフローを停止させる
-                        if "Bubble Import Failed" in str(e):
-                            raise e
                         logger.error(f"Bubble APIへの通知に失敗しました ({filename}): {e}")
-                        # その他のエラーは従来通りログ出力のみで続行
+                        # ワークフローを停止させるため例外を再送出する
+                        raise e
                 else:
                     if current_part_num == 1: # ログ過多防止のため初回のみログ出力
                         if not ENABLE_BUBBLE_API:

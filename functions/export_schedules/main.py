@@ -238,6 +238,8 @@ def export_schedules(request):
 
             except Exception as e:
                 logger.error(f"Bubble APIへの通知に失敗しました: {e}")
+                # ワークフローを停止させるため例外を再送出する
+                raise e
         else:
             if not ENABLE_BUBBLE_API:
                  logger.info("ENABLE_BUBBLE_APIがfalseのため、通知をスキップします。")
