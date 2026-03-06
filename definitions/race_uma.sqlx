@@ -1255,7 +1255,7 @@ SELECT
     WHEN '直抑え' THEN '直抑え'
     WHEN '外逃げ' THEN '外逃げ'
     WHEN 'ヨレる' THEN 'ヨレる'
-    ELSE z.chokyo_den_oikiri_ashiiro
+    ELSE REPLACE(REPLACE(z.chokyo_den_oikiri_ashiiro, ' ', ''), '　', '')
   END AS chokyo_den_oikiri_ashiiro_label,
   z.chokyo_den_oikiri_yajirushi,
   CASE z.chokyo_den_oikiri_yajirushi
@@ -1596,7 +1596,7 @@ SELECT
     WHEN '楽 走' THEN '楽走' WHEN '向正面' THEN '向正面' WHEN 'ササる' THEN 'ササる' WHEN '稍強め' THEN '稍強め'
     WHEN '止める' THEN '止める' WHEN 'バカ付' THEN 'バカ付' WHEN '引掛る' THEN '引掛る' WHEN '末抑え' THEN '末抑え'
     WHEN '直抑え' THEN '直抑え' WHEN '外逃げ' THEN '外逃げ' WHEN 'ヨレる' THEN 'ヨレる'
-    ELSE z.chokyo_sei_ashiiro
+    ELSE REPLACE(REPLACE(z.chokyo_sei_ashiiro, ' ', ''), '　', '')
   END AS chokyo_sei_ashiiro_label,
   z.chokyo_sei_yajirushi,
   CASE z.chokyo_sei_yajirushi
