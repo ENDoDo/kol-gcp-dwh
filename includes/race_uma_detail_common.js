@@ -1,14 +1,4 @@
--- =================================================================
--- race_uma_details.sqlx
--- 説明: race_umaテーブルとraceテーブルを結合し、馬毎のレース詳細情報を持つテーブルを作成する。
--- =================================================================
-
--- Dataform設定ブロック
-config {
-  type: "table",
-  dependencies: [ "race", "race_uma" ],
-  description: "馬毎のレース情報(race_uma)とレース自体の情報(race)を結合した詳細テーブル。",
-  columns: {
+const columns = {
     // ID / コード
     race_code_uma_kol: "KOL仕様馬毎レースID",
     race_code_uma_jvd: "JRA-VAN仕様馬毎レースID",
@@ -86,19 +76,19 @@ config {
     chokyo_den_oikiri_basho_course_label: "調教場所とコースを結合したラベル",
     chokyo_den_oikiri_babajotai: "調教馬場状態",
     chokyo_den_oikiri_hanro_pool_kaisu_int: "坂路またはプール:chokyo_6f それ以外:null",
-    chokyo_den_oikiri_8f: "調教タイム 8F",
-    chokyo_den_oikiri_8f_float: "調教タイム 8F (小数点)",
-    chokyo_den_oikiri_7f: "調教タイム 7F",
-    chokyo_den_oikiri_7f_float: "調教タイム 7F (小数点)",
-    chokyo_den_oikiri_6f: "調教タイム 6F",
-    chokyo_den_oikiri_6f_float: "調教タイム 6F (小数点)",
+    chokyo_den_oikiri_8f: "調教タイム 8F",
+    chokyo_den_oikiri_8f_float: "調教タイム 8F (小数点)",
+    chokyo_den_oikiri_7f: "調教タイム 7F",
+    chokyo_den_oikiri_7f_float: "調教タイム 7F (小数点)",
+    chokyo_den_oikiri_6f: "調教タイム 6F",
+    chokyo_den_oikiri_6f_float: "調教タイム 6F (小数点)",
     chokyo_den_oikiri_5f_float: "調教タイム 5F (小数点)",
     chokyo_den_oikiri_4f_float: "調教タイム 4F (小数点)",
     chokyo_den_oikiri_3f_float: "調教タイム 3F (小数点)",
 
-    chokyo_den_oikiri_2f_float: "調教タイム 2F推定値 (小数点)",
+    chokyo_den_oikiri_2f_float: "調教タイム 2F推定値 (小数点)",
 
-    chokyo_den_oikiri_1f_float: "調教タイム 1F (小数点)",
+    chokyo_den_oikiri_1f_float: "調教タイム 1F (小数点)",
     chokyo_den_oikiri_lap_8f: "追い切り 8Fラップタイム 8f-7f",
     chokyo_den_oikiri_lap_7f: "追い切り 7Fラップタイム 7f-6f",
     chokyo_den_oikiri_lap_6f: "追い切り 6Fラップタイム 6f-5f",
@@ -313,15 +303,9 @@ config {
     // --- タイムスタンプ ---
     created: "データ作成日時",
     modified: "データ更新日時"
-  },
-  bigquery: {
-    partitionBy: "DATE(hasso_date)"
-  }
-}
+};
 
-
--- CTE: race_umaとraceテーブルを結合
--- メインクエリ: カラムを選択し、重複を除外
+const query = `
 SELECT
   ru.*,
   r.* EXCEPT (
@@ -330,6 +314,12 @@ SELECT
     keibajo_code_jvd, keibajo_code_kol, created, modified, schedule_id
   )
 FROM
-  ${ref("race_uma")} AS ru
-  LEFT JOIN ${ref("race")} AS r
+  \${ref("race_uma")} AS ru
+  LEFT JOIN \${ref("race")} AS r
   ON ru.race_code_jvd = r.race_code_jvd
+`;
+
+module.exports = {
+  columns,
+  query
+};

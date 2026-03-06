@@ -22,7 +22,7 @@ PROJECT_ID = os.environ.get("PROJECT_ID")
 DATASET_ID = os.environ.get("DATASET_ID") # 例: kolbi_analysis または kolbi_analysis_stg
 SECRET_USER = os.environ.get("SECRET_USER") # ユーザー名のシークレットリソースID
 SECRET_PASS = os.environ.get("SECRET_PASS") # パスワードのシークレットリソースID
-STATE_TABLE_NAME = "race_uma_details_export_state"
+STATE_TABLE_NAME = "race_uma_detail_bubble_export_state"
 FTP_HOST = "smartkb.mixh.jp"
 BUBBLE_API_URL = os.environ.get("BUBBLE_API_URL")
 BUBBLE_API_KEY_SECRET_ID = os.environ.get("BUBBLE_API_KEY_SECRET_ID")
@@ -55,8 +55,8 @@ def ensure_state_table(bq_client, dataset_id, table_name):
 
 
 @functions_framework.http
-def export_race_uma_details(request):
-    """更新されたレース詳細情報(race_uma_details)をFTPにエクスポートするHTTP Cloud Function"""
+def export_race_uma_detail_bubble(request):
+    """更新されたレース詳細情報(race_uma_detail_bubble)をBubbleにエクスポートするHTTP Cloud Function"""
     try:
         # 1. クライアントの初期化
         bq_client = bigquery.Client(project=PROJECT_ID)
@@ -86,7 +86,7 @@ def export_race_uma_details(request):
                             yosou_tansho_odds_float
                         ) FROM UNNEST([t]))
                     ))) as current_hash
-                FROM `{PROJECT_ID}.{DATASET_ID}.race_uma_details` t
+                FROM `{PROJECT_ID}.{DATASET_ID}.race_uma_detail_bubble` t
             ),
             State AS (
                 SELECT
@@ -115,7 +115,7 @@ def export_race_uma_details(request):
         part_num = 1
 
         # テーブルスキーマから出力用フィールドを自動取得
-        table_ref = f"{PROJECT_ID}.{DATASET_ID}.race_uma_details"
+        table_ref = f"{PROJECT_ID}.{DATASET_ID}.race_uma_detail_bubble"
         table_info = bq_client.get_table(table_ref)
         fieldnames = [field.name for field in table_info.schema]
 
@@ -136,7 +136,7 @@ def export_race_uma_details(request):
 
             c_min = min(chunk_dates)
             c_max = max(chunk_dates)
-            table_name = "race_uma_details"
+            table_name = "race_uma_detail_bubble"
             filename = f"{table_name}_{c_min}_{c_max}_part{current_part_num:03d}.csv"
 
             logger.info(f"FTPへアップロード中... ({filename}, {len(chunk)} rows)")
@@ -280,7 +280,7 @@ def export_race_uma_details(request):
                     bigquery.SchemaField("exported_at", "TIMESTAMP"),
                 ]
             )
-            temp_table_id = f"{PROJECT_ID}.{DATASET_ID}.temp_race_uma_details_state_updates"
+            temp_table_id = f"{PROJECT_ID}.{DATASET_ID}.temp_race_uma_detail_bubble_state_updates"
 
             # チャンク分割してロードすることを検討すべきだが、コード簡略化のため一括
             # JSON Lines ファイルをGCSに書いてロードするのがベストプラクティスだが、ここでは直接ロード

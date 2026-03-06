@@ -1,0 +1,16 @@
+-- =================================================================
+-- race_uma_detail_bubble.sqlx
+-- 説明: race_umaテーブルとraceテーブルを結合し、馬毎のレース詳細情報を持つテーブルを作成する。(Bubble取り込み用)
+-- =================================================================
+
+config {
+  type: "table",
+  dependencies: [ "race", "race_uma" ],
+  description: "馬毎のレース情報(race_uma)とレース自体の情報(race)を結合した詳細テーブル。(Bubble取り込み用)",
+  columns: race_uma_detail_common.columns,
+  bigquery: {
+    partitionBy: "DATE(hasso_date)"
+  }
+}
+
+${race_uma_detail_common.query}

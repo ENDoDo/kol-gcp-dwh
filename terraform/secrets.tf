@@ -24,14 +24,14 @@ resource "google_secret_manager_secret_iam_member" "ftp_user_accessor_race_uma" 
   project   = "56638639323"
   secret_id = "kol_ftp_bubble_username"
   role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.export_race_uma_details_sa.email}"
+  member    = "serviceAccount:${google_service_account.export_race_uma_detail_bubble_sa.email}"
 }
 
 resource "google_secret_manager_secret_iam_member" "ftp_pass_accessor_race_uma" {
   project   = "56638639323"
   secret_id = "kol_ftp_bubble_password"
   role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.export_race_uma_details_sa.email}"
+  member    = "serviceAccount:${google_service_account.export_race_uma_detail_bubble_sa.email}"
 }
 resource "google_secret_manager_secret_iam_member" "bubble_api_key_accessor" {
   project   = "56638639323"
@@ -44,5 +44,5 @@ resource "google_secret_manager_secret_iam_member" "bubble_api_key_accessor_race
   project   = "56638639323"
   secret_id = "kol_bubble_workflow_api_key"
   role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.export_race_uma_details_sa.email}"
+  member    = "serviceAccount:${google_service_account.export_race_uma_detail_bubble_sa.email}"
 }
