@@ -34,3 +34,8 @@ declare({
   schema: source_schema,
   name: "kol_uma_ketto"
 });
+
+declare({
+  schema: source_schema,
+  name: "kol_yosou_odds"
+});
