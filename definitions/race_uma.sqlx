@@ -1718,29 +1718,21 @@ SELECT
   SAFE_CAST(z.kakutei_chakujun AS INT64) AS kakutei_chakujun_num,
 
   SAFE_CAST(
-    CASE -- 修正ロジック (数値型)
-      WHEN z.kakutei_chakujun IN ('01') THEN
-        CASE
-          WHEN z.tansho3_umaban IS NOT NULL THEN z.tansho3_haraimodoshikin
-          WHEN z.tansho2_umaban IS NOT NULL THEN z.tansho2_haraimodoshikin
-          WHEN z.tansho1_umaban IS NOT NULL THEN z.tansho1_haraimodoshikin
-          ELSE '0'
-        END
+    CASE
+      WHEN z.umaban = z.tansho1_umaban THEN z.tansho1_haraimodoshikin
+      WHEN z.umaban = z.tansho2_umaban THEN z.tansho2_haraimodoshikin
+      WHEN z.umaban = z.tansho3_umaban THEN z.tansho3_haraimodoshikin
       ELSE '0'
     END
   AS INT64) AS tansho_haraimodoshi_num,
 
   SAFE_CAST(
-    CASE -- 修正ロジック (数値型)
-      WHEN z.kakutei_chakujun IN ('01', '02', '03') THEN
-        CASE
-          WHEN z.fukusho5_umaban IS NOT NULL THEN z.fukusho5_haraimodoshikin
-          WHEN z.fukusho4_umaban IS NOT NULL THEN z.fukusho4_haraimodoshikin
-          WHEN z.fukusho3_umaban IS NOT NULL THEN z.fukusho3_haraimodoshikin
-          WHEN z.fukusho2_umaban IS NOT NULL THEN z.fukusho2_haraimodoshikin
-          WHEN z.fukusho1_umaban IS NOT NULL THEN z.fukusho1_haraimodoshikin
-          ELSE '0'
-        END
+    CASE
+      WHEN z.umaban = z.fukusho1_umaban THEN z.fukusho1_haraimodoshikin
+      WHEN z.umaban = z.fukusho2_umaban THEN z.fukusho2_haraimodoshikin
+      WHEN z.umaban = z.fukusho3_umaban THEN z.fukusho3_haraimodoshikin
+      WHEN z.umaban = z.fukusho4_umaban THEN z.fukusho4_haraimodoshikin
+      WHEN z.umaban = z.fukusho5_umaban THEN z.fukusho5_haraimodoshikin
       ELSE '0'
     END
   AS INT64) AS fukusho_haraimodoshi_num,
