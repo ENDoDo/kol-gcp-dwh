@@ -332,7 +332,7 @@ WITH
       -- 予想オッズ抽出ロジック
       SAFE_CAST(
         NULLIF(
-          NULLIF(
+          REPLACE(
             CASE SAFE_CAST(d2.umaban AS INT64)
               WHEN 1 THEN yo.yosou_odds_tansho_1
               WHEN 2 THEN yo.yosou_odds_tansho_2
@@ -354,7 +354,7 @@ WITH
               WHEN 18 THEN yo.yosou_odds_tansho_18
               ELSE NULL
             END,
-          '*'),
+          '*', '500'),
         '-')
       AS FLOAT64) / 10.0 AS yosou_tansho_odds_float_raw,
       -- Chokyo Dynamic Selection Logic
