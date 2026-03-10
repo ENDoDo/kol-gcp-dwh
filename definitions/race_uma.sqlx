@@ -860,7 +860,10 @@ WITH
       END AS wood_1f_rank,
 
       -- Odds Logic
-      RANK() OVER (PARTITION BY race_code_kol ORDER BY yosou_tansho_odds_float_raw ASC) AS yosou_tansho_ninkijun_num,
+      CASE
+        WHEN yosou_tansho_odds_float_raw IS NOT NULL THEN RANK() OVER (PARTITION BY race_code_kol ORDER BY yosou_tansho_odds_float_raw ASC)
+        ELSE NULL
+      END AS yosou_tansho_ninkijun_num,
       yosou_tansho_odds_float_raw AS yosou_tansho_odds_float
 
     FROM with_zensou_data
@@ -1839,7 +1842,10 @@ SELECT
   z.comment_kishu_kyusha,
   z.comment_next,
   z.comment_last,
-  RANK() OVER (PARTITION BY z.race_code_kol ORDER BY z.yosou_tansho_odds_float_raw ASC) AS yosou_tansho_ninkijun_num,
+  CASE
+    WHEN z.yosou_tansho_odds_float_raw IS NOT NULL THEN RANK() OVER (PARTITION BY z.race_code_kol ORDER BY z.yosou_tansho_odds_float_raw ASC)
+    ELSE NULL
+  END AS yosou_tansho_ninkijun_num,
   z.yosou_tansho_odds_float_raw AS yosou_tansho_odds_float,
   sc.shirushi_hanro_4f_flag,
   sc.shirushi_hanro_1f_flag,
