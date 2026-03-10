@@ -258,9 +258,6 @@ config {
 
 -- CTE Step1: 全てのソーステーブルを結合し、基本的な整形を行うベーステーブルを作成
 WITH
-  races_uma_odds_kol AS (
-    SELECT * FROM ${ref("jvd_odds", "races_uma_odds_kol")}
-  ),
   base_data AS (
     SELECT
       d2.race_code_uma_kol,
@@ -334,6 +331,34 @@ WITH
       s2.corner4_ichidori,
       o1.YosouTanNinki,
       o1.YosouTanOdds,
+      -- 予想オッズ抽出ロジック
+      SAFE_CAST(
+        NULLIF(
+          NULLIF(
+            CASE SAFE_CAST(d2.umaban AS INT64)
+              WHEN 1 THEN yo.yosou_odds_tansho_1
+              WHEN 2 THEN yo.yosou_odds_tansho_2
+              WHEN 3 THEN yo.yosou_odds_tansho_3
+              WHEN 4 THEN yo.yosou_odds_tansho_4
+              WHEN 5 THEN yo.yosou_odds_tansho_5
+              WHEN 6 THEN yo.yosou_odds_tansho_6
+              WHEN 7 THEN yo.yosou_odds_tansho_7
+              WHEN 8 THEN yo.yosou_odds_tansho_8
+              WHEN 9 THEN yo.yosou_odds_tansho_9
+              WHEN 10 THEN yo.yosou_odds_tansho_10
+              WHEN 11 THEN yo.yosou_odds_tansho_11
+              WHEN 12 THEN yo.yosou_odds_tansho_12
+              WHEN 13 THEN yo.yosou_odds_tansho_13
+              WHEN 14 THEN yo.yosou_odds_tansho_14
+              WHEN 15 THEN yo.yosou_odds_tansho_15
+              WHEN 16 THEN yo.yosou_odds_tansho_16
+              WHEN 17 THEN yo.yosou_odds_tansho_17
+              WHEN 18 THEN yo.yosou_odds_tansho_18
+              ELSE NULL
+            END,
+          '*'),
+        '-')
+      AS FLOAT64) / 10.0 AS yosou_tansho_odds_float_raw,
       -- Chokyo Dynamic Selection Logic
       CASE
         WHEN d2.chokyo1_flag = '1' THEN d2.chokyo1_flag
@@ -664,9 +689,7 @@ WITH
     LEFT JOIN
       ${ref("kol_uma_ketto")} AS k ON d2.ketto_toroku_bango = k.ketto_toroku_bango_uma
     LEFT JOIN
-      ${ref("kol_com1")} AS c1 ON d2.race_code_uma_kol = c1.race_code_uma_kol
-    LEFT JOIN
-      races_uma_odds_kol AS o1 ON d2.race_code_uma_kol = o1.RaceUmaCode
+      ${ref("kol_yosou_odds")} AS yo ON SUBSTR(d2.race_code_uma_kol, 1, 16) = yo.race_code_kol
   ),
 
 -- CTE Step2: ウィンドウ関数を使い、馬ごとに1つ前のレース情報を取得
@@ -737,7 +760,9 @@ WITH
       LAG(bataiju, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS bataiju_zensou,
       LAG(kyori_kubun, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kyori_kubun_zensou,
       LAG(kyori, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kyori_zensou,
-      LAG(track_code1_dirtsiba_label, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS track_code1_label_dirtsiba_zensou
+      LAG(track_code1_dirtsiba_label, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS track_code1_label_dirtsiba_zensou,
+      -- 予想オッズに基づく人気順位の計算
+      RANK() OVER (PARTITION BY race_code_kol ORDER BY yosou_tansho_odds_float_raw ASC) AS yosou_tansho_ninkijun_num_raw
     FROM
       base_data
   ),
@@ -1816,8 +1841,8 @@ SELECT
   z.comment_kishu_kyusha,
   z.comment_next,
   z.comment_last,
-  CAST(z.YosouTanNinki AS INT64) AS yosou_tansho_ninkijun_num,
-  CAST(z.YosouTanOdds AS FLOAT64) AS yosou_tansho_odds_float,
+  z.yosou_tansho_ninkijun_num_raw AS yosou_tansho_ninkijun_num,
+  z.yosou_tansho_odds_float_raw AS yosou_tansho_odds_float,
   sc.shirushi_hanro_4f_flag,
   sc.shirushi_hanro_1f_flag,
   sc.shirushi_wood_4f_flag,
