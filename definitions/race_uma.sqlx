@@ -861,7 +861,7 @@ WITH
 
       -- Odds Logic
       CASE
-        WHEN yosou_tansho_odds_float_raw IS NOT NULL THEN RANK() OVER (PARTITION BY race_code_kol ORDER BY yosou_tansho_odds_float_raw ASC)
+        WHEN yosou_tansho_odds_float_raw IS NOT NULL THEN RANK() OVER (PARTITION BY race_code_kol, (yosou_tansho_odds_float_raw IS NOT NULL) ORDER BY yosou_tansho_odds_float_raw ASC)
         ELSE NULL
       END AS yosou_tansho_ninkijun_num,
       yosou_tansho_odds_float_raw AS yosou_tansho_odds_float
@@ -1843,7 +1843,7 @@ SELECT
   z.comment_next,
   z.comment_last,
   CASE
-    WHEN z.yosou_tansho_odds_float_raw IS NOT NULL THEN RANK() OVER (PARTITION BY z.race_code_kol ORDER BY z.yosou_tansho_odds_float_raw ASC)
+    WHEN z.yosou_tansho_odds_float_raw IS NOT NULL THEN RANK() OVER (PARTITION BY z.race_code_kol, (z.yosou_tansho_odds_float_raw IS NOT NULL) ORDER BY z.yosou_tansho_odds_float_raw ASC)
     ELSE NULL
   END AS yosou_tansho_ninkijun_num,
   z.yosou_tansho_odds_float_raw AS yosou_tansho_odds_float,
