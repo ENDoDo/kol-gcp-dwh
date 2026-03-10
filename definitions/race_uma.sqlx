@@ -860,8 +860,8 @@ WITH
       END AS wood_1f_rank,
 
       -- Odds Logic
-      CAST(YosouTanNinki AS INT64) AS yosou_tansho_ninkijun_num,
-      CAST(YosouTanOdds AS FLOAT64) AS yosou_tansho_odds_float
+      RANK() OVER (PARTITION BY race_code_kol ORDER BY yosou_tansho_odds_float_raw ASC) AS yosou_tansho_ninkijun_num,
+      yosou_tansho_odds_float_raw AS yosou_tansho_odds_float
 
     FROM with_zensou_data
   ),
