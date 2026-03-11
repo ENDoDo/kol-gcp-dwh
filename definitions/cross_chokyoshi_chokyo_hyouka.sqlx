@@ -1,0 +1,48 @@
+-- =================================================================
+-- cross_chokyoshi_chokyo_hyouka.sqlx
+-- 説明: 調教師と調教評価（脚色・矢印）の組み合わせごとに単勝・複勝払戻金合計、着順別回数を算出するテーブル。
+-- =================================================================
+
+config {
+  type: "table",
+  description: "調教師と調教評価ごとの成績集計",
+  columns: {
+    chokyoshi_code: "調教師コード",
+    chokyoshimei: "調教師名",
+    chokyo_sei_ashiiro_label: "競走成績出走馬データ 追い切り chokyo_ashiiroをもとに対応 表記揺れのないようにまとめる (例)一杯/強め/馬なり/末強め/直強め",
+    chokyo_sei_yajirushi_label: "競走成績出走馬データ 追い切り chokyo_yajirushiをもとに対応 調教評価 一変(↑)/平行(→)/下降(↓)/良化(↗)/下降気味(↘)",
+    total_tansho_haraimodoshi: "単勝払戻金合計",
+    total_fukusho_haraimodoshi: "複勝払戻金合計",
+    count_1chaku: "1着回数",
+    count_2chaku: "2着回数",
+    count_3chaku: "3着回数",
+    count_4chaku_ika: "4着以下回数",
+    count_total_races: "総レース数"
+  }
+}
+
+SELECT
+  chokyoshi_code,
+  ARRAY_AGG(chokyoshimei ORDER BY hasso_date DESC LIMIT 1)[OFFSET(0)] AS chokyoshimei,
+  chokyo_sei_ashiiro_label,
+  chokyo_sei_yajirushi_label,
+  SUM(tansho_haraimodoshi_num) AS total_tansho_haraimodoshi,
+  SUM(fukusho_haraimodoshi_num) AS total_fukusho_haraimodoshi,
+  COUNTIF(kakutei_chakujun_num = 1) AS count_1chaku,
+  COUNTIF(kakutei_chakujun_num = 2) AS count_2chaku,
+  COUNTIF(kakutei_chakujun_num = 3) AS count_3chaku,
+  COUNTIF(kakutei_chakujun_num >= 4) AS count_4chaku_ika,
+  COUNT(*) AS count_total_races
+FROM
+  ${ref("race_uma")}
+WHERE
+  chokyoshi_code IS NOT NULL
+  AND chokyo_sei_ashiiro_label IS NOT NULL
+  AND chokyo_sei_yajirushi_label IS NOT NULL
+  AND kakutei_chakujun_num >= 1
+  AND hasso_date >= DATE_TRUNC(DATE_SUB(CURRENT_DATE('Asia/Tokyo'), INTERVAL 3 YEAR), YEAR)
+  AND hasso_date < DATE_TRUNC(CURRENT_DATE('Asia/Tokyo'), YEAR)
+GROUP BY
+  chokyoshi_code,
+  chokyo_sei_ashiiro_label,
+  chokyo_sei_yajirushi_label
