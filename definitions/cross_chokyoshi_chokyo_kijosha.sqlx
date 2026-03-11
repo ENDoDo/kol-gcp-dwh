@@ -1,18 +1,17 @@
 -- =================================================================
--- cross_kijosha_chokyoshi.sqlx
+-- cross_chokyoshi_chokyo_kijosha.sqlx
 -- 説明: 調教師と調教騎乗者の組み合わせごとに単勝・複勝払戻金合計、着順別回数を算出するテーブル。
---       Looker Studioでのフィルタリング用にコース区分（芝・ダート）を含める。
 -- =================================================================
 
 config {
   type: "table",
-  description: "調教師と調教騎乗者の組み合わせごとの成績集計（コース区分別）",
+  description: "調教師と調教騎乗者の組み合わせごとの成績集計",
   columns: {
     chokyoshi_code: "調教師コード",
     chokyoshimei: "調教師名",
     chokyo_kijosha: "調教騎乗者",
     chokyo_kijosha_kubun: "調教騎乗者区分",
-    track_code1_dirtsiba_label: "トラック区分(芝/ダ)",
+    chokyo_sei_kijosha_equal_kishumei_flag: "競走成績出走馬データ 追い切り 調教騎乗騎手がレースでも騎乗 chokyo_kijoshaとkishumei_ryakushoが一致する場合は「はい」 不一致の場合は「いいえ」",
     total_tansho_haraimodoshi: "単勝払戻金合計",
     total_fukusho_haraimodoshi: "複勝払戻金合計",
     count_1chaku: "1着回数",
@@ -28,7 +27,7 @@ SELECT
   ARRAY_AGG(chokyoshimei ORDER BY hasso_date DESC LIMIT 1)[OFFSET(0)] AS chokyoshimei,
   chokyo_sei_kijosha AS chokyo_kijosha,
   chokyo_sei_kijosha_kubun AS chokyo_kijosha_kubun,
-  track_code1_dirtsiba_label,
+  chokyo_sei_kijosha_equal_kishumei_flag,
   SUM(tansho_haraimodoshi_num) AS total_tansho_haraimodoshi,
   SUM(fukusho_haraimodoshi_num) AS total_fukusho_haraimodoshi,
   COUNTIF(kakutei_chakujun_num = 1) AS count_1chaku,
@@ -48,4 +47,4 @@ GROUP BY
   chokyoshi_code,
   chokyo_sei_kijosha,
   chokyo_sei_kijosha_kubun,
-  track_code1_dirtsiba_label
+  chokyo_sei_kijosha_equal_kishumei_flag

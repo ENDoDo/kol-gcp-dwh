@@ -183,7 +183,7 @@ resource "google_dataform_repository_workflow_config" "workflow_stg" {
     included_targets {
       database = var.project_id
       schema   = var.stg_schema
-      name     = "cross_kijosha_chokyoshi"
+      name     = "cross_chokyoshi_chokyo_kijosha"
     }
     service_account = google_service_account.dataform.email
   }
@@ -278,7 +278,7 @@ resource "google_dataform_repository_workflow_config" "workflow_prd" {
     included_targets {
       database = var.project_id
       schema   = var.prd_schema
-      name     = "cross_kijosha_chokyoshi"
+      name     = "cross_chokyoshi_chokyo_kijosha"
     }
     service_account = google_service_account.dataform.email
   }
