@@ -10,6 +10,8 @@ config {
     ketto1_f_hanshoku_toroku_bango: "血統情報1 父 繁殖登録番号",
     ketto1_f_bamei: "血統情報1 父 馬名",
     chokyo_sei_basho_course_label: "競走成績出走馬データ 追い切り chokyo_bashoとchokyo_courseを文字列結合する (例)栗東坂",
+    chokyo_sei_course_kubun: "競走成績出走馬データ 追い切り chokyo_courseをもとに判定 「坂」の場合：「坂路」 / 「Ｐ」の場合：「ポリトラック」 / 「プール」の場合：「プール」 / 「坂」「Ｐ」「プール」以外の場合：「コース」",
+    chokyo_sei_basho: "競走成績出走馬データ 追い切り 調教場所 (例)栗東/美南/美北/函館/笠松/プール",
     total_tansho_haraimodoshi: "単勝払戻金合計",
     total_fukusho_haraimodoshi: "複勝払戻金合計",
     count_1chaku: "1着回数",
@@ -24,6 +26,8 @@ SELECT
   ketto1_f_hanshoku_toroku_bango,
   ARRAY_AGG(ketto1_f_bamei ORDER BY hasso_date DESC LIMIT 1)[OFFSET(0)] AS ketto1_f_bamei,
   chokyo_sei_basho_course_label,
+  chokyo_sei_course_kubun,
+  chokyo_sei_basho,
   SUM(tansho_haraimodoshi_num) AS total_tansho_haraimodoshi,
   SUM(fukusho_haraimodoshi_num) AS total_fukusho_haraimodoshi,
   COUNTIF(kakutei_chakujun_num = 1) AS count_1chaku,
@@ -41,4 +45,6 @@ WHERE
   AND hasso_date < DATE_TRUNC(CURRENT_DATE('Asia/Tokyo'), YEAR)
 GROUP BY
   ketto1_f_hanshoku_toroku_bango,
-  chokyo_sei_basho_course_label
+  chokyo_sei_basho_course_label,
+  chokyo_sei_course_kubun,
+  chokyo_sei_basho
