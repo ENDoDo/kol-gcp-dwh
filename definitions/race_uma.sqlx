@@ -170,8 +170,10 @@ config {
     chokyo_sei_check_time_4f_6f_flag: "競走成績出走馬データ  追い切り 4F/6F標準タイムクリアフラグ",
     chokyo_sei_check_time_wood_4f_5f_flag: "競走成績出走馬データ  追い切り ウッド全体好時計は「はい」該当しない場合はnull",
     chokyo_sei_check_time_wood_1f_2f_flag: "競走成績出走馬データ  追い切り ウッド終い鋭伸は「はい」該当しない場合はnull",
+    chokyo_sei_naka1week_fight_flag: "競走成績出走馬データ  追い切り 中1週勝負パターン。中1週かつKOLオッズ1～2位かつ前走馬体重460以上かつ馬齢2～4を前提として、chokyo_sei_4f_float 坂路なら52.9以下、ウッドならchokyo_sei_4f_float 50.9以下",
     chokyo_den_oikiri_check_time_wood_4f_5f_flag: "調教1～3追い切り ウッド全体好時計は「はい」該当しない場合はnull",
     chokyo_den_oikiri_check_time_wood_1f_2f_flag: "調教1～3追い切り ウッド終い鋭伸は「はい」該当しない場合はnull",
+    chokyo_den_oikiri_naka1week_fight_flag: "中1週勝負パターン。中1週かつKOLオッズ1～2位かつ前走馬体重460以上かつ馬齢2～4を前提として、chokyo_den_oikiri_4f_float 坂路なら52.9以下、ウッドなら50.9以下",
     // スピード指数・ローテーション
 
     zensou_kankaku: "前走との間隔。rotatin1～8の確定着順をもとに判定 連闘/中1周/中2週/中3週/中4週/中5週/中6週/中7週",
@@ -1849,6 +1851,64 @@ SELECT
   sc.shirushi_kubun_rank,
   sc.shirushi_shirushi_label,
   sc.shirushi_shirushi_num,
+  CASE
+    WHEN
+      CASE
+        WHEN z.rotation1 IS NOT NULL THEN '連闘'
+        WHEN z.rotation2 IS NOT NULL THEN '中1週'
+        WHEN z.rotation3 IS NOT NULL THEN '中2週'
+        WHEN z.rotation4 IS NOT NULL THEN '中3週'
+        WHEN z.rotation5 IS NOT NULL THEN '中4週'
+        WHEN z.rotation6 IS NOT NULL THEN '中5週'
+        WHEN z.rotation7 IS NOT NULL THEN '中6週'
+        WHEN z.rotation8 IS NOT NULL THEN '中7週'
+        ELSE NULL
+      END = '中1週'
+      AND (
+        CASE
+          WHEN z.yosou_tansho_odds_float_raw IS NOT NULL THEN RANK() OVER (PARTITION BY z.race_code_kol, (z.yosou_tansho_odds_float_raw IS NOT NULL) ORDER BY z.yosou_tansho_odds_float_raw ASC)
+          ELSE NULL
+        END
+      ) IN (1, 2)
+      AND SAFE_CAST(z.bataiju_zensou AS INT64) >= 460
+      AND SAFE_CAST(z.barei AS INT64) IN (2, 3, 4)
+    THEN
+      CASE
+        WHEN (z.chokyo_sei_basho = '栗東' OR z.chokyo_sei_basho = '美南') AND z.chokyo_sei_course = '坂' AND SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) <= 52.9 THEN 'はい'
+        WHEN ((z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = 'CW') OR (z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ')) AND SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) <= 50.9 THEN 'はい'
+        ELSE NULL
+      END
+    ELSE NULL
+  END AS chokyo_sei_naka1week_fight_flag,
+  CASE
+    WHEN
+      CASE
+        WHEN z.rotation1 IS NOT NULL THEN '連闘'
+        WHEN z.rotation2 IS NOT NULL THEN '中1週'
+        WHEN z.rotation3 IS NOT NULL THEN '中2週'
+        WHEN z.rotation4 IS NOT NULL THEN '中3週'
+        WHEN z.rotation5 IS NOT NULL THEN '中4週'
+        WHEN z.rotation6 IS NOT NULL THEN '中5週'
+        WHEN z.rotation7 IS NOT NULL THEN '中6週'
+        WHEN z.rotation8 IS NOT NULL THEN '中7週'
+        ELSE NULL
+      END = '中1週'
+      AND (
+        CASE
+          WHEN z.yosou_tansho_odds_float_raw IS NOT NULL THEN RANK() OVER (PARTITION BY z.race_code_kol, (z.yosou_tansho_odds_float_raw IS NOT NULL) ORDER BY z.yosou_tansho_odds_float_raw ASC)
+          ELSE NULL
+        END
+      ) IN (1, 2)
+      AND SAFE_CAST(z.bataiju_zensou AS INT64) >= 460
+      AND SAFE_CAST(z.barei AS INT64) IN (2, 3, 4)
+    THEN
+      CASE
+        WHEN (z.chokyo_den_oikiri_basho = '栗東' OR z.chokyo_den_oikiri_basho = '美南') AND z.chokyo_den_oikiri_course = '坂' AND SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) <= 52.9 THEN 'はい'
+        WHEN ((z.chokyo_den_oikiri_basho = '栗東' AND z.chokyo_den_oikiri_course = 'CW') OR (z.chokyo_den_oikiri_basho = '美南' AND z.chokyo_den_oikiri_course = 'Ｗ')) AND SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64) <= 50.9 THEN 'はい'
+        ELSE NULL
+      END
+    ELSE NULL
+  END AS chokyo_den_oikiri_naka1week_fight_flag,
   CURRENT_TIMESTAMP() AS created,
   CURRENT_TIMESTAMP() AS modified
 FROM
