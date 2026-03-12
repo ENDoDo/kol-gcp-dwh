@@ -199,10 +199,10 @@ SELECT
   kaisai_nichiji AS nichiji,
   SAFE_CAST(race_num AS INT64) AS race_bango_num,
   CASE
-    WHEN kyoso_joken_kubun_label = 'オープン' THEN
+    WHEN kyoso_joken_kubun_label = 'オープン' AND kyosomei_15moji IS NOT NULL THEN
       CONCAT(
-        COALESCE(kyosomei_15moji, ''),
-        IF(grade_code_label IS NOT NULL, CONCAT('（', grade_code_label, '）'), '')
+        kyosomei_15moji,
+        COALESCE(CONCAT('（', grade_code_label, '）'), '')
       )
     ELSE
       CONCAT(
