@@ -7,8 +7,8 @@ config {
   type: "table",
   description: "血統（父）とレースグレードごとの成績集計",
   columns: {
-    ketto1_f_hanshoku_toroku_bango: "血統情報 父 繁殖登録番号",
-    ketto1_f_bamei: "血統情報 父 馬名",
+    ketto1_f_hanshoku_toroku_bango: "血統情報1 父 繁殖登録番号",
+    ketto1_f_bamei: "血統情報1 父 馬名",
     grade_code_label: "grade_codeをもとに対応 GⅠ/GⅡ/GⅢ/JGⅠ/JGⅡ/JGⅢ",
     kyoso_joken_kubun_label: "kyoso_joken_kubunをもとに対応 新馬/未出走/未勝利/1勝クラス/2勝クラス/3勝クラス/オープン",
     total_tansho_haraimodoshi: "単勝払戻金合計",
@@ -44,3 +44,4 @@ GROUP BY
   ketto1_f_hanshoku_toroku_bango,
   grade_code_label,
   kyoso_joken_kubun_label
+
