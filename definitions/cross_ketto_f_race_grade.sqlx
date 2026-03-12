@@ -1,17 +1,16 @@
 -- =================================================================
--- cross_ketto_f_chokyo_course.sqlx
--- 説明: 血統(父)と調教コースの組み合わせごとに単勝・複勝払戻金合計、着順別回数を算出するテーブル。
+-- cross_ketto_f_race_grade.sqlx
+-- 説明: 血統（父）とレースグレードごとに単勝・複勝払戻金合計、着順別回数を算出するテーブル。
 -- =================================================================
 
 config {
   type: "table",
-  description: "血統(父)と調教コースごとの成績集計",
+  description: "血統（父）とレースグレードごとの成績集計",
   columns: {
-    ketto1_f_hanshoku_toroku_bango: "血統情報1 父 繁殖登録番号",
-    ketto1_f_bamei: "血統情報1 父 馬名",
-    chokyo_sei_basho_course_label: "競走成績出走馬データ 追い切り chokyo_bashoとchokyo_courseを文字列結合する (例)栗東坂",
-    chokyo_sei_course_kubun: "競走成績出走馬データ 追い切り chokyo_courseをもとに判定 「坂」の場合：「坂路」 / 「Ｐ」の場合：「ポリトラック」 / 「プール」の場合：「プール」 / 「坂」「Ｐ」「プール」以外の場合：「コース」",
-    chokyo_sei_basho: "競走成績出走馬データ 追い切り 調教場所 (例)栗東/美南/美北/函館/笠松/プール",
+    ketto1_f_hanshoku_toroku_bango: "血統情報 父 繁殖登録番号",
+    ketto1_f_bamei: "血統情報 父 馬名",
+    grade_code_label: "grade_codeをもとに対応 GⅠ/GⅡ/GⅢ/JGⅠ/JGⅡ/JGⅢ",
+    kyoso_joken_kubun_label: "kyoso_joken_kubunをもとに対応 新馬/未出走/未勝利/1勝クラス/2勝クラス/3勝クラス/オープン",
     total_tansho_haraimodoshi: "単勝払戻金合計",
     total_fukusho_haraimodoshi: "複勝払戻金合計",
     count_1chaku: "1着回数",
@@ -25,9 +24,8 @@ config {
 SELECT
   ketto1_f_hanshoku_toroku_bango,
   ARRAY_AGG(ketto1_f_bamei ORDER BY hasso_date DESC LIMIT 1)[OFFSET(0)] AS ketto1_f_bamei,
-  chokyo_sei_basho_course_label,
-  chokyo_sei_course_kubun,
-  chokyo_sei_basho,
+  grade_code_label,
+  kyoso_joken_kubun_label,
   SUM(tansho_haraimodoshi_num) AS total_tansho_haraimodoshi,
   SUM(fukusho_haraimodoshi_num) AS total_fukusho_haraimodoshi,
   COUNTIF(kakutei_chakujun_num = 1) AS count_1chaku,
@@ -39,12 +37,10 @@ FROM
   ${ref("race_uma_detail_looker")}
 WHERE
   ketto1_f_hanshoku_toroku_bango IS NOT NULL
-  AND chokyo_sei_basho_course_label IS NOT NULL
   AND kakutei_chakujun_num >= 1
   AND hasso_date >= DATE_TRUNC(DATE_SUB(CURRENT_DATE('Asia/Tokyo'), INTERVAL 3 YEAR), YEAR)
   AND hasso_date < DATE_TRUNC(CURRENT_DATE('Asia/Tokyo'), YEAR)
 GROUP BY
   ketto1_f_hanshoku_toroku_bango,
-  chokyo_sei_basho_course_label,
-  chokyo_sei_course_kubun,
-  chokyo_sei_basho
+  grade_code_label,
+  kyoso_joken_kubun_label
