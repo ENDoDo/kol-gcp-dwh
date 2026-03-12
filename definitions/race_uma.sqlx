@@ -824,7 +824,7 @@ WITH
       -- Hanro (Slope) Logic
       CASE
         WHEN chokyo_den_oikiri_course_kubun = '坂路' AND chokyo_den_oikiri_4f_d2 IS NOT NULL
-        THEN ROW_NUMBER() OVER (
+        THEN DENSE_RANK() OVER (
           PARTITION BY SUBSTR(race_code_uma_kol, 1, 16), IF(chokyo_den_oikiri_course_kubun = '坂路', 1, 0)
           ORDER BY SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_4f_d2, r'[^0-9.]', '') AS FLOAT64) ASC, race_code_uma_kol ASC
         )
@@ -832,7 +832,7 @@ WITH
       END AS hanro_4f_rank,
       CASE
         WHEN chokyo_den_oikiri_course_kubun = '坂路' AND chokyo_den_oikiri_1f_d2 IS NOT NULL
-        THEN ROW_NUMBER() OVER (
+        THEN DENSE_RANK() OVER (
           PARTITION BY SUBSTR(race_code_uma_kol, 1, 16), IF(chokyo_den_oikiri_course_kubun = '坂路', 1, 0)
           ORDER BY SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) ASC, race_code_uma_kol ASC
         )
@@ -843,7 +843,7 @@ WITH
       CASE
         WHEN ((chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW') OR (chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ'))
              AND chokyo_den_oikiri_4f_d2 IS NOT NULL
-        THEN ROW_NUMBER() OVER (
+        THEN DENSE_RANK() OVER (
           PARTITION BY SUBSTR(race_code_uma_kol, 1, 16),
           IF(((chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW') OR (chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ')), 1, 0)
           ORDER BY SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_4f_d2, r'[^0-9.]', '') AS FLOAT64) ASC, race_code_uma_kol ASC
@@ -853,7 +853,7 @@ WITH
       CASE
         WHEN ((chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW') OR (chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ'))
              AND chokyo_den_oikiri_1f_d2 IS NOT NULL
-        THEN ROW_NUMBER() OVER (
+        THEN DENSE_RANK() OVER (
           PARTITION BY SUBSTR(race_code_uma_kol, 1, 16),
           IF(((chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW') OR (chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ')), 1, 0)
           ORDER BY SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) ASC, race_code_uma_kol ASC
@@ -863,7 +863,7 @@ WITH
 
       -- Odds Logic
       CASE
-        WHEN yosou_tansho_odds_float_raw IS NOT NULL THEN ROW_NUMBER() OVER (PARTITION BY race_code_kol, (yosou_tansho_odds_float_raw IS NOT NULL) ORDER BY yosou_tansho_odds_float_raw ASC, race_code_uma_kol ASC)
+        WHEN yosou_tansho_odds_float_raw IS NOT NULL THEN DENSE_RANK() OVER (PARTITION BY race_code_kol, (yosou_tansho_odds_float_raw IS NOT NULL) ORDER BY yosou_tansho_odds_float_raw ASC, race_code_uma_kol ASC)
         ELSE NULL
       END AS yosou_tansho_ninkijun_num,
       yosou_tansho_odds_float_raw AS yosou_tansho_odds_float
@@ -963,7 +963,7 @@ SELECT
   SAFE_CAST(z.rating AS FLOAT64) / 10 AS rating_float,
   IF(
     SAFE_CAST(z.rating AS FLOAT64) IS NOT NULL,
-    ROW_NUMBER() OVER (
+    DENSE_RANK() OVER (
       PARTITION BY z.race_code_kol
       ORDER BY SAFE_CAST(z.rating AS FLOAT64) DESC, z.race_code_uma_kol ASC
     ),
@@ -1837,7 +1837,7 @@ SELECT
   z.comment_next,
   z.comment_last,
   CASE
-    WHEN z.yosou_tansho_odds_float_raw IS NOT NULL THEN ROW_NUMBER() OVER (PARTITION BY z.race_code_kol, (z.yosou_tansho_odds_float_raw IS NOT NULL) ORDER BY z.yosou_tansho_odds_float_raw ASC, z.race_code_uma_kol ASC)
+    WHEN z.yosou_tansho_odds_float_raw IS NOT NULL THEN DENSE_RANK() OVER (PARTITION BY z.race_code_kol, (z.yosou_tansho_odds_float_raw IS NOT NULL) ORDER BY z.yosou_tansho_odds_float_raw ASC, z.race_code_uma_kol ASC)
     ELSE NULL
   END AS yosou_tansho_ninkijun_num,
   z.yosou_tansho_odds_float_raw AS yosou_tansho_odds_float,
@@ -1866,7 +1866,7 @@ SELECT
       END = '中1週'
       AND (
         CASE
-          WHEN z.yosou_tansho_odds_float_raw IS NOT NULL THEN ROW_NUMBER() OVER (PARTITION BY z.race_code_kol, (z.yosou_tansho_odds_float_raw IS NOT NULL) ORDER BY z.yosou_tansho_odds_float_raw ASC, z.race_code_uma_kol ASC)
+          WHEN z.yosou_tansho_odds_float_raw IS NOT NULL THEN DENSE_RANK() OVER (PARTITION BY z.race_code_kol, (z.yosou_tansho_odds_float_raw IS NOT NULL) ORDER BY z.yosou_tansho_odds_float_raw ASC, z.race_code_uma_kol ASC)
           ELSE NULL
         END
       ) IN (1, 2)
@@ -1895,7 +1895,7 @@ SELECT
       END = '中1週'
       AND (
         CASE
-          WHEN z.yosou_tansho_odds_float_raw IS NOT NULL THEN ROW_NUMBER() OVER (PARTITION BY z.race_code_kol, (z.yosou_tansho_odds_float_raw IS NOT NULL) ORDER BY z.yosou_tansho_odds_float_raw ASC, z.race_code_uma_kol ASC)
+          WHEN z.yosou_tansho_odds_float_raw IS NOT NULL THEN DENSE_RANK() OVER (PARTITION BY z.race_code_kol, (z.yosou_tansho_odds_float_raw IS NOT NULL) ORDER BY z.yosou_tansho_odds_float_raw ASC, z.race_code_uma_kol ASC)
           ELSE NULL
         END
       ) IN (1, 2)
