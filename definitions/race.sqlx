@@ -34,6 +34,8 @@ config {
     bettei_barei_handicap_summary_code: "重量種別コード(別定馬齢ハンデ概要コード)",
     bettei_barei_handicap_summary_code_label: "bettei_barei_handicap_summary_codeをもとに対応 別定/馬齢/ハンデ/定量/規定(道営のみ)",
     bettei_barei_handicap_detail: "別定/馬齢/ハンデ/定量/規定（道営のみ）/牡 55 K/牝 53 K/牝2K減",
+    kyoso_joken_cut: "条件カット",
+    kyoso_joken_cut_label: "kyoso_joken_cutをもとに判定 2歳/3歳/3歳以上/4歳以上",
     kyoso_joken_age_limit: "競走種別コード2 条件年齢制限",
     kyoso_joken_age_limit_label: "kyoso_joken_age_limitをもとに対応 2歳/3歳/4歳/3,4,5歳/4,5,6歳/3歳以上/4歳以上/3,4歳/4,5歳",
     kyoso_joken_kubun: "競走条件コード1 競走条件区分",
@@ -212,6 +214,22 @@ SELECT
     ELSE NULL
   END AS bettei_barei_handicap_summary_code_label,
   d1.bettei_barei_handicap_detail,
+  d1.kyoso_joken_cut,
+  CASE d1.kyoso_joken_cut
+    WHEN '1' THEN '2歳'
+    WHEN '2' THEN '3歳'
+    WHEN '3' THEN '3歳以上'
+    WHEN '4' THEN '4歳以上'
+    WHEN '5' THEN '2歳'
+    WHEN '6' THEN '3歳'
+    WHEN '7' THEN '3歳以上'
+    WHEN '8' THEN '3歳以上'
+    WHEN '9' THEN '4歳以上'
+    WHEN 'A' THEN '4歳以上'
+    WHEN 'B' THEN '4歳'
+    WHEN 'C' THEN '4歳'
+    ELSE NULL
+  END AS kyoso_joken_cut_label,
   d1.kyoso_joken_age_limit,
   CASE d1.kyoso_joken_age_limit
     WHEN '0' THEN '2歳'
