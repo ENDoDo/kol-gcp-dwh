@@ -242,10 +242,25 @@ def export_races(request):
                             logger.info(f"Bubble APIへの通知に成功しました ({filename}): {resp_json}")
 
                             # インポート成功可否のチェック (HTTP 200 OK だが内部でエラーの場合)
-                            if resp_json and resp_json.get("response", {}).get("is_import_success") is False:
-                                error_text = resp_json.get("response", {}).get("error_text", "Unknown error")
-                                logger.error(f"Bubble Import Failed ({filename}): {error_text}")
-                                raise Exception(f"Bubble Import Failed: {error_text}")
+                            if resp_json:
+                                # キーの表記ゆれを考慮
+                                resp_data = resp_json.get("response", {})
+                                is_success = resp_data.get("is_import_success")
+                                if is_success is None:
+                                    is_success = resp_data.get("is import success")
+
+                                if is_success is False:
+                                    # エラー内容の取得
+                                    error_text = resp_data.get("error_text")
+                                    if error_text is None:
+                                        error_text = resp_data.get("error text", "Unknown error")
+
+                                    # 特例処理: 短時間重複エラーの場合は警告ログのみ
+                                    if "短時間で同じファイルの取り込みを検知したため中止" in error_text:
+                                        logger.warning(f"Bubble API Warning (Duplicate): {error_text}")
+                                    else:
+                                        logger.error(f"Bubble Import Failed ({filename}): {error_text}")
+                                        raise Exception(f"Bubble Import Failed: {error_text}")
 
                         except Exception as e:
                             logger.error(f"Bubble APIへの通知に失敗しました ({filename}): {e}")
