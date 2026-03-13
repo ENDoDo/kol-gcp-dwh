@@ -314,8 +314,8 @@ SELECT
     keibajo_code_jvd, keibajo_code_kol, created, modified, schedule_id
   )
 FROM
-  \${ref("race_uma")} AS ru
-  LEFT JOIN \${ref("race")} AS r
+  ${ref("race_uma")} AS ru
+  LEFT JOIN ${ref("race")} AS r
   ON ru.race_code_jvd = r.race_code_jvd
 `;
 
