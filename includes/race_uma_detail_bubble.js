@@ -92,7 +92,7 @@ const columns = {
     chokyo_den_oikiri_lap_8f: "追い切り 8Fラップタイム 8f-7f",
     chokyo_den_oikiri_lap_7f: "追い切り 7Fラップタイム 7f-6f",
     chokyo_den_oikiri_lap_6f: "追い切り 6Fラップタイム 6f-5f",
-    chokyo_den_oikiri_lap_5f: "追い切り 5Fラップタイム 5f-4f",
+    chokyo_den_oikiri_lap_5f: "追い切り 5Fラップタイム 4f-3f",
     chokyo_den_oikiri_lap_4f: "追い切り 4Fラップタイム 4f-3f",
     chokyo_den_oikiri_lap_3f: "追い切り 3Fラップタイム 3f-2f",
     chokyo_den_oikiri_lap_2f: "追い切り 2Fラップタイム 2f-1f",
@@ -314,8 +314,8 @@ SELECT
     keibajo_code_jvd, keibajo_code_kol, created, modified, schedule_id
   )
 FROM
-  ${ref("race_uma")} AS ru
-  LEFT JOIN ${ref("race")} AS r
+  \${ref("race_uma")} AS ru
+  LEFT JOIN \${ref("race")} AS r
   ON ru.race_code_jvd = r.race_code_jvd
 `;
 
