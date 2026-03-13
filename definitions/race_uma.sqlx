@@ -82,7 +82,7 @@ config {
     chokyo_den_oikiri_nengappi_date: "調教年月日",
     chokyo_den_oikiri_basho: "調教場所",
     chokyo_den_oikiri_course: "調教コース",
-    chokyo_den_oikiri_course_kubun: "調教コース区分",
+    chokyo_den_oikiri_course_kubun: "競走成績出走馬データ 追い切り chokyo_courseをもとに判定 「坂」の場合:「坂路」 / 「Ｐ」の場合:「ポリトラック」 / 「プール」の場合:「プール」 / 「坂」「Ｐ」「プール」以外の場合:「コース」",
     chokyo_den_oikiri_basho_course_label: "調教場所とコースを結合したラベル",
     chokyo_den_oikiri_babajotai: "調教馬場状態",
     chokyo_den_oikiri_hanro_pool_kaisu_int: "坂路またはプール:chokyo_6f それ以外:null",
@@ -128,7 +128,7 @@ config {
     chokyo_sei_nengappi_date: "競走成績出走馬データ  追い切り 調教年月日 date形式",
     chokyo_sei_basho: "競走成績出走馬データ  追い切り 調教場所 (例)栗東/美南/美北/函館/笠松/プール",
     chokyo_sei_course: "競走成績出走馬データ  追い切り 調教コース (例)A/B/C/CW/D/E/本/内/芝/ダ/障/牧/坂/W/DW/外",
-    chokyo_sei_course_kubun: "競走成績出走馬データ  追い切り 調教コース区分",
+    chokyo_sei_course_kubun: "競走成績出走馬データ 追い切り chokyo_courseをもとに判定 「坂」の場合:「坂路」 / 「Ｐ」の場合:「ポリトラック」 / 「プール」の場合:「プール」 / 「坂」「Ｐ」「プール」以外の場合:「コース」",
     chokyo_sei_basho_course_label: "競走成績出走馬データ  追い切り 調教場所とコースを結合したラベル (例)栗東坂",
     chokyo_sei_babajotai: "競走成績出走馬データ  追い切り 調教馬場状態 良/重/不/稍",
     chokyo_sei_hanro_pool_kaisu_int: "競走成績出走馬データ  追い切り 坂路またはプール:chokyo_6f それ以外:null (例)1",
@@ -705,12 +705,14 @@ WITH
       CASE
         WHEN chokyo_den_oikiri_course IS NULL AND chokyo_den_oikiri_basho IS NULL THEN NULL
         WHEN chokyo_den_oikiri_course = '坂' THEN '坂路'
+        WHEN chokyo_den_oikiri_course = 'Ｐ' THEN 'ポリトラック'
         WHEN chokyo_den_oikiri_basho = 'プール' THEN 'プール'
         ELSE 'コース'
       END AS chokyo_den_oikiri_course_kubun,
       CASE
         WHEN chokyo_sei_course IS NULL AND chokyo_sei_basho IS NULL THEN NULL
         WHEN chokyo_sei_course = '坂' THEN '坂路'
+        WHEN chokyo_sei_course = 'Ｐ' THEN 'ポリトラック'
         WHEN chokyo_sei_basho = 'プール' THEN 'プール'
         ELSE 'コース'
       END AS chokyo_sei_course_kubun,
@@ -1155,6 +1157,7 @@ SELECT
   CASE
     WHEN z.chokyo_den_oikiri_course IS NULL AND z.chokyo_den_oikiri_basho IS NULL THEN NULL
     WHEN z.chokyo_den_oikiri_course = '坂' THEN '坂路'
+    WHEN z.chokyo_den_oikiri_course = 'Ｐ' THEN 'ポリトラック'
     WHEN z.chokyo_den_oikiri_basho = 'プール' THEN 'プール'
     ELSE 'コース'
   END AS chokyo_den_oikiri_course_kubun,
@@ -1431,6 +1434,7 @@ SELECT
   CASE
     WHEN z.chokyo_sei_course IS NULL AND z.chokyo_sei_basho IS NULL THEN NULL
     WHEN z.chokyo_sei_course = '坂' THEN '坂路'
+    WHEN z.chokyo_sei_course = 'Ｐ' THEN 'ポリトラック'
     WHEN z.chokyo_sei_basho = 'プール' THEN 'プール'
     ELSE 'コース'
   END AS chokyo_sei_course_kubun,
