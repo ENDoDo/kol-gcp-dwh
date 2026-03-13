@@ -222,13 +222,27 @@ def export_races(request):
                             }
                             logger.info(f"Bubble APIへリクエストを送信します: URL={BUBBLE_API_URL}")
                             response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
-                            response.raise_for_status()
 
-                            resp_json = response.json()
+                            # エラーレスポンスでもJSONが含まれている可能性があるため、まずデコードを試みる
+                            resp_json = None
+                            try:
+                                resp_json = response.json()
+                            except Exception:
+                                pass
+
+                            if not response.ok:
+                                # HTTP 4xx/5xx の場合
+                                if resp_json and "message" in resp_json:
+                                    error_msg = f"Bubble API Error ({response.status_code}): {resp_json['message']}"
+                                    logger.error(error_msg)
+                                    raise Exception(error_msg)
+                                else:
+                                    response.raise_for_status()
+
                             logger.info(f"Bubble APIへの通知に成功しました ({filename}): {resp_json}")
 
-                            # インポート成功可否のチェック
-                            if resp_json.get("response", {}).get("is_import_success") is False:
+                            # インポート成功可否のチェック (HTTP 200 OK だが内部でエラーの場合)
+                            if resp_json and resp_json.get("response", {}).get("is_import_success") is False:
                                 error_text = resp_json.get("response", {}).get("error_text", "Unknown error")
                                 logger.error(f"Bubble Import Failed ({filename}): {error_text}")
                                 raise Exception(f"Bubble Import Failed: {error_text}")
