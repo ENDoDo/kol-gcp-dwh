@@ -12,6 +12,7 @@ config {
     chokyo_sei_lap_group: "競走成績出走馬データ 追い切り chokyo_courseが栗東坂または美南坂 書籍「調教タイムの読み方」ラップのグループ分け",
     chokyo_sei_check_time_wood_4f_5f_flag: "競走成績出走馬データ 追い切り ウッド全体好時計は「はい」 該当しない場合はnull",
     chokyo_sei_check_time_wood_1f_2f_flag: "競走成績出走馬データ 追い切り ウッド終い鋭伸は「はい」 該当しない場合はnull",
+    chokyo_sei_batsugun_flag: "競走成績出走馬データ 追い切り 調教追い切り抜群馬 該当する場合「はい」該当しない場合はnull",
     total_tansho_haraimodoshi: "単勝払戻金合計",
     total_fukusho_haraimodoshi: "複勝払戻金合計",
     count_1chaku: "1着回数",
@@ -28,6 +29,7 @@ SELECT
   chokyo_sei_lap_group,
   chokyo_sei_check_time_wood_4f_5f_flag,
   chokyo_sei_check_time_wood_1f_2f_flag,
+  chokyo_sei_batsugun_flag,
   SUM(tansho_haraimodoshi_num) AS total_tansho_haraimodoshi,
   SUM(fukusho_haraimodoshi_num) AS total_fukusho_haraimodoshi,
   COUNTIF(kakutei_chakujun_num = 1) AS count_1chaku,
@@ -46,4 +48,5 @@ GROUP BY
   ketto1_f_hanshoku_toroku_bango,
   chokyo_sei_lap_group,
   chokyo_sei_check_time_wood_4f_5f_flag,
-  chokyo_sei_check_time_wood_1f_2f_flag
+  chokyo_sei_check_time_wood_1f_2f_flag,
+  chokyo_sei_batsugun_flag
