@@ -188,6 +188,7 @@ const columns = {
     chokyo_sei_reigai: "競走成績出走馬データ  追い切り 調教例外",
     chokyo_sei_check_time_1f_flag: "競走成績出走馬データ  追い切り 1F標準タイムクリアフラグ",
     chokyo_sei_check_time_4f_6f_flag: "競走成績出走馬データ  追い切り 4F/6F標準タイムクリアフラグ",
+    chokyo_sei_naka1week_fight_flag: "競走成績出走馬データ  追い切り 中1週勝負パターン",
 
 
 
