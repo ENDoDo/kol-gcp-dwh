@@ -245,6 +245,16 @@ resource "google_dataform_repository_workflow_config" "workflow_stg" {
       schema   = var.stg_schema
       name     = "cross_ketto_f_chokyo_kijosha"
     }
+    included_targets {
+      database = var.project_id
+      schema   = var.stg_schema
+      name     = "cross_chokyoshi_other"
+    }
+    included_targets {
+      database = var.project_id
+      schema   = var.stg_schema
+      name     = "cross_ketto_f_other"
+    }
     service_account = google_service_account.dataform.email
   }
 
@@ -399,6 +409,16 @@ resource "google_dataform_repository_workflow_config" "workflow_prd" {
       database = var.project_id
       schema   = var.prd_schema
       name     = "cross_ketto_f_chokyo_kijosha"
+    }
+    included_targets {
+      database = var.project_id
+      schema   = var.prd_schema
+      name     = "cross_chokyoshi_other"
+    }
+    included_targets {
+      database = var.project_id
+      schema   = var.prd_schema
+      name     = "cross_ketto_f_other"
     }
     service_account = google_service_account.dataform.email
   }
