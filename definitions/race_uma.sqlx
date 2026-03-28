@@ -698,8 +698,8 @@ WITH
       ROW_NUMBER() OVER (PARTITION BY d2.race_code_uma_kol ORDER BY d2.race_code_uma_kol) = 1
   ),
 
--- CTE Step2: ウィンドウ関数を使い、馬ごとに1つ前のレース情報を取得
-  with_zensou_data AS (
+-- CTE Step1.5: ハロンタイムの計算 (別名定義を後続で利用可能にするため分離)
+  with_chokyo_laps AS (
     SELECT
       *,
       -- 坂路ハロンタイム算出 (den)
@@ -711,7 +711,15 @@ WITH
       SAFE_CAST(REGEXP_REPLACE(chokyo_sei_1f, r'[^0-9.]', '') AS FLOAT64) AS sei_t1,
       ROUND(SAFE_CAST(REGEXP_REPLACE(chokyo_sei_3f, r'[^0-9.]', '') AS FLOAT64) - SAFE_CAST(REGEXP_REPLACE(chokyo_sei_1f, r'[^0-9.]', '') AS FLOAT64), 1) AS sei_t2,
       ROUND(SAFE_CAST(REGEXP_REPLACE(chokyo_sei_4f, r'[^0-9.]', '') AS FLOAT64) - SAFE_CAST(REGEXP_REPLACE(chokyo_sei_3f, r'[^0-9.]', '') AS FLOAT64), 1) AS sei_t3,
-      ROUND(SAFE_CAST(REGEXP_REPLACE(chokyo_sei_5f, r'[^0-9.]', '') AS FLOAT64) - SAFE_CAST(REGEXP_REPLACE(chokyo_sei_4f, r'[^0-9.]', '') AS FLOAT64), 1) AS sei_t4,
+      ROUND(SAFE_CAST(REGEXP_REPLACE(chokyo_sei_5f, r'[^0-9.]', '') AS FLOAT64) - SAFE_CAST(REGEXP_REPLACE(chokyo_sei_4f, r'[^0-9.]', '') AS FLOAT64), 1) AS sei_t4
+    FROM
+      base_data
+  ),
+
+-- CTE Step2: ウィンドウ関数を使い、馬ごとに1つ前のレース情報を取得
+  with_zensou_data AS (
+    SELECT
+      *,
       CASE
         WHEN chokyo_den_oikiri_course IS NULL AND chokyo_den_oikiri_basho IS NULL THEN NULL
         WHEN chokyo_den_oikiri_course = '坂' THEN '坂路'
@@ -869,7 +877,7 @@ WITH
         ELSE NULL
       END AS zensou_kankaku
     FROM
-      base_data
+      with_chokyo_laps
   ),
 
   -- 【追加】馬ごとの「その日の直前のレースID」を事前に算出しておく
