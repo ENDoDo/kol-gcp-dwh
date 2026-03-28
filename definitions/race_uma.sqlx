@@ -702,6 +702,16 @@ WITH
   with_zensou_data AS (
     SELECT
       *,
+      -- 坂路ハロンタイム算出 (den)
+      SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) AS den_t1,
+      ROUND(SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_3f_d2, r'[^0-9.]', '') AS FLOAT64) - SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64), 1) AS den_t2,
+      ROUND(SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_4f_d2, r'[^0-9.]', '') AS FLOAT64) - SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_3f_d2, r'[^0-9.]', '') AS FLOAT64), 1) AS den_t3,
+      ROUND(SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_5f_d2, r'[^0-9.]', '') AS FLOAT64) - SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_4f_d2, r'[^0-9.]', '') AS FLOAT64), 1) AS den_t4,
+      -- 坂路ハロンタイム算出 (sei)
+      SAFE_CAST(REGEXP_REPLACE(chokyo_sei_1f, r'[^0-9.]', '') AS FLOAT64) AS sei_t1,
+      ROUND(SAFE_CAST(REGEXP_REPLACE(chokyo_sei_3f, r'[^0-9.]', '') AS FLOAT64) - SAFE_CAST(REGEXP_REPLACE(chokyo_sei_1f, r'[^0-9.]', '') AS FLOAT64), 1) AS sei_t2,
+      ROUND(SAFE_CAST(REGEXP_REPLACE(chokyo_sei_4f, r'[^0-9.]', '') AS FLOAT64) - SAFE_CAST(REGEXP_REPLACE(chokyo_sei_3f, r'[^0-9.]', '') AS FLOAT64), 1) AS sei_t3,
+      ROUND(SAFE_CAST(REGEXP_REPLACE(chokyo_sei_5f, r'[^0-9.]', '') AS FLOAT64) - SAFE_CAST(REGEXP_REPLACE(chokyo_sei_4f, r'[^0-9.]', '') AS FLOAT64), 1) AS sei_t4,
       CASE
         WHEN chokyo_den_oikiri_course IS NULL AND chokyo_den_oikiri_basho IS NULL THEN NULL
         WHEN chokyo_den_oikiri_course = '坂' THEN '坂路'
@@ -774,37 +784,35 @@ WITH
       CASE
         WHEN chokyo_den_oikiri_course = '坂' AND (chokyo_den_oikiri_basho LIKE '%栗東%' OR chokyo_den_oikiri_basho LIKE '%美南%') THEN
           CASE
-            WHEN ROUND(SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64), 1) = ROUND((SAFE_CAST(chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64)), 1)
-                 AND SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) < 12.0
-            THEN 'C3:終い2F1F11秒台の同タイム'
-            WHEN ROUND(SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64), 1) = ROUND((SAFE_CAST(chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64)), 1)
-                 AND SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) >= 12.0
-                 AND SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) < 12.5
-            THEN 'C2:終い2F1F12秒台前半の同タイム'
-            WHEN ROUND(SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64), 1) = ROUND((SAFE_CAST(chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64)), 1)
-                 AND SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) >= 12.5
-                 AND SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) < 13.0
-            THEN 'C1:終い2F1F12秒台後半の同タイム'
-            WHEN SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) < 12.0
-                 AND SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) < ROUND(SAFE_CAST(chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64), 9)
-            THEN 'A3:終い1F11秒台の加速ラップ'
-            WHEN ROUND(SAFE_CAST(chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64), 9) < 12.0
-                 AND SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) > ROUND(SAFE_CAST(chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64), 9)
-            THEN 'B3:2F11秒台減速ラップ'
-            WHEN (SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) >= 12.0 AND SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) < 13.0)
-                 AND (ROUND(SAFE_CAST(chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64), 9) >= 12.0 AND ROUND(SAFE_CAST(chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64), 9) < 13.0)
-                 AND SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) < ROUND(SAFE_CAST(chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64), 9)
-            THEN 'A2:終い2F各12秒台の加速ラップ'
-            WHEN (SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) >= 12.0 AND SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) < 13.0)
-                 AND (ROUND(SAFE_CAST(chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64), 9) >= 12.0 AND ROUND(SAFE_CAST(chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64), 9) < 13.0)
-                 AND SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) > ROUND(SAFE_CAST(chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64), 9)
-            THEN 'B2:終い2F各12秒台の減速ラップ'
-            WHEN (SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) >= 12.0 AND SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) < 13.0)
-                 AND ROUND(SAFE_CAST(chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64), 9) >= 13.0
-            THEN 'A1:終い1Fのみ12秒台の加速ラップ'
-            WHEN (ROUND(SAFE_CAST(chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64), 9) >= 12.0 AND ROUND(SAFE_CAST(chokyo_den_oikiri_3f_d2 AS FLOAT64) - SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64), 9) < 13.0)
-                 AND SAFE_CAST(chokyo_den_oikiri_1f_d2 AS FLOAT64) >= 13.0
-            THEN 'B1:2Fのみ12秒台の減速ラップ'
+            -- 判定条件: 道中の加速 (4F > 3F > 2F) が前提
+            WHEN den_t4 > den_t3 AND den_t3 > den_t2 THEN
+              CASE
+                -- C (同タイム): 2F = 1F
+                WHEN ROUND(den_t1, 1) = ROUND(den_t2, 1) THEN
+                  CASE
+                    WHEN den_t1 < 12.0 THEN 'C3:終い2F1F11秒台の同タイム'
+                    WHEN den_t1 >= 12.0 AND den_t1 < 12.5 THEN 'C2:終い2F1F12秒台前半の同タイム'
+                    WHEN den_t1 >= 12.5 AND den_t1 < 13.0 THEN 'C1:終い2F1F12秒台後半の同タイム'
+                    ELSE NULL
+                  END
+                -- A (加速): 2F > 1F
+                WHEN den_t1 < den_t2 THEN
+                  CASE
+                    WHEN den_t1 < 12.0 THEN 'A3:終い1F11秒台の加速ラップ'
+                    WHEN den_t1 >= 12.0 AND den_t1 < 13.0 AND den_t2 >= 12.0 AND den_t2 < 13.0 THEN 'A2:終い2F各12秒台の加速ラップ'
+                    WHEN den_t1 >= 12.0 AND den_t1 < 13.0 AND den_t2 >= 13.0 THEN 'A1:終い1Fのみ12秒台の加速ラップ'
+                    ELSE NULL
+                  END
+                -- B (減速): 2F < 1F
+                WHEN den_t1 > den_t2 THEN
+                  CASE
+                    WHEN den_t2 < 12.0 THEN 'B3:2F11秒台減速ラップ'
+                    WHEN den_t1 >= 12.0 AND den_t1 < 13.0 AND den_t2 >= 12.0 AND den_t2 < 13.0 THEN 'B2:終い2F各12秒台の減速ラップ'
+                    WHEN den_t2 >= 12.0 AND den_t2 < 13.0 AND den_t1 >= 13.0 THEN 'B1:2Fのみ12秒台の減速ラップ'
+                    ELSE NULL
+                  END
+                ELSE NULL
+              END
             ELSE NULL
           END
         ELSE NULL
@@ -814,37 +822,35 @@ WITH
       CASE
         WHEN chokyo_sei_course = '坂' AND (chokyo_sei_basho LIKE '%栗東%' OR chokyo_sei_basho LIKE '%美南%') THEN
           CASE
-            WHEN ROUND(SAFE_CAST(chokyo_sei_1f AS FLOAT64), 1) = ROUND((SAFE_CAST(chokyo_sei_3f AS FLOAT64) - SAFE_CAST(chokyo_sei_1f AS FLOAT64)), 1)
-                 AND SAFE_CAST(chokyo_sei_1f AS FLOAT64) < 12.0
-            THEN 'C3:終い2F1F11秒台の同タイム'
-            WHEN ROUND(SAFE_CAST(chokyo_sei_1f AS FLOAT64), 1) = ROUND((SAFE_CAST(chokyo_sei_3f AS FLOAT64) - SAFE_CAST(chokyo_sei_1f AS FLOAT64)), 1)
-                 AND SAFE_CAST(chokyo_sei_1f AS FLOAT64) >= 12.0
-                 AND SAFE_CAST(chokyo_sei_1f AS FLOAT64) < 12.5
-            THEN 'C2:終い2F1F12秒台前半の同タイム'
-            WHEN ROUND(SAFE_CAST(chokyo_sei_1f AS FLOAT64), 1) = ROUND((SAFE_CAST(chokyo_sei_3f AS FLOAT64) - SAFE_CAST(chokyo_sei_1f AS FLOAT64)), 1)
-                 AND SAFE_CAST(chokyo_sei_1f AS FLOAT64) >= 12.5
-                 AND SAFE_CAST(chokyo_sei_1f AS FLOAT64) < 13.0
-            THEN 'C1:終い2F1F12秒台後半の同タイム'
-            WHEN SAFE_CAST(chokyo_sei_1f AS FLOAT64) < 12.0
-                 AND SAFE_CAST(chokyo_sei_1f AS FLOAT64) < ROUND(SAFE_CAST(chokyo_sei_3f AS FLOAT64) - SAFE_CAST(chokyo_sei_1f AS FLOAT64), 9)
-            THEN 'A3:終い1F11秒台の加速ラップ'
-            WHEN ROUND(SAFE_CAST(chokyo_sei_3f AS FLOAT64) - SAFE_CAST(chokyo_sei_1f AS FLOAT64), 9) < 12.0
-                 AND SAFE_CAST(chokyo_sei_1f AS FLOAT64) > ROUND(SAFE_CAST(chokyo_sei_3f AS FLOAT64) - SAFE_CAST(chokyo_sei_1f AS FLOAT64), 9)
-            THEN 'B3:2F11秒台減速ラップ'
-            WHEN (SAFE_CAST(chokyo_sei_1f AS FLOAT64) >= 12.0 AND SAFE_CAST(chokyo_sei_1f AS FLOAT64) < 13.0)
-                 AND (ROUND(SAFE_CAST(chokyo_sei_3f AS FLOAT64) - SAFE_CAST(chokyo_sei_1f AS FLOAT64), 9) >= 12.0 AND ROUND(SAFE_CAST(chokyo_sei_3f AS FLOAT64) - SAFE_CAST(chokyo_sei_1f AS FLOAT64), 9) < 13.0)
-                 AND SAFE_CAST(chokyo_sei_1f AS FLOAT64) < ROUND(SAFE_CAST(chokyo_sei_3f AS FLOAT64) - SAFE_CAST(chokyo_sei_1f AS FLOAT64), 9)
-            THEN 'A2:終い2F各12秒台の加速ラップ'
-            WHEN (SAFE_CAST(chokyo_sei_1f AS FLOAT64) >= 12.0 AND SAFE_CAST(chokyo_sei_1f AS FLOAT64) < 13.0)
-                 AND (ROUND(SAFE_CAST(chokyo_sei_3f AS FLOAT64) - SAFE_CAST(chokyo_sei_1f AS FLOAT64), 9) >= 12.0 AND ROUND(SAFE_CAST(chokyo_sei_3f AS FLOAT64) - SAFE_CAST(chokyo_sei_1f AS FLOAT64), 9) < 13.0)
-                 AND SAFE_CAST(chokyo_sei_1f AS FLOAT64) > ROUND(SAFE_CAST(chokyo_sei_3f AS FLOAT64) - SAFE_CAST(chokyo_sei_1f AS FLOAT64), 9)
-            THEN 'B2:終い2F各12秒台の減速ラップ'
-            WHEN (SAFE_CAST(chokyo_sei_1f AS FLOAT64) >= 12.0 AND SAFE_CAST(chokyo_sei_1f AS FLOAT64) < 13.0)
-                 AND ROUND(SAFE_CAST(chokyo_sei_3f AS FLOAT64) - SAFE_CAST(chokyo_sei_1f AS FLOAT64), 9) >= 13.0
-            THEN 'A1:終い1Fのみ12秒台の加速ラップ'
-            WHEN (ROUND(SAFE_CAST(chokyo_sei_3f AS FLOAT64) - SAFE_CAST(chokyo_sei_1f AS FLOAT64), 9) >= 12.0 AND ROUND(SAFE_CAST(chokyo_sei_3f AS FLOAT64) - SAFE_CAST(chokyo_sei_1f AS FLOAT64), 9) < 13.0)
-                 AND SAFE_CAST(chokyo_sei_1f AS FLOAT64) >= 13.0
-            THEN 'B1:2Fのみ12秒台の減速ラップ'
+            -- 判定条件: 道中の加速 (4F > 3F > 2F) が前提
+            WHEN sei_t4 > sei_t3 AND sei_t3 > sei_t2 THEN
+              CASE
+                -- C (同タイム): 2F = 1F
+                WHEN ROUND(sei_t1, 1) = ROUND(sei_t2, 1) THEN
+                  CASE
+                    WHEN sei_t1 < 12.0 THEN 'C3:終い2F1F11秒台の同タイム'
+                    WHEN sei_t1 >= 12.0 AND sei_t1 < 12.5 THEN 'C2:終い2F1F12秒台前半の同タイム'
+                    WHEN sei_t1 >= 12.5 AND sei_t1 < 13.0 THEN 'C1:終い2F1F12秒台後半の同タイム'
+                    ELSE NULL
+                  END
+                -- A (加速): 2F > 1F
+                WHEN sei_t1 < sei_t2 THEN
+                  CASE
+                    WHEN sei_t1 < 12.0 THEN 'A3:終い1F11秒台の加速ラップ'
+                    WHEN sei_t1 >= 12.0 AND sei_t1 < 13.0 AND sei_t2 >= 12.0 AND sei_t2 < 13.0 THEN 'A2:終い2F各12秒台の加速ラップ'
+                    WHEN sei_t1 >= 12.0 AND sei_t1 < 13.0 AND sei_t2 >= 13.0 THEN 'A1:終い1Fのみ12秒台の加速ラップ'
+                    ELSE NULL
+                  END
+                -- B (減速): 2F < 1F
+                WHEN sei_t1 > sei_t2 THEN
+                  CASE
+                    WHEN sei_t2 < 12.0 THEN 'B3:2F11秒台減速ラップ'
+                    WHEN sei_t1 >= 12.0 AND sei_t1 < 13.0 AND sei_t2 >= 12.0 AND sei_t2 < 13.0 THEN 'B2:終い2F各12秒台の減速ラップ'
+                    WHEN sei_t2 >= 12.0 AND sei_t2 < 13.0 AND sei_t1 >= 13.0 THEN 'B1:2Fのみ12秒台の減速ラップ'
+                    ELSE NULL
+                  END
+                ELSE NULL
+              END
             ELSE NULL
           END
         ELSE NULL
