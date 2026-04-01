@@ -1810,11 +1810,11 @@ SELECT
   END AS corner4_juni_label,
   z.corner4_ichidori,
   CASE z.corner4_ichidori
-    WHEN '1' THEN '最内'
-    WHEN '2' THEN '内'
-    WHEN '3' THEN '中'
-    WHEN '4' THEN '外'
-    WHEN '5' THEN '大外'
+    WHEN '0' THEN '最内'
+    WHEN '1' THEN '内'
+    WHEN '2' THEN '中'
+    WHEN '3' THEN '外'
+    WHEN '4' THEN '大外'
     ELSE NULL
   END AS corner4_ichidori_label,
   z.comment_kishu_kyusha,
