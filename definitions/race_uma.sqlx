@@ -782,8 +782,7 @@ WITH
 
       -- 前走データの取得ロジック
       LAG(race_code_kol) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date, race_code_kol) AS text_zensou_race_code_kol,
-      LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS zensou_week_monday,
-      LAG(bataiju, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS bataiju_zensou,
+     LAG(bataiju, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS bataiju_zensou,
       LAG(kyori_kubun, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kyori_kubun_zensou,
       LAG(kyori, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kyori_zensou,
       LAG(track_code1_dirtsiba_label, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS track_code1_label_dirtsiba_zensou,
@@ -865,7 +864,7 @@ WITH
       END AS chokyo_sei_lap_group,
 
       -- 前走間隔
-      CASE DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), zensou_week_monday, WEEK)
+      CASE DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK)
         WHEN 1 THEN '連闘'
         WHEN 2 THEN '中1週'
         WHEN 3 THEN '中2週'
