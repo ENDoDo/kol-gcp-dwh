@@ -781,8 +781,8 @@ WITH
       END AS chokyo_den_oikiri_check_time_wood_1f_2f_flag,
 
       -- 前走データの取得ロジック
-      -- PARTITION BY は race_code_uma_kol (馬毎) で行う
-      LAG(race_code_kol) OVER (PARTITION BY race_code_uma_kol ORDER BY hasso_date, race_code_kol) AS text_zensou_race_code_kol,
+      LAG(race_code_kol) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date, race_code_kol) AS text_zensou_race_code_kol,
+      LAG(DATE_TRUNC(DATE(hasso_date_utc, 'Asia/Tokyo'), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS zensou_week_monday,
       LAG(bataiju, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS bataiju_zensou,
       LAG(kyori_kubun, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kyori_kubun_zensou,
       LAG(kyori, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kyori_zensou,
@@ -865,15 +865,15 @@ WITH
       END AS chokyo_sei_lap_group,
 
       -- 前走間隔
-      CASE
-        WHEN rotation1 IS NOT NULL THEN '連闘'
-        WHEN rotation2 IS NOT NULL THEN '中1週'
-        WHEN rotation3 IS NOT NULL THEN '中2週'
-        WHEN rotation4 IS NOT NULL THEN '中3週'
-        WHEN rotation5 IS NOT NULL THEN '中4週'
-        WHEN rotation6 IS NOT NULL THEN '中5週'
-        WHEN rotation7 IS NOT NULL THEN '中6週'
-        WHEN rotation8 IS NOT NULL THEN '中7週'
+      CASE DATE_DIFF(DATE_TRUNC(DATE(hasso_date_utc, 'Asia/Tokyo'), WEEK(MONDAY)), zensou_week_monday, WEEK)
+        WHEN 1 THEN '連闘'
+        WHEN 2 THEN '中1週'
+        WHEN 3 THEN '中2週'
+        WHEN 4 THEN '中3週'
+        WHEN 5 THEN '中4週'
+        WHEN 6 THEN '中5週'
+        WHEN 7 THEN '中6週'
+        WHEN 8 THEN '中7週'
         ELSE NULL
       END AS zensou_kankaku
     FROM
@@ -1837,17 +1837,7 @@ SELECT
   sc.shirushi_shirushi_num,
   CASE
     WHEN
-      CASE
-        WHEN z.rotation1 IS NOT NULL THEN '連闘'
-        WHEN z.rotation2 IS NOT NULL THEN '中1週'
-        WHEN z.rotation3 IS NOT NULL THEN '中2週'
-        WHEN z.rotation4 IS NOT NULL THEN '中3週'
-        WHEN z.rotation5 IS NOT NULL THEN '中4週'
-        WHEN z.rotation6 IS NOT NULL THEN '中5週'
-        WHEN z.rotation7 IS NOT NULL THEN '中6週'
-        WHEN z.rotation8 IS NOT NULL THEN '中7週'
-        ELSE NULL
-      END = '中1週'
+      z.zensou_kankaku = '中1週'
       AND (
         CASE
           WHEN z.yosou_tansho_odds_float_raw IS NOT NULL THEN ROW_NUMBER() OVER (PARTITION BY z.race_code_kol, (z.yosou_tansho_odds_float_raw IS NOT NULL) ORDER BY z.yosou_tansho_odds_float_raw ASC, z.race_code_uma_kol ASC)
@@ -1866,17 +1856,7 @@ SELECT
   END AS chokyo_sei_naka1week_fight_flag,
   CASE
     WHEN
-      CASE
-        WHEN z.rotation1 IS NOT NULL THEN '連闘'
-        WHEN z.rotation2 IS NOT NULL THEN '中1週'
-        WHEN z.rotation3 IS NOT NULL THEN '中2週'
-        WHEN z.rotation4 IS NOT NULL THEN '中3週'
-        WHEN z.rotation5 IS NOT NULL THEN '中4週'
-        WHEN z.rotation6 IS NOT NULL THEN '中5週'
-        WHEN z.rotation7 IS NOT NULL THEN '中6週'
-        WHEN z.rotation8 IS NOT NULL THEN '中7週'
-        ELSE NULL
-      END = '中1週'
+      z.zensou_kankaku = '中1週'
       AND (
         CASE
           WHEN z.yosou_tansho_odds_float_raw IS NOT NULL THEN ROW_NUMBER() OVER (PARTITION BY z.race_code_kol, (z.yosou_tansho_odds_float_raw IS NOT NULL) ORDER BY z.yosou_tansho_odds_float_raw ASC, z.race_code_uma_kol ASC)
