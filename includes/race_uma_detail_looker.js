@@ -5,6 +5,7 @@ const columns = {
     race_code_kol: "KOL仕様レースID",
     race_code_jvd: "JRA-VAN仕様レースID",
     schedule_id: "発走日8文字 YYYYMMDD",
+    schedule_date: "発走日0時0分 date型",
     keibajo_code_jvd: "JRA-VAN仕様競馬場コード",
     keibajo_code_kol: "KOL仕様競馬場コード",
     hasso_date: "発走日時",
