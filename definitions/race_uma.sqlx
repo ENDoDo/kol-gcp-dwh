@@ -96,6 +96,7 @@ config {
     chokyo_den_oikiri_lap_3f: "追い切り 3Fラップタイム 3f-2f",
     chokyo_den_oikiri_lap_2f: "追い切り 2Fラップタイム 2f-1f",
     chokyo_den_oikiri_lap_group: "調教ラップグループ A1-B3",
+    chokyo_den_oikiri_lap_group_zensou: "調教1～3追い切り 坂路ラップグループ 前走",
     chokyo_den_oikiri_ichidori: "調教位置取り",
     chokyo_den_oikiri_ashiiro: "調教脚色",
     chokyo_den_oikiri_ashiiro_label: "調教脚色(ラベル)",
@@ -156,6 +157,7 @@ config {
     chokyo_sei_lap_3f: "競走成績出走馬データ  追い切り 3Fラップタイム 3f-2f",
     chokyo_sei_lap_2f: "競走成績出走馬データ  追い切り 2Fラップタイム 2f-1f",
     chokyo_sei_lap_group: "競走成績出走馬データ  追い切り ラップグループ A1-B3",
+    chokyo_sei_lap_group_zensou: "前走の坂路ラップグループ",
     chokyo_sei_5f_wood_kubun: "競走成績出走馬データ  追い切り ウッドコース5Fタイム区分",
     chokyo_sei_4f_wood_kubun: "競走成績出走馬データ  追い切り ウッドコース4Fタイム区分",
     chokyo_sei_1f_wood_kubun: "競走成績出走馬データ  追い切り ウッドコース1Fタイム区分",
@@ -717,77 +719,10 @@ WITH
       base_data
   ),
 
--- CTE Step2: ウィンドウ関数を使い、馬ごとに1つ前のレース情報を取得
-  with_zensou_data AS (
+-- CTE Step1.6: ラップグループ判定
+  with_lap_groups AS (
     SELECT
       *,
-      CASE
-        WHEN chokyo_den_oikiri_course IS NULL AND chokyo_den_oikiri_basho IS NULL THEN NULL
-        WHEN chokyo_den_oikiri_course = '坂' THEN '坂路'
-        WHEN chokyo_den_oikiri_course = 'Ｐ' THEN 'ポリトラック'
-        WHEN chokyo_den_oikiri_basho = 'プール' THEN 'プール'
-        ELSE 'コース'
-      END AS chokyo_den_oikiri_course_kubun,
-      CASE
-        WHEN chokyo_sei_course IS NULL AND chokyo_sei_basho IS NULL THEN NULL
-        WHEN chokyo_sei_course = '坂' THEN '坂路'
-        WHEN chokyo_sei_course = 'Ｐ' THEN 'ポリトラック'
-        WHEN chokyo_sei_basho = 'プール' THEN 'プール'
-        ELSE 'コース'
-      END AS chokyo_sei_course_kubun,
-
-      CASE
-         WHEN chokyo_den_oikiri_kijosha IS NULL THEN NULL
-         WHEN chokyo_den_oikiri_kijosha = '調教師' THEN '調教師'
-         WHEN chokyo_den_oikiri_kijosha = '助手' THEN '助手'
-         WHEN chokyo_den_oikiri_kijosha = '見習' THEN '見習'
-         WHEN chokyo_den_oikiri_kijosha = '厩舎' THEN '見習'
-         ELSE '騎手'
-       END AS chokyo_den_oikiri_kijosha_kubun,
-
-      CASE
-        WHEN chokyo_den_oikiri_kijosha IS NOT NULL AND chokyo_den_oikiri_kijosha = kishumei_ryakusho THEN 'はい'
-        WHEN chokyo_den_oikiri_kijosha IS NOT NULL THEN 'いいえ'
-        ELSE NULL
-      END AS chokyo_den_oikiri_kijosha_equal_kishumei_flag,
-
-      CASE
-        WHEN chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = '坂' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) <= 12.4 THEN 'はい'
-        WHEN chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = '坂' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) <= 12.5 THEN 'はい'
-        WHEN chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) <= 11.6 THEN 'はい'
-        WHEN chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) <= 11.7 THEN 'はい'
-        ELSE NULL
-      END AS chokyo_den_oikiri_check_time_1f_flag,
-
-      CASE
-        WHEN chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = '坂' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_4f_d2, r'[^0-9.]', '') AS FLOAT64) <= 53.9 THEN 'はい'
-        WHEN chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = '坂' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_4f_d2, r'[^0-9.]', '') AS FLOAT64) <= 54.9 THEN 'はい'
-        WHEN chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_6f_d2, r'[^0-9.]', '') AS FLOAT64) <= 82.9 THEN 'はい'
-        WHEN chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_6f_d2, r'[^0-9.]', '') AS FLOAT64) <= 83.9 THEN 'はい'
-        ELSE NULL
-      END AS chokyo_den_oikiri_check_time_4f_6f_flag,
-
-      CASE
-        WHEN ((chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW') OR (chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ'))
-             AND (SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_5f_d2, r'[^0-9.]', '') AS FLOAT64) <= 66.9 OR SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_4f_d2, r'[^0-9.]', '') AS FLOAT64) <= 50.9)
-        THEN 'はい'
-        ELSE NULL
-      END AS chokyo_den_oikiri_check_time_wood_4f_5f_flag,
-
-      CASE
-        WHEN ((chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW') OR (chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ'))
-             AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) <= 11.5
-        THEN 'はい'
-        ELSE NULL
-      END AS chokyo_den_oikiri_check_time_wood_1f_2f_flag,
-
-      -- 前走データの取得ロジック
-      LAG(race_code_kol) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date, race_code_kol) AS text_zensou_race_code_kol,
-     LAG(bataiju, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS bataiju_zensou,
-      LAG(kyori_kubun, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kyori_kubun_zensou,
-      LAG(kyori, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kyori_zensou,
-      LAG(track_code1_dirtsiba_label, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS track_code1_label_dirtsiba_zensou,
-
       -- ラップグループ判定 (den_oikiri)
       CASE
         WHEN chokyo_den_oikiri_course = '坂' AND (chokyo_den_oikiri_basho LIKE '%栗東%' OR chokyo_den_oikiri_basho LIKE '%美南%') THEN
@@ -862,7 +797,84 @@ WITH
             ELSE NULL
           END
         ELSE NULL
-      END AS chokyo_sei_lap_group,
+      END AS chokyo_sei_lap_group
+    FROM
+      with_chokyo_laps
+  ),
+
+-- CTE Step2: ウィンドウ関数を使い、馬ごとに1つ前のレース情報を取得
+  with_zensou_data AS (
+    SELECT
+      *,
+      CASE
+        WHEN chokyo_den_oikiri_course IS NULL AND chokyo_den_oikiri_basho IS NULL THEN NULL
+        WHEN chokyo_den_oikiri_course = '坂' THEN '坂路'
+        WHEN chokyo_den_oikiri_course = 'Ｐ' THEN 'ポリトラック'
+        WHEN chokyo_den_oikiri_basho = 'プール' THEN 'プール'
+        ELSE 'コース'
+      END AS chokyo_den_oikiri_course_kubun,
+      CASE
+        WHEN chokyo_sei_course IS NULL AND chokyo_sei_basho IS NULL THEN NULL
+        WHEN chokyo_sei_course = '坂' THEN '坂路'
+        WHEN chokyo_sei_course = 'Ｐ' THEN 'ポリトラック'
+        WHEN chokyo_sei_basho = 'プール' THEN 'プール'
+        ELSE 'コース'
+      END AS chokyo_sei_course_kubun,
+
+      CASE
+         WHEN chokyo_den_oikiri_kijosha IS NULL THEN NULL
+         WHEN chokyo_den_oikiri_kijosha = '調教師' THEN '調教師'
+         WHEN chokyo_den_oikiri_kijosha = '助手' THEN '助手'
+         WHEN chokyo_den_oikiri_kijosha = '見習' THEN '見習'
+         WHEN chokyo_den_oikiri_kijosha = '厩舎' THEN '見習'
+         ELSE '騎手'
+       END AS chokyo_den_oikiri_kijosha_kubun,
+
+      CASE
+        WHEN chokyo_den_oikiri_kijosha IS NOT NULL AND chokyo_den_oikiri_kijosha = kishumei_ryakusho THEN 'はい'
+        WHEN chokyo_den_oikiri_kijosha IS NOT NULL THEN 'いいえ'
+        ELSE NULL
+      END AS chokyo_den_oikiri_kijosha_equal_kishumei_flag,
+
+      CASE
+        WHEN chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = '坂' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) <= 12.4 THEN 'はい'
+        WHEN chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = '坂' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) <= 12.5 THEN 'はい'
+        WHEN chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) <= 11.6 THEN 'はい'
+        WHEN chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) <= 11.7 THEN 'はい'
+        ELSE NULL
+      END AS chokyo_den_oikiri_check_time_1f_flag,
+
+      CASE
+        WHEN chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = '坂' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_4f_d2, r'[^0-9.]', '') AS FLOAT64) <= 53.9 THEN 'はい'
+        WHEN chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = '坂' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_4f_d2, r'[^0-9.]', '') AS FLOAT64) <= 54.9 THEN 'はい'
+        WHEN chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_6f_d2, r'[^0-9.]', '') AS FLOAT64) <= 82.9 THEN 'はい'
+        WHEN chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ' AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_6f_d2, r'[^0-9.]', '') AS FLOAT64) <= 83.9 THEN 'はい'
+        ELSE NULL
+      END AS chokyo_den_oikiri_check_time_4f_6f_flag,
+
+      CASE
+        WHEN ((chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW') OR (chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ'))
+             AND (SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_5f_d2, r'[^0-9.]', '') AS FLOAT64) <= 66.9 OR SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_4f_d2, r'[^0-9.]', '') AS FLOAT64) <= 50.9)
+        THEN 'はい'
+        ELSE NULL
+      END AS chokyo_den_oikiri_check_time_wood_4f_5f_flag,
+
+      CASE
+        WHEN ((chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW') OR (chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ'))
+             AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) <= 11.5
+        THEN 'はい'
+        ELSE NULL
+      END AS chokyo_den_oikiri_check_time_wood_1f_2f_flag,
+
+      -- 前走データの取得ロジック
+      LAG(race_code_kol) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date, race_code_kol) AS text_zensou_race_code_kol,
+     LAG(bataiju, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS bataiju_zensou,
+      LAG(kyori_kubun, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kyori_kubun_zensou,
+      LAG(kyori, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kyori_zensou,
+      LAG(track_code1_dirtsiba_label, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS track_code1_label_dirtsiba_zensou,
+
+      LAG(chokyo_den_oikiri_lap_group, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS chokyo_den_oikiri_lap_group_zensou,
+      LAG(chokyo_sei_lap_group, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS chokyo_sei_lap_group_zensou,
 
       -- 前走間隔
       CASE DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK)
@@ -877,7 +889,7 @@ WITH
         ELSE NULL
       END AS zensou_kankaku
     FROM
-      with_chokyo_laps
+      with_lap_groups
   ),
 
   -- 【追加】馬ごとの「その日の直前のレースID」を事前に算出しておく
@@ -1247,6 +1259,7 @@ SELECT
   END AS chokyo_den_oikiri_lap_2f,
 
   z.chokyo_den_oikiri_lap_group,
+  z.chokyo_den_oikiri_lap_group_zensou,
 
   CASE
     WHEN (z.chokyo_den_oikiri_basho = '栗東' AND z.chokyo_den_oikiri_course = 'CW') OR (z.chokyo_den_oikiri_basho = '美南' AND z.chokyo_den_oikiri_course = 'Ｗ') THEN
@@ -1523,6 +1536,7 @@ SELECT
   END AS chokyo_sei_lap_2f,
 
   z.chokyo_sei_lap_group,
+  z.chokyo_sei_lap_group_zensou,
 
   CASE
     WHEN z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = '坂' AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) <= 12.4 THEN 'はい'
