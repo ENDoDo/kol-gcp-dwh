@@ -181,7 +181,7 @@ config {
     chokyo_sei_batsugun_flag: "競走成績 調教追い切り抜群馬 該当する場合「はい」 該当しない場合はnull",
     // スピード指数・ローテーション
 
-    zensou_kankaku: "前走との間隔。rotatin1～8の確定着順をもとに判定 連闘/中1周/中2週/中3週/中4週/中5週/中6週/中7週",
+    zensou_kankaku: "前走との間隔。連闘～中15週以上、初出走",
     // 馬体重・前走比較
     bataiju: "馬体重(kg)",
     bataiju_kubun: "馬体重区分",
@@ -877,15 +877,24 @@ WITH
       LAG(chokyo_sei_lap_group, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS chokyo_sei_lap_group_zensou,
 
       -- 前走間隔
-      CASE DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK)
-        WHEN 1 THEN '連闘'
-        WHEN 2 THEN '中1週'
-        WHEN 3 THEN '中2週'
-        WHEN 4 THEN '中3週'
-        WHEN 5 THEN '中4週'
-        WHEN 6 THEN '中5週'
-        WHEN 7 THEN '中6週'
-        WHEN 8 THEN '中7週'
+      CASE
+        WHEN LAG(hasso_date) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) IS NULL THEN '初出走'
+        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 1 THEN '連闘'
+        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 2 THEN '中1週'
+        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 3 THEN '中2週'
+        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 4 THEN '中3週'
+        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 5 THEN '中4週'
+        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 6 THEN '中5週'
+        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 7 THEN '中6週'
+        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 8 THEN '中7週'
+        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 9 THEN '中8週'
+        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 10 THEN '中9週'
+        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 11 THEN '中10週'
+        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 12 THEN '中11週'
+        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 13 THEN '中12週'
+        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 14 THEN '中13週'
+        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 15 THEN '中14週'
+        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) >= 16 THEN '中15週以上'
         ELSE NULL
       END AS zensou_kankaku
     FROM
