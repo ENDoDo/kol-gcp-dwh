@@ -259,7 +259,7 @@ config {
     modified: "データ更新日時"
   },
   bigquery: {
-    partitionBy: "DATE(hasso_date_utc)"
+    partitionBy: "schedule_date"
   }
 }
 
