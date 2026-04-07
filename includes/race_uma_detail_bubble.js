@@ -216,6 +216,7 @@ const columns = {
     zogen_sa_num: "増減差(整数)",
 
     kakutei_chakujun_num: "確定着順(整数)",
+    kakutei_chakujun_num_zensou: "前走 確定着順 整数型",
 
     tansho_haraimodoshi_num: "単勝払戻(整数)",
 

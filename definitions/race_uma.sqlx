@@ -218,6 +218,7 @@ config {
     kakutei_tansho_odds_float: "確定 単勝 オッズ 小数点第一位まで",
 
     kakutei_chakujun_num: "確定着順(整数)",
+    kakutei_chakujun_num_zensou: "前走 確定着順 整数型",
     tansho_haraimodoshi_num: "単勝払戻(整数)",
     fukusho_haraimodoshi_num: "複勝払戻(整数)",
     ijo_kubun_code1: "異常区分コード1",
@@ -875,6 +876,7 @@ WITH
 
       LAG(chokyo_den_oikiri_lap_group, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS chokyo_den_oikiri_lap_group_zensou,
       LAG(chokyo_sei_lap_group, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS chokyo_sei_lap_group_zensou,
+      LAG(kakutei_chakujun, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kakutei_chakujun_zensou_raw,
 
       -- 前走間隔
       CASE
@@ -1726,6 +1728,7 @@ SELECT
   SAFE_CAST(z.tansho_odds AS FLOAT64) / 10 AS kakutei_tansho_odds_float,
 
   SAFE_CAST(z.kakutei_chakujun AS INT64) AS kakutei_chakujun_num,
+  SAFE_CAST(z.kakutei_chakujun_zensou_raw AS INT64) AS kakutei_chakujun_num_zensou,
 
   SAFE_CAST(
     CASE
