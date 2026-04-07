@@ -1,7 +1,9 @@
 const columns = {
     // ID / コード
     race_code_uma_kol: "KOL仕様馬毎レースID",
+    race_code_uma_kol_zensou: "前走のKOL仕様馬毎レースID",
     race_code_uma_jvd: "JRA-VAN仕様馬毎レースID",
+    race_code_uma_jvd_zensou: "前走のJRA-VAN仕様馬毎レースID",
     race_code_kol: "KOL仕様レースID",
     race_code_jvd: "JRA-VAN仕様レースID",
     schedule_id: "発走日8文字 YYYYMMDD",

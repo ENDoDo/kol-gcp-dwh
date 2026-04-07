@@ -11,7 +11,9 @@ config {
   columns: {
     // ID / コード
     race_code_uma_kol: "KOL仕様馬毎レースID",
+    race_code_uma_kol_zensou: "前走のKOL仕様馬毎レースID",
     race_code_uma_jvd: "JRA-VAN仕様馬毎レースID",
+    race_code_uma_jvd_zensou: "前走のJRA-VAN仕様馬毎レースID",
     race_code_kol: "KOL仕様レースID",
     race_code_jvd: "JRA-VAN仕様レースID",
     schedule_id: "発走日8文字 YYYYMMDD",
@@ -869,6 +871,7 @@ WITH
 
       -- 前走データの取得ロジック
       LAG(race_code_kol) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date, race_code_kol) AS text_zensou_race_code_kol,
+      LAG(race_code_uma_kol) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date, race_code_kol) AS race_code_uma_kol_zensou,
      LAG(bataiju, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS bataiju_zensou,
       LAG(kyori_kubun, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kyori_kubun_zensou,
       LAG(kyori, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kyori_zensou,
@@ -1079,7 +1082,21 @@ WITH
 SELECT
   -- ID / コード
   z.race_code_uma_kol,
+  z.race_code_uma_kol_zensou,
   z.kaisai_nengappi || z.keibajo_code_jvd_from_kol || z.kaisai_kaiji || z.kaisai_nichiji || z.race_num || z.umaban AS race_code_uma_jvd,
+  -- 前走のKOL仕様馬毎レースIDからJRA-VAN仕様馬毎レースIDへ変換
+  -- race_code_uma_kol形式: YYYYMMDD(8) + keibajo_kol(2) + kaiji(2) + nichiji(2) + race_num(2) + umaban(2) = 18桁
+  CASE
+    WHEN z.race_code_uma_kol_zensou IS NULL THEN NULL
+    ELSE
+      SUBSTR(z.race_code_uma_kol_zensou, 1, 8)
+      || CASE SUBSTR(z.race_code_uma_kol_zensou, 9, 2)
+           WHEN '08' THEN '01' WHEN '09' THEN '02' WHEN '06' THEN '03' WHEN '07' THEN '04'
+           WHEN '04' THEN '05' WHEN '05' THEN '06' WHEN '02' THEN '07' WHEN '00' THEN '08'
+           WHEN '01' THEN '09' WHEN '03' THEN '10' ELSE NULL
+         END
+      || SUBSTR(z.race_code_uma_kol_zensou, 11, 8)
+  END AS race_code_uma_jvd_zensou,
   z.race_code_kol,
   z.kaisai_nengappi || z.keibajo_code_jvd_from_kol || z.kaisai_kaiji || z.kaisai_nichiji || z.race_num AS race_code_jvd,
   z.kaisai_nengappi AS schedule_id,
