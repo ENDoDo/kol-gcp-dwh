@@ -79,8 +79,6 @@ def export_race_uma_detail_bubble(request):
                     TO_HEX(MD5(TO_JSON_STRING(
                         (SELECT AS STRUCT * EXCEPT(
                             created, modified,
-                            shirushi_hanro_4f_flag, shirushi_hanro_1f_flag, shirushi_wood_4f_flag, shirushi_wood_1f_flag,
-                            shirushi_awase_senchaku_flag, shirushi_point, shirushi_kubun_yosou_tansho_ninkijun, shirushi_kubun_rank,
                             shirushi_shirushi_label, shirushi_shirushi_num, torikeshi_tosu_num, toroku_tosu_num,
                             yosou_tansho_ninkijun_num,
                             yosou_tansho_odds_float
