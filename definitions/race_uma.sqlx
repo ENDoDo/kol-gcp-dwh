@@ -30,7 +30,6 @@ config {
     wakuban: "枠番",
     umaban: "馬番 2桁",
     umaban_num: "馬番 整数型",
-    umaban_even: "馬番が偶数",
     // 馬情報
     bamei: "馬名",
     seibetsu_code: "性別コード",
@@ -57,7 +56,6 @@ config {
     kyuyo_riyu: "休養理由",
     // 騎手
     kishumei: "騎手名",
-    kishumei_ryakusho: "騎手名略称",
     kishu_code: "騎手コード",
     kishu_tozai_shozoku_code: "騎手東西所属区分",
     kishu_tozai_shozoku_code_label: "騎手東西所属 西/東/招待",
@@ -71,13 +69,11 @@ config {
     // 調教師
     chokyoshi_code: "調教師コード",
     chokyoshimei: "調教師名",
-    chokyoshimei_ryakusho: "調教師名略称",
     chokyoshi_shozokubasho_code: "調教師所属場所コード",
     chokyoshi_shozokubasho_code_label: "調教師所属場所",
     chokyoshi_tracen_kubun: "調教師トレセン区分",
     chokyoshi_tracen_kubun_label: "調教師トレセン区分",
     // 調教 (den2由来)
-    chokyo_den_oikiri_flag: "調教フラグ",
     chokyo_den_oikiri_flag_label: "調教フラグ はい/いいえ",
     chokyo_den_oikiri_kijosha: "調教騎乗者",
     chokyo_den_oikiri_nengappi: "追い切り 調教年月日",
@@ -119,11 +115,7 @@ config {
     chokyo_den_oikiri_reigai: "調教例外",
     chokyo_den_oikiri_kijosha_kubun: "調教1～3追い切り 調教騎乗者区分",
     chokyo_den_oikiri_kijosha_equal_kishumei_flag: "調教1～3追い切り 調教騎乗騎手がレースでも騎乗フラグ",
-    chokyo_den_oikiri_check_time_1f_flag: "調教1～3追い切り 1Fの標準タイムクリア判定のフラグ",
-    chokyo_den_oikiri_check_time_4f_6f_flag: "調教1～3追い切り 4F/6Fの標準タイムクリア判定のフラグ",
     // 調教 (sei2由来)
-    chokyo_sei_flag: "競走成績出走馬データ  追い切り 調教フラグ",
-    chokyo_sei_flag_label: "競走成績出走馬データ  追い切り chokyo_flagをもとに対応 はい/いいえ",
     chokyo_sei_kijosha: "競走成績出走馬データ  追い切り 調教騎乗者",
     chokyo_sei_kijosha_kubun: "競走成績出走馬データ  追い切り 調教騎乗者区分",
     chokyo_sei_kijosha_equal_kishumei_flag: "競走成績出走馬データ  追い切り 調教騎乗騎手がレースでも騎乗フラグ",
@@ -160,19 +152,12 @@ config {
     chokyo_sei_lap_2f: "競走成績出走馬データ  追い切り 2Fラップタイム 2f-1f",
     chokyo_sei_lap_group: "競走成績出走馬データ  追い切り ラップグループ A1-B3",
     chokyo_sei_lap_group_zensou: "前走の坂路ラップグループ",
-    chokyo_sei_5f_wood_kubun: "競走成績出走馬データ  追い切り ウッドコース5Fタイム区分",
-    chokyo_sei_4f_wood_kubun: "競走成績出走馬データ  追い切り ウッドコース4Fタイム区分",
-    chokyo_sei_1f_wood_kubun: "競走成績出走馬データ  追い切り ウッドコース1Fタイム区分",
-    chokyo_sei_4f_hanro_kubun: "競走成績出走馬データ  追い切り 坂路コース4Fタイム区分",
     chokyo_sei_ichidori: "競走成績出走馬データ  追い切り 調教位置取り",
-    chokyo_sei_ichidori_label: "競走成績出走馬データ  追い切り 調教位置取り(ラベル)",
     chokyo_sei_ashiiro: "競走成績出走馬データ  追い切り 調教脚色",
     chokyo_sei_ashiiro_label: "競走成績出走馬データ  追い切り 調教脚色(ラベル)",
     chokyo_sei_yajirushi: "競走成績出走馬データ  追い切り 調教矢印",
     chokyo_sei_yajirushi_label: "競走成績出走馬データ  追い切り 調教矢印(ラベル)",
     chokyo_sei_reigai: "競走成績出走馬データ  追い切り 調教例外",
-    chokyo_sei_check_time_1f_flag: "競走成績出走馬データ  追い切り 1F標準タイムクリアフラグ",
-    chokyo_sei_check_time_4f_6f_flag: "競走成績出走馬データ  追い切り 4F/6F標準タイムクリアフラグ",
     chokyo_sei_check_time_wood_4f_5f_flag: "競走成績出走馬データ  追い切り ウッド全体好時計は「はい」該当しない場合はnull",
     chokyo_sei_check_time_wood_1f_2f_flag: "競走成績出走馬データ  追い切り ウッド終い鋭伸は「はい」該当しない場合はnull",
     chokyo_sei_naka1week_fight_flag: "競走成績出走馬データ  追い切り 中1週勝負パターン。中1週かつKOLオッズ1～2位かつ前走馬体重460以上かつ馬齢2～4を前提として、chokyo_sei_4f_float 坂路なら52.9以下、ウッドならchokyo_sei_4f_float 50.9以下",
@@ -186,15 +171,12 @@ config {
     zensou_kankaku: "前走との間隔。連闘～中15週以上、初出走",
     // 馬体重・前走比較
     bataiju: "馬体重(kg)",
-    bataiju_kubun: "馬体重区分",
     bataiju_zensou: "前走 馬体重kg",
-    bataiju_kubun_zensou: "前走 馬体重区分",
     kyori_kubun_zensou: "前走 距離区分",
     kyori_extension_flag: "距離延長フラグ",
     kyori_shortening_flag: "距離短縮フラグ",
     ensei_kansai_to_kantou_flag: "遠征 関西→関東",
     ensei_kantou_to_kansai_flag: "遠征 関東→関西",
-    ensei_flag: "遠征フラグ",
     track_code1_label_dirtsiba_zensou: "前走 ダ/芝",
     siba_to_dirt_flag: "芝→ダ替わりフラグ",
     dirt_to_siba_flag: "ダ→芝替わりフラグ",
@@ -205,14 +187,6 @@ config {
     yosou_tansho_ninkijun_num: "予想オッズ 単勝人気順",
     yosou_tansho_odds_float: "予想オッズ 小数点第一位まで",
     // 印（Shirushi）カラム
-    shirushi_hanro_4f_flag: "調教推奨印 坂路タイム 全体タイムが同レース出走馬の中でで最も速い 該当馬は「はい」それ以外はnull",
-    shirushi_hanro_1f_flag: "調教推奨印 坂路タイム 最後の1Fタイムが同レース出走馬の中で最も速い 該当馬は「はい」それ以外はnull",
-    shirushi_wood_4f_flag: "調教推奨印 ウッドタイム 4Fからのタイムが最も速い馬 該当馬は「はい」それ以外はnull",
-    shirushi_wood_1f_flag: "調教推奨印 ウッドタイム 最後の1Fタイム同レース出走馬の中でが最も速い 該当馬は「はい」それ以外はnull",
-    shirushi_awase_senchaku_flag: "調教推奨印 併せ馬 先着している馬 該当馬は「はい」それ以外はnull",
-    shirushi_point: "印ポイント",
-    shirushi_kubun_yosou_tansho_ninkijun: "予想人気順区分",
-    shirushi_kubun_rank: "人気区分内順位",
     shirushi_shirushi_label: "予想印ラベル",
     shirushi_shirushi_num: "予想印数値",
 
@@ -1151,7 +1125,6 @@ SELECT
   z.ketto5_mf_bamei,
   z.kishu_code,
   z.kishumei,
-  z.kishumei_ryakusho,
   z.kishu_tozai_shozoku_code,
   CASE z.kishu_tozai_shozoku_code
     WHEN '1' THEN '西'
@@ -1183,7 +1156,6 @@ SELECT
   END AS kishu_norikawari_kubun_label,
   z.chokyoshi_code,
   z.chokyoshimei,
-  z.chokyoshimei_ryakusho,
   z.chokyoshi_shozokubasho_code,
   CASE z.chokyoshi_shozokubasho_code
     WHEN '001' THEN '栗東'
@@ -1198,7 +1170,6 @@ SELECT
     WHEN '3' THEN '美浦北'
     ELSE NULL
   END AS chokyoshi_tracen_kubun_label,
-  z.chokyo_den_oikiri_flag,
   CASE
     WHEN z.chokyo_den_oikiri_flag = '1' THEN 'はい'
     ELSE 'いいえ'
@@ -1289,60 +1260,7 @@ SELECT
   z.chokyo_den_oikiri_lap_group,
   z.chokyo_den_oikiri_lap_group_zensou,
 
-  CASE
-    WHEN (z.chokyo_den_oikiri_basho = '栗東' AND z.chokyo_den_oikiri_course = 'CW') OR (z.chokyo_den_oikiri_basho = '美南' AND z.chokyo_den_oikiri_course = 'Ｗ') THEN
-      CASE
-        WHEN SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) >= 70.0 THEN '70.0～'
-        WHEN SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) >= 68.0 THEN '68.0～69.9'
-        WHEN SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) >= 66.0 THEN '66.0～67.9'
-        WHEN SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) >= 64.0 THEN '64.0～65.9'
-        ELSE NULL
-      END
-    ELSE NULL
-  END AS chokyo_den_oikiri_5f_wood_kubun,
-
-  CASE
-    WHEN (z.chokyo_den_oikiri_basho = '栗東' AND z.chokyo_den_oikiri_course = 'CW') OR (z.chokyo_den_oikiri_basho = '美南' AND z.chokyo_den_oikiri_course = 'Ｗ') THEN
-      CASE
-        WHEN SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64) >= 56.0 THEN '56.0～'
-        WHEN SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64) >= 54.0 THEN '54.0～55.9'
-        WHEN SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64) >= 52.0 THEN '52.0～53.9'
-        WHEN SAFE_CAST(z.chokyo_den_oikiri_4f_d2 AS FLOAT64) >= 50.0 THEN '50.0～51.9'
-        ELSE NULL
-      END
-    ELSE NULL
-  END AS chokyo_den_oikiri_4f_wood_kubun,
-
-  CASE
-    WHEN (z.chokyo_den_oikiri_basho = '栗東' AND z.chokyo_den_oikiri_course = 'CW') OR (z.chokyo_den_oikiri_basho = '美南' AND z.chokyo_den_oikiri_course = 'Ｗ') THEN
-      CASE
-        WHEN SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) >= 12.5 THEN '12.5～'
-        WHEN SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) >= 12.0 THEN '12.0～12.4'
-        WHEN SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) >= 11.5 THEN '11.5～11.9'
-        WHEN SAFE_CAST(z.chokyo_den_oikiri_1f_d2 AS FLOAT64) >= 11.0 THEN '11.0～11.4'
-        ELSE NULL
-      END
-    ELSE NULL
-  END AS chokyo_den_oikiri_1f_wood_kubun,
-
-  CASE
-    WHEN (z.chokyo_den_oikiri_basho = '栗東' OR z.chokyo_den_oikiri_basho = '美南') AND z.chokyo_den_oikiri_course = '坂' THEN
-      CASE
-        WHEN SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) >= 56.0 AND SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) <= 57.9 THEN '56.0～57.9'
-        WHEN SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) >= 54.0 AND SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) <= 55.9 THEN '54.0～55.9'
-        WHEN SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) >= 52.0 AND SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) <= 53.9 THEN '52.0～53.9'
-        WHEN SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) >= 50.0 AND SAFE_CAST(z.chokyo_den_oikiri_5f_d2 AS FLOAT64) <= 51.9 THEN '50.0～51.9'
-        ELSE NULL
-      END
-    ELSE NULL
-  END AS chokyo_den_oikiri_4f_hanro_kubun,
-
   z.chokyo_den_oikiri_ichidori,
-  CASE z.chokyo_den_oikiri_ichidori
-     WHEN '1' THEN '①' WHEN '2' THEN '②' WHEN '3' THEN '③' WHEN '4' THEN '④' WHEN '5' THEN '⑤'
-     WHEN '6' THEN '⑥' WHEN '7' THEN '⑦' WHEN '8' THEN '⑧' WHEN '9' THEN '⑨'
-     ELSE z.chokyo_den_oikiri_ichidori
-  END AS chokyo_den_oikiri_ichidori_label,
 
   z.chokyo_den_oikiri_ashiiro,
   CASE z.chokyo_den_oikiri_ashiiro
@@ -1391,8 +1309,6 @@ SELECT
   z.chokyo_den_oikiri_reigai,
   z.chokyo_den_oikiri_kijosha_kubun,
   z.chokyo_den_oikiri_kijosha_equal_kishumei_flag,
-  z.chokyo_den_oikiri_check_time_1f_flag,
-  z.chokyo_den_oikiri_check_time_4f_6f_flag,
   z.chokyo_den_oikiri_check_time_wood_4f_5f_flag,
   z.chokyo_den_oikiri_check_time_wood_1f_2f_flag,
   -- 調教1
@@ -1463,11 +1379,6 @@ SELECT
 
 
   -- 調教 (sei2由来) -------------------------------------------------------------
-  z.chokyo_sei_flag,
-  CASE
-    WHEN z.chokyo_sei_flag = '1' THEN 'はい'
-    ELSE NULL
-  END AS chokyo_sei_flag_label,
   z.chokyo_sei_kijosha,
   CASE
     WHEN z.chokyo_sei_kijosha IS NULL THEN NULL
@@ -1567,22 +1478,6 @@ SELECT
   z.chokyo_sei_lap_group_zensou,
 
   CASE
-    WHEN z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = '坂' AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) <= 12.4 THEN 'はい'
-    WHEN z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = '坂' AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) <= 12.5 THEN 'はい'
-    WHEN z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = 'CW' AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) <= 11.6 THEN 'はい'
-    WHEN z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ' AND SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) <= 11.7 THEN 'はい'
-    ELSE NULL
-  END AS chokyo_sei_check_time_1f_flag,
-
-  CASE
-    WHEN z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = '坂' AND SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) <= 53.9 THEN 'はい'
-    WHEN z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = '坂' AND SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) <= 54.9 THEN 'はい'
-    WHEN z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = 'CW' AND SAFE_CAST(z.chokyo_sei_6f AS FLOAT64) <= 82.9 THEN 'はい'
-    WHEN z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ' AND SAFE_CAST(z.chokyo_sei_6f AS FLOAT64) <= 83.9 THEN 'はい'
-    ELSE NULL
-  END AS chokyo_sei_check_time_4f_6f_flag,
-
-  CASE
     WHEN ((z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = 'CW') OR (z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ'))
          AND (SAFE_CAST(REGEXP_REPLACE(z.chokyo_sei_5f, r'[^0-9.]', '') AS FLOAT64) <= 66.9 OR SAFE_CAST(REGEXP_REPLACE(z.chokyo_sei_4f, r'[^0-9.]', '') AS FLOAT64) <= 50.9)
     THEN 'はい'
@@ -1596,60 +1491,7 @@ SELECT
     ELSE NULL
   END AS chokyo_sei_check_time_wood_1f_2f_flag,
 
-  CASE
-    WHEN (z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = 'CW') OR (z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ') THEN
-      CASE
-        WHEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) >= 70.0 THEN '70.0～'
-        WHEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) >= 68.0 THEN '68.0～69.9'
-        WHEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) >= 66.0 THEN '66.0～67.9'
-        WHEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) >= 64.0 THEN '64.0～65.9'
-        ELSE NULL
-      END
-    ELSE NULL
-  END AS chokyo_sei_5f_wood_kubun,
-
-  CASE
-    WHEN (z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = 'CW') OR (z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ') THEN
-      CASE
-        WHEN SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) >= 56.0 THEN '56.0～'
-        WHEN SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) >= 54.0 THEN '54.0～55.9'
-        WHEN SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) >= 52.0 THEN '52.0～53.9'
-        WHEN SAFE_CAST(z.chokyo_sei_4f AS FLOAT64) >= 50.0 THEN '50.0～51.9'
-        ELSE NULL
-      END
-    ELSE NULL
-  END AS chokyo_sei_4f_wood_kubun,
-
-  CASE
-    WHEN (z.chokyo_sei_basho = '栗東' AND z.chokyo_sei_course = 'CW') OR (z.chokyo_sei_basho = '美南' AND z.chokyo_sei_course = 'Ｗ') THEN
-      CASE
-        WHEN SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 12.5 THEN '12.5～'
-        WHEN SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 12.0 THEN '12.0～12.4'
-        WHEN SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 11.5 THEN '11.5～11.9'
-        WHEN SAFE_CAST(z.chokyo_sei_1f AS FLOAT64) >= 11.0 THEN '11.0～11.4'
-        ELSE NULL
-      END
-    ELSE NULL
-  END AS chokyo_sei_1f_wood_kubun,
-
-  CASE
-    WHEN (z.chokyo_sei_basho = '栗東' OR z.chokyo_sei_basho = '美南') AND z.chokyo_sei_course = '坂' THEN
-      CASE
-        WHEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) >= 56.0 AND SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) <= 57.9 THEN '56.0～57.9'
-        WHEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) >= 54.0 AND SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) <= 55.9 THEN '54.0～55.9'
-        WHEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) >= 52.0 AND SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) <= 53.9 THEN '52.0～53.9'
-        WHEN SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) >= 50.0 AND SAFE_CAST(z.chokyo_sei_5f AS FLOAT64) <= 51.9 THEN '50.0～51.9'
-        ELSE NULL
-      END
-    ELSE NULL
-  END AS chokyo_sei_4f_hanro_kubun,
-
   z.chokyo_sei_ichidori,
-  CASE z.chokyo_sei_ichidori
-     WHEN '1' THEN '①' WHEN '2' THEN '②' WHEN '3' THEN '③' WHEN '4' THEN '④' WHEN '5' THEN '⑤'
-     WHEN '6' THEN '⑥' WHEN '7' THEN '⑦' WHEN '8' THEN '⑧' WHEN '9' THEN '⑨'
-     ELSE z.chokyo_sei_ichidori
-  END AS chokyo_sei_ichidori_label,
 
   z.chokyo_sei_ashiiro,
   CASE z.chokyo_sei_ashiiro
@@ -1678,27 +1520,7 @@ SELECT
     ELSE '中'
   END AS waku_kubun,
   z.bataiju,
-  CASE
-    WHEN SAFE_CAST(z.bataiju AS INT64) >= 500 THEN '500kg以上'
-    WHEN SAFE_CAST(z.bataiju AS INT64) BETWEEN 480 AND 499 THEN '480～499kg'
-    WHEN SAFE_CAST(z.bataiju AS INT64) BETWEEN 460 AND 479 THEN '460～479kg'
-    WHEN SAFE_CAST(z.bataiju AS INT64) BETWEEN 440 AND 459 THEN '440～459kg'
-    WHEN SAFE_CAST(z.bataiju AS INT64) < 440 THEN '439kg以下'
-    ELSE NULL
-  END AS bataiju_kubun,
   z.bataiju_zensou,
-  CASE
-    WHEN SAFE_CAST(z.bataiju_zensou AS INT64) >= 500 THEN '500kg以上'
-    WHEN SAFE_CAST(z.bataiju_zensou AS INT64) BETWEEN 480 AND 499 THEN '480～499kg'
-    WHEN SAFE_CAST(z.bataiju_zensou AS INT64) BETWEEN 460 AND 479 THEN '460～479kg'
-    WHEN SAFE_CAST(z.bataiju_zensou AS INT64) BETWEEN 440 AND 459 THEN '440～459kg'
-    WHEN SAFE_CAST(z.bataiju_zensou AS INT64) < 440 THEN '439kg以下'
-    ELSE NULL
-  END AS bataiju_kubun_zensou,
-  CASE
-    WHEN MOD(SAFE_CAST(z.umaban AS INT64), 2) = 0 THEN 'はい'
-    ELSE 'いいえ'
-  END AS umaban_even,
   z.kyori_kubun_zensou,
   CASE
     WHEN z.kyori > z.kyori_zensou THEN 'はい'
@@ -1716,13 +1538,6 @@ SELECT
     WHEN z.chokyoshi_tracen_kubun IN ('2', '3') AND z.keibajo_code IN ('00', '01', '03', '02') THEN 'はい'
     ELSE 'いいえ'
   END AS ensei_kantou_to_kansai_flag,
-  CASE
-    WHEN
-      (z.chokyoshi_tracen_kubun = '1' AND z.keibajo_code IN ('04', '05', '07', '06'))
-      OR (z.chokyoshi_tracen_kubun IN ('2', '3') AND z.keibajo_code IN ('00', '01', '03', '02'))
-    THEN 'はい'
-    ELSE 'いいえ'
-  END AS ensei_flag,
   z.track_code1_label_dirtsiba_zensou,
   CASE
     WHEN z.track_code1_label_dirtsiba_zensou = '芝' AND z.track_code1_dirtsiba_label = 'ダ' THEN 'はい'
@@ -1869,14 +1684,6 @@ SELECT
     ELSE NULL
   END AS yosou_tansho_ninkijun_num,
   z.yosou_tansho_odds_float_raw AS yosou_tansho_odds_float,
-  sc.shirushi_hanro_4f_flag,
-  sc.shirushi_hanro_1f_flag,
-  sc.shirushi_wood_4f_flag,
-  sc.shirushi_wood_1f_flag,
-  sc.shirushi_awase_senchaku_flag,
-  sc.shirushi_point,
-  sc.shirushi_kubun_yosou_tansho_ninkijun,
-  sc.shirushi_kubun_rank,
   sc.shirushi_shirushi_label,
   sc.shirushi_shirushi_num,
   CASE
