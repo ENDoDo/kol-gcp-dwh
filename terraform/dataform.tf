@@ -175,11 +175,6 @@ resource "google_dataform_repository_workflow_config" "workflow_stg" {
       schema   = var.stg_schema
       name     = "race_hit"
     }
-    included_targets {
-      database = var.project_id
-      schema   = var.stg_schema
-      name     = "cross_chokyoshi_chokyo_time"
-    }
     service_account = google_service_account.dataform.email
   }
 
@@ -264,11 +259,6 @@ resource "google_dataform_repository_workflow_config" "workflow_prd" {
       database = var.project_id
       schema   = var.prd_schema
       name     = "race_hit"
-    }
-    included_targets {
-      database = var.project_id
-      schema   = var.prd_schema
-      name     = "cross_chokyoshi_chokyo_time"
     }
     service_account = google_service_account.dataform.email
   }
