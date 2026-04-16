@@ -74,7 +74,6 @@ config {
     chokyoshi_tracen_kubun: "調教師トレセン区分",
     chokyoshi_tracen_kubun_label: "調教師トレセン区分",
     // 調教 (den2由来)
-    chokyo_den_oikiri_flag_label: "調教フラグ はい/いいえ",
     chokyo_den_oikiri_kijosha: "調教騎乗者",
     chokyo_den_oikiri_nengappi: "追い切り 調教年月日",
     chokyo_den_oikiri_nengappi_label: "調教1～3追い切り 調教年月日 文字列 y年m月d日(曜日)",
@@ -1170,10 +1169,6 @@ SELECT
     WHEN '3' THEN '美浦北'
     ELSE NULL
   END AS chokyoshi_tracen_kubun_label,
-  CASE
-    WHEN z.chokyo_den_oikiri_flag = '1' THEN 'はい'
-    ELSE 'いいえ'
-  END AS chokyo_den_oikiri_flag_label,
   z.chokyo_den_oikiri_kijosha,
   z.chokyo_den_oikiri_nengappi,
   FORMAT_DATE('%Y年%m月%d日', SAFE.PARSE_DATE('%Y%m%d', z.chokyo_den_oikiri_nengappi)) || '(' || CASE EXTRACT(DAYOFWEEK FROM SAFE.PARSE_DATE('%Y%m%d', z.chokyo_den_oikiri_nengappi)) WHEN 1 THEN '日' WHEN 2 THEN '月' WHEN 3 THEN '火' WHEN 4 THEN '水' WHEN 5 THEN '木' WHEN 6 THEN '金' WHEN 7 THEN '土' END || ')' AS chokyo_den_oikiri_nengappi_label,

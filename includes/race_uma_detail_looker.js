@@ -64,7 +64,6 @@ const columns = {
     chokyoshi_tracen_kubun: "調教師トレセン区分",
     chokyoshi_tracen_kubun_label: "調教師トレセン区分",
     // 調教 (den2/sei2由来)
-    chokyo_den_oikiri_flag_label: "調教フラグ はい/いいえ",
     chokyo_den_oikiri_kijosha: "調教騎乗者",
     chokyo_den_oikiri_nengappi_date: "調教年月日",
     chokyo_den_oikiri_nengappi_label: "調教1～3追い切り 調教年月日 文字列 y年m月d日(曜日)",
