@@ -172,6 +172,17 @@ config {
     bataiju: "馬体重(kg)",
     bataiju_zensou: "前走 馬体重kg",
     kyori_kubun_zensou: "前走 距離区分",
+    kyori_zensou: "距離 前走",
+    kishu_code_zensou: "騎手コード 前走",
+    kishumei_zensou: "騎手名 前走",
+    chokyo_sei_check_time_wood_4f_5f_flag_zensou: "ウッド全体好時計判定 前走",
+    chokyo_sei_check_time_wood_1f_2f_flag_zensou: "ウッド終い鋭伸判定 前走",
+    chokyo_den_oikiri_check_time_wood_4f_5f_flag_zensou: "調教1～3追い切り ウッド全体好時計は「はい」 前走",
+    chokyo_den_oikiri_check_time_wood_1f_2f_flag_zensou: "調教1～3追い切り ウッド終い鋭伸は「はい」 前走",
+    kakutei_tansho_ninkijun_num_zensou: "単勝 人気順 前走",
+    corner3_juni_label_zensou: "3角順位 前走",
+    corner4_juni_label_zensou: "4角順位 前走",
+    corner4_ichidori_label_zensou: "4角位置取り 前走",
     kyori_extension_flag: "距離延長フラグ",
     kyori_shortening_flag: "距離短縮フラグ",
     ensei_kansai_to_kantou_flag: "遠征 関西→関東",
@@ -864,6 +875,77 @@ WITH
       LAG(chokyo_den_oikiri_lap_group, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS chokyo_den_oikiri_lap_group_zensou,
       LAG(chokyo_sei_lap_group, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS chokyo_sei_lap_group_zensou,
       LAG(kakutei_chakujun, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kakutei_chakujun_zensou_raw,
+
+      LAG(kishu_code, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kishu_code_zensou,
+      LAG(kishumei, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kishumei_zensou,
+
+      LAG(
+        CASE
+          WHEN ((chokyo_sei_basho = '栗東' AND chokyo_sei_course = 'CW') OR (chokyo_sei_basho = '美南' AND chokyo_sei_course = 'Ｗ'))
+               AND (SAFE_CAST(REGEXP_REPLACE(chokyo_sei_5f, r'[^0-9.]', '') AS FLOAT64) <= 66.9 OR SAFE_CAST(REGEXP_REPLACE(chokyo_sei_4f, r'[^0-9.]', '') AS FLOAT64) <= 50.9)
+          THEN 'はい'
+          ELSE NULL
+        END, 1
+      ) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS chokyo_sei_check_time_wood_4f_5f_flag_zensou,
+
+      LAG(
+        CASE
+          WHEN ((chokyo_sei_basho = '栗東' AND chokyo_sei_course = 'CW') OR (chokyo_sei_basho = '美南' AND chokyo_sei_course = 'Ｗ'))
+               AND SAFE_CAST(REGEXP_REPLACE(chokyo_sei_1f, r'[^0-9.]', '') AS FLOAT64) <= 11.5
+          THEN 'はい'
+          ELSE NULL
+        END, 1
+      ) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS chokyo_sei_check_time_wood_1f_2f_flag_zensou,
+
+      LAG(
+        CASE
+          WHEN ((chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW') OR (chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ'))
+               AND (SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_5f_d2, r'[^0-9.]', '') AS FLOAT64) <= 66.9 OR SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_4f_d2, r'[^0-9.]', '') AS FLOAT64) <= 50.9)
+          THEN 'はい'
+          ELSE NULL
+        END, 1
+      ) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS chokyo_den_oikiri_check_time_wood_4f_5f_flag_zensou,
+
+      LAG(
+        CASE
+          WHEN ((chokyo_den_oikiri_basho = '栗東' AND chokyo_den_oikiri_course = 'CW') OR (chokyo_den_oikiri_basho = '美南' AND chokyo_den_oikiri_course = 'Ｗ'))
+               AND SAFE_CAST(REGEXP_REPLACE(chokyo_den_oikiri_1f_d2, r'[^0-9.]', '') AS FLOAT64) <= 11.5
+          THEN 'はい'
+          ELSE NULL
+        END, 1
+      ) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS chokyo_den_oikiri_check_time_wood_1f_2f_flag_zensou,
+
+      LAG(
+        CASE
+          WHEN tansho_ninkijun IN ('34', '35') THEN 0
+          ELSE SAFE_CAST(tansho_ninkijun AS INT64)
+        END, 1
+      ) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kakutei_tansho_ninkijun_num_zensou,
+
+      LAG(
+        CASE
+          WHEN SAFE_CAST(corner3_juni AS INT64) IS NULL THEN corner3_juni
+          ELSE LPAD(corner3_juni, 2, '0')
+        END, 1
+      ) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS corner3_juni_label_zensou,
+
+      LAG(
+        CASE
+          WHEN SAFE_CAST(corner4_juni AS INT64) IS NULL THEN corner4_juni
+          ELSE LPAD(corner4_juni, 2, '0')
+        END, 1
+      ) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS corner4_juni_label_zensou,
+
+      LAG(
+        CASE corner4_ichidori
+          WHEN '0' THEN '最内'
+          WHEN '1' THEN '内'
+          WHEN '2' THEN '中'
+          WHEN '3' THEN '外'
+          WHEN '4' THEN '大外'
+          ELSE NULL
+        END, 1
+      ) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS corner4_ichidori_label_zensou,
 
       -- 前走間隔
       CASE
@@ -1745,6 +1827,17 @@ SELECT
     WHEN '4' THEN '大外'
     ELSE NULL
   END AS corner4_ichidori_label,
+  z.kishu_code_zensou,
+  z.kishumei_zensou,
+  z.chokyo_sei_check_time_wood_4f_5f_flag_zensou,
+  z.chokyo_sei_check_time_wood_1f_2f_flag_zensou,
+  z.chokyo_den_oikiri_check_time_wood_4f_5f_flag_zensou,
+  z.chokyo_den_oikiri_check_time_wood_1f_2f_flag_zensou,
+  z.kyori_zensou,
+  z.kakutei_tansho_ninkijun_num_zensou,
+  z.corner3_juni_label_zensou,
+  z.corner4_juni_label_zensou,
+  z.corner4_ichidori_label_zensou,
   z.comment_kishu_kyusha,
   z.comment_next,
   z.comment_last,
