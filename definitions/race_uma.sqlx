@@ -1782,14 +1782,14 @@ SELECT
   z.tenkai_position,
   CASE 
     WHEN z.tenkai_kyakushitsu_kubun IS NOT NULL AND z.tenkai_position IS NOT NULL
-         AND COUNT(z.umaban) OVER (PARTITION BY z.race_code_jvd, z.tenkai_kyakushitsu_kubun, z.tenkai_position) > 1 
+         AND COUNT(z.umaban) OVER (PARTITION BY z.race_code_kol, z.tenkai_kyakushitsu_kubun, z.tenkai_position) > 1 
     THEN 'はい' 
     ELSE NULL 
   END AS tenkai_ittai_flag,
   CASE 
     WHEN z.tenkai_kyakushitsu_kubun IS NOT NULL AND z.tenkai_position IS NOT NULL THEN
       DENSE_RANK() OVER (
-        PARTITION BY z.race_code_jvd 
+        PARTITION BY z.race_code_kol 
         ORDER BY 
           CASE z.tenkai_kyakushitsu_kubun 
             WHEN '逃げ' THEN 1 
