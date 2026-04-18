@@ -230,6 +230,13 @@ config {
     comment_kishu_kyusha: "騎手厩舎コメント",
     comment_next: "次走へのメモ",
     comment_last: "前回出走時のコメント",
+    
+    // 展開予想
+    tenkai_kyakushitsu_kubun: "展開予想 脚質 逃げ/先行/差し/追い込み",
+    tenkai_position: "展開予想 脚質内の順番。一団時は全員同値 1～4",
+    tenkai_ittai_flag: "展開予想 一団フラグ。該当する場合「はい」該当しない場合はnull",
+    tenkai_order: "展開予想 全体通し順位。一団時は同値になる。1～28",
+    
     // タイムスタンプ
     created: "データ作成日時",
     modified: "データ更新日時"
@@ -656,6 +663,10 @@ WITH
       s1.fukusho4_haraimodoshikin,
       s1.fukusho5_umaban,
       s1.fukusho5_haraimodoshikin,
+      d1.tenkai_nige_1_1, d1.tenkai_nige_1_2, d1.tenkai_nige_1_3, d1.tenkai_nige_1_4,
+      d1.tenkai_senkou_2_1, d1.tenkai_senkou_2_2, d1.tenkai_senkou_2_3, d1.tenkai_senkou_2_4,
+      d1.tenkai_sashi_3_1, d1.tenkai_sashi_3_2, d1.tenkai_sashi_3_3, d1.tenkai_sashi_3_4,
+      d1.tenkai_oikomi_4_1, d1.tenkai_oikomi_4_2, d1.tenkai_oikomi_4_3, d1.tenkai_oikomi_4_4,
       c1.comment_kishu_kyusha,
       c1.comment_next,
       c1.comment_last
@@ -1049,6 +1060,38 @@ WITH
         ELSE NULL
       END AS shirushi_shirushi_num
     FROM shirushi_calc
+  ),
+
+  with_tenkai_data AS (
+    SELECT
+      *,
+      CASE
+        WHEN umaban = TRIM(tenkai_nige_1_1) THEN '逃げ'
+        WHEN umaban = TRIM(tenkai_nige_1_2) THEN '逃げ'
+        WHEN umaban = TRIM(tenkai_nige_1_3) THEN '逃げ'
+        WHEN umaban = TRIM(tenkai_nige_1_4) THEN '逃げ'
+        WHEN umaban = TRIM(tenkai_senkou_2_1) THEN '先行'
+        WHEN umaban = TRIM(tenkai_senkou_2_2) THEN '先行'
+        WHEN umaban = TRIM(tenkai_senkou_2_3) THEN '先行'
+        WHEN umaban = TRIM(tenkai_senkou_2_4) THEN '先行'
+        WHEN umaban = TRIM(tenkai_sashi_3_1) THEN '差し'
+        WHEN umaban = TRIM(tenkai_sashi_3_2) THEN '差し'
+        WHEN umaban = TRIM(tenkai_sashi_3_3) THEN '差し'
+        WHEN umaban = TRIM(tenkai_sashi_3_4) THEN '差し'
+        WHEN umaban = TRIM(tenkai_oikomi_4_1) THEN '追い込み'
+        WHEN umaban = TRIM(tenkai_oikomi_4_2) THEN '追い込み'
+        WHEN umaban = TRIM(tenkai_oikomi_4_3) THEN '追い込み'
+        WHEN umaban = TRIM(tenkai_oikomi_4_4) THEN '追い込み'
+        ELSE NULL
+      END AS tenkai_kyakushitsu_kubun,
+      CASE
+        WHEN umaban IN (TRIM(tenkai_nige_1_1), TRIM(tenkai_senkou_2_1), TRIM(tenkai_sashi_3_1), TRIM(tenkai_oikomi_4_1)) THEN 1
+        WHEN umaban IN (TRIM(tenkai_nige_1_2), TRIM(tenkai_senkou_2_2), TRIM(tenkai_sashi_3_2), TRIM(tenkai_oikomi_4_2)) THEN 2
+        WHEN umaban IN (TRIM(tenkai_nige_1_3), TRIM(tenkai_senkou_2_3), TRIM(tenkai_sashi_3_3), TRIM(tenkai_oikomi_4_3)) THEN 3
+        WHEN umaban IN (TRIM(tenkai_nige_1_4), TRIM(tenkai_senkou_2_4), TRIM(tenkai_sashi_3_4), TRIM(tenkai_oikomi_4_4)) THEN 4
+        ELSE NULL
+      END AS tenkai_position
+    FROM shirushi_final
   )
 
 -- Final Step: 全ての情報を結合し、最終的なカラムを生成
@@ -1733,10 +1776,37 @@ SELECT
     THEN 'はい'
     ELSE NULL
   END AS chokyo_sei_batsugun_flag,
+  
+  -- 展開予想・脚質カラム追加
+  z.tenkai_kyakushitsu_kubun,
+  z.tenkai_position,
+  CASE 
+    WHEN z.tenkai_kyakushitsu_kubun IS NOT NULL AND z.tenkai_position IS NOT NULL
+         AND COUNT(z.umaban) OVER (PARTITION BY z.race_code_jvd, z.tenkai_kyakushitsu_kubun, z.tenkai_position) > 1 
+    THEN 'はい' 
+    ELSE NULL 
+  END AS tenkai_ittai_flag,
+  CASE 
+    WHEN z.tenkai_kyakushitsu_kubun IS NOT NULL AND z.tenkai_position IS NOT NULL THEN
+      DENSE_RANK() OVER (
+        PARTITION BY z.race_code_jvd 
+        ORDER BY 
+          CASE z.tenkai_kyakushitsu_kubun 
+            WHEN '逃げ' THEN 1 
+            WHEN '先行' THEN 2 
+            WHEN '差し' THEN 3 
+            WHEN '追い込み' THEN 4 
+            ELSE 99 
+          END, 
+          z.tenkai_position
+      )
+    ELSE NULL 
+  END AS tenkai_order,
+
   CURRENT_TIMESTAMP() AS created,
   CURRENT_TIMESTAMP() AS modified
 FROM
-  with_zensou_data AS z
+  with_tenkai_data AS z
 LEFT JOIN
   partner_lookup AS pl
   ON z.race_code_uma_kol = pl.race_code_uma_kol
