@@ -1091,7 +1091,7 @@ WITH
         WHEN umaban IN (TRIM(tenkai_nige_1_4), TRIM(tenkai_senkou_2_4), TRIM(tenkai_sashi_3_4), TRIM(tenkai_oikomi_4_4)) THEN 4
         ELSE NULL
       END AS tenkai_position
-    FROM shirushi_final
+    FROM with_zensou_data
   )
 
 -- Final Step: 全ての情報を結合し、最終的なカラムを生成
