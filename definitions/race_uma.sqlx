@@ -1065,6 +1065,7 @@ WITH
   with_tenkai_data AS (
     SELECT
       *,
+      -- 1. 明示的なマッチ判定
       CASE
         WHEN umaban = TRIM(tenkai_nige_1_1) THEN '逃げ'
         WHEN umaban = TRIM(tenkai_nige_1_2) THEN '逃げ'
@@ -1083,15 +1084,45 @@ WITH
         WHEN umaban = TRIM(tenkai_oikomi_4_3) THEN '追い込み'
         WHEN umaban = TRIM(tenkai_oikomi_4_4) THEN '追い込み'
         ELSE NULL
-      END AS tenkai_kyakushitsu_kubun,
+      END AS explicit_kyakushitsu,
       CASE
         WHEN umaban IN (TRIM(tenkai_nige_1_1), TRIM(tenkai_senkou_2_1), TRIM(tenkai_sashi_3_1), TRIM(tenkai_oikomi_4_1)) THEN 1
         WHEN umaban IN (TRIM(tenkai_nige_1_2), TRIM(tenkai_senkou_2_2), TRIM(tenkai_sashi_3_2), TRIM(tenkai_oikomi_4_2)) THEN 2
         WHEN umaban IN (TRIM(tenkai_nige_1_3), TRIM(tenkai_senkou_2_3), TRIM(tenkai_sashi_3_3), TRIM(tenkai_oikomi_4_3)) THEN 3
         WHEN umaban IN (TRIM(tenkai_nige_1_4), TRIM(tenkai_senkou_2_4), TRIM(tenkai_sashi_3_4), TRIM(tenkai_oikomi_4_4)) THEN 4
         ELSE NULL
-      END AS tenkai_position
+      END AS explicit_position,
+
+      -- 2. レース全体の一団（30）の特定
+      CASE
+        WHEN '30' IN (TRIM(tenkai_nige_1_1), TRIM(tenkai_nige_1_2), TRIM(tenkai_nige_1_3), TRIM(tenkai_nige_1_4)) THEN '逃げ'
+        WHEN '30' IN (TRIM(tenkai_senkou_2_1), TRIM(tenkai_senkou_2_2), TRIM(tenkai_senkou_2_3), TRIM(tenkai_senkou_2_4)) THEN '先行'
+        WHEN '30' IN (TRIM(tenkai_sashi_3_1), TRIM(tenkai_sashi_3_2), TRIM(tenkai_sashi_3_3), TRIM(tenkai_sashi_3_4)) THEN '差し'
+        WHEN '30' IN (TRIM(tenkai_oikomi_4_1), TRIM(tenkai_oikomi_4_2), TRIM(tenkai_oikomi_4_3), TRIM(tenkai_oikomi_4_4)) THEN '追い込み'
+        ELSE NULL
+      END AS race_ittai_kyakushitsu,
+      CASE
+        WHEN TRIM(tenkai_nige_1_1) = '30' OR TRIM(tenkai_senkou_2_1) = '30' OR TRIM(tenkai_sashi_3_1) = '30' OR TRIM(tenkai_oikomi_4_1) = '30' THEN 1
+        WHEN TRIM(tenkai_nige_1_2) = '30' OR TRIM(tenkai_senkou_2_2) = '30' OR TRIM(tenkai_sashi_3_2) = '30' OR TRIM(tenkai_oikomi_4_2) = '30' THEN 2
+        WHEN TRIM(tenkai_nige_1_3) = '30' OR TRIM(tenkai_senkou_2_3) = '30' OR TRIM(tenkai_sashi_3_3) = '30' OR TRIM(tenkai_oikomi_4_3) = '30' THEN 3
+        WHEN TRIM(tenkai_nige_1_4) = '30' OR TRIM(tenkai_senkou_2_4) = '30' OR TRIM(tenkai_sashi_3_4) = '30' OR TRIM(tenkai_oikomi_4_4) = '30' THEN 4
+        ELSE NULL
+      END AS race_ittai_position
     FROM with_zensou_data
+  ),
+
+  with_tenkai_mapped AS (
+    SELECT
+      *,
+      -- 3. 割り当ての合成
+      COALESCE(explicit_kyakushitsu, race_ittai_kyakushitsu) AS tenkai_kyakushitsu_kubun,
+      COALESCE(explicit_position, race_ittai_position) AS tenkai_position,
+      CASE 
+        WHEN explicit_kyakushitsu IS NULL AND race_ittai_kyakushitsu IS NOT NULL 
+        THEN 'はい'
+        ELSE NULL
+      END AS tenkai_ittai_flag
+    FROM with_tenkai_data
   )
 
 -- Final Step: 全ての情報を結合し、最終的なカラムを生成
@@ -1780,12 +1811,7 @@ SELECT
   -- 展開予想・脚質カラム追加
   z.tenkai_kyakushitsu_kubun,
   z.tenkai_position,
-  CASE 
-    WHEN z.tenkai_kyakushitsu_kubun IS NOT NULL AND z.tenkai_position IS NOT NULL
-         AND COUNT(z.umaban) OVER (PARTITION BY z.race_code_kol, z.tenkai_kyakushitsu_kubun, z.tenkai_position) > 1 
-    THEN 'はい' 
-    ELSE NULL 
-  END AS tenkai_ittai_flag,
+  z.tenkai_ittai_flag,
   CASE 
     WHEN z.tenkai_kyakushitsu_kubun IS NOT NULL AND z.tenkai_position IS NOT NULL THEN
       DENSE_RANK() OVER (
@@ -1806,7 +1832,7 @@ SELECT
   CURRENT_TIMESTAMP() AS created,
   CURRENT_TIMESTAMP() AS modified
 FROM
-  with_tenkai_data AS z
+  with_tenkai_mapped AS z
 LEFT JOIN
   partner_lookup AS pl
   ON z.race_code_uma_kol = pl.race_code_uma_kol
