@@ -9,25 +9,20 @@ config {
   description: "競走成績レース面（kol_sei1）の発走状況（hasso_jokyo1～6）をレース・グループ番号単位に展開したテーブル。",
   columns: {
     race_code_kol: "KOL仕様レースID 年月日8桁+KOL仕様開催場所コード2桁+開催回次2桁+開催日次2桁+レース番号2桁",
-    race_code_jvd: "JRA-VAN仕様レースID 年4桁+月2桁+日2桁+JRA-VAN仕様競馬場コード2桁+回次2桁+日次2桁+レース番号2桁",
-    schedule_date: "発走日 date型",
-    hasso_date: "発走日時 (JST)",
-    hasso_date_utc: "発走日時 (UTC)",
-    keibajo_code_jvd: "JRA-VAN仕様競馬場コード",
-    keibajo_code_kol: "KOL仕様競馬場コード",
-    keibajo_name: "競馬場名",
-    race_bango_num: "レース番号 整数型",
-    hasso_jokyo_no: "発走状況グループ番号 (1～6)",
-    hasso_jokyo_code: "発走状況コード (kol_sei1.hasso_jokyo1～6の値)",
-    hasso_jokyo_label: "発走状況ラベル"
+    race_code_jvd: "JRA-VAN仕様 年4桁+月2桁+日2桁+JRA-VAN仕様競馬場コード2桁+回次2桁+日次2桁+レース番号2桁",
+    schedule_id: "発走日8文字 YYYYMMDD",
+    hasso_date: "発走日時のUTC時刻から9時間経過。 kaisai_nen ・ kaisai_nichiji ・ hasso_jikokuから算出",
+    hasso_date_utc: "発走日時のUTC時刻",
+    hasso_jokyo: "発走状況 (ex) ⑤アオル 1 馬身不利",
+    hasso_jokyo_sort_num: "発走状況 ソート用の連番 1～6"
   },
   bigquery: {
-    partitionBy: "schedule_date"
+    partitionBy: "DATE(hasso_date)"
   }
 }
 
 WITH
-  -- kol_sei1から発走状況と基本情報を取得
+  -- kol_sei1から発走状況を取得
   sei1_base AS (
     SELECT
       s1.race_code_kol,
@@ -67,12 +62,11 @@ WITH
     FROM ${ref("kol_den1")} AS d1
   ),
 
-  -- SEI1とDEN1を結合してレース情報を付与
+  -- SEI1とDEN1を結合してデータを準備
   joined AS (
     SELECT
       s1.race_code_kol,
       d1.keibajo_code_jvd,
-      d1.keibajo_code   AS keibajo_code_kol,
       d1.kaisai_nengappi AS kaisai_nengappi_str,
       d1.hasso_jikoku,
       d1.kaisai_kaiji,
@@ -91,64 +85,41 @@ WITH
 
   -- 発走状況をアンピボット (hasso_jokyo1～6 → 行展開)
   unpivoted AS (
-    SELECT race_code_kol, keibajo_code_jvd, keibajo_code_kol, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 1 AS hasso_jokyo_no, hasso_jokyo1 AS hasso_jokyo_code FROM joined WHERE hasso_jokyo1 IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 1 AS hasso_jokyo_sort_num, hasso_jokyo1 AS hasso_jokyo_text FROM joined WHERE hasso_jokyo1 IS NOT NULL AND hasso_jokyo1 != ''
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, keibajo_code_kol, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 2, hasso_jokyo2 FROM joined WHERE hasso_jokyo2 IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 2, hasso_jokyo2 FROM joined WHERE hasso_jokyo2 IS NOT NULL AND hasso_jokyo2 != ''
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, keibajo_code_kol, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 3, hasso_jokyo3 FROM joined WHERE hasso_jokyo3 IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 3, hasso_jokyo3 FROM joined WHERE hasso_jokyo3 IS NOT NULL AND hasso_jokyo3 != ''
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, keibajo_code_kol, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 4, hasso_jokyo4 FROM joined WHERE hasso_jokyo4 IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 4, hasso_jokyo4 FROM joined WHERE hasso_jokyo4 IS NOT NULL AND hasso_jokyo4 != ''
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, keibajo_code_kol, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 5, hasso_jokyo5 FROM joined WHERE hasso_jokyo5 IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 5, hasso_jokyo5 FROM joined WHERE hasso_jokyo5 IS NOT NULL AND hasso_jokyo5 != ''
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, keibajo_code_kol, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 6, hasso_jokyo6 FROM joined WHERE hasso_jokyo6 IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 6, hasso_jokyo6 FROM joined WHERE hasso_jokyo6 IS NOT NULL AND hasso_jokyo6 != ''
   )
 
 -- 最終SELECT
 SELECT
   u.race_code_kol,
-  -- JRA-VAN仕様レースID 組み立て
+  -- JRA-VAN仕様 年4桁+月2桁+日2桁+JRA-VAN仕様競馬場コード2桁+回次2桁+日次2桁+レース番号2桁
   u.kaisai_nengappi_str || u.keibajo_code_jvd || u.kaisai_kaiji || u.kaisai_nichiji || u.race_num AS race_code_jvd,
-  -- 発走日 (date型)
-  DATE(PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', ''))) AS schedule_date,
+  -- 発走日8文字 YYYYMMDD
+  u.kaisai_nengappi_str AS schedule_id,
   -- 発走日時 (JST)
   PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', '')) AS hasso_date,
   -- 発走日時 (UTC)
   DATETIME_ADD(PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', '')), INTERVAL -9 HOUR) AS hasso_date_utc,
-  u.keibajo_code_jvd,
-  u.keibajo_code_kol,
-  CASE u.keibajo_code_jvd
-    WHEN '01' THEN '札幌'
-    WHEN '02' THEN '函館'
-    WHEN '03' THEN '福島'
-    WHEN '04' THEN '新潟'
-    WHEN '05' THEN '東京'
-    WHEN '06' THEN '中山'
-    WHEN '07' THEN '中京'
-    WHEN '08' THEN '京都'
-    WHEN '09' THEN '阪神'
-    WHEN '10' THEN '小倉'
-    ELSE NULL
-  END AS keibajo_name,
-  SAFE_CAST(u.race_num AS INT64) AS race_bango_num,
-  u.hasso_jokyo_no,
-  u.hasso_jokyo_code,
-  -- 発走状況コードラベル
-  CASE u.hasso_jokyo_code
-    WHEN '00' THEN '発走良好'
-    WHEN '01' THEN '出遅れ1'
-    WHEN '02' THEN '出遅れ2'
-    WHEN '03' THEN '出遅れ3'
-    WHEN '04' THEN '出遅れ4'
-    WHEN '05' THEN '出遅れ5'
-    WHEN '11' THEN '逸走'
-    WHEN '12' THEN '落馬'
-    WHEN '13' THEN '故障'
-    WHEN '14' THEN '騎手落馬'
-    WHEN '15' THEN '骨折'
-    WHEN '16' THEN '事故'
-    WHEN '99' THEN 'その他'
-    ELSE u.hasso_jokyo_code
-  END AS hasso_jokyo_label
+  -- 発走状況 (ex) ⑤アオル 1 馬身不利
+  CASE u.hasso_jokyo_sort_num
+    WHEN 1 THEN '①'
+    WHEN 2 THEN '②'
+    WHEN 3 THEN '③'
+    WHEN 4 THEN '④'
+    WHEN 5 THEN '⑤'
+    WHEN 6 THEN '⑥'
+    ELSE ''
+  END || u.hasso_jokyo_text AS hasso_jokyo,
+  -- 発走状況 ソート用の連番 1～6
+  u.hasso_jokyo_sort_num
 FROM unpivoted AS u
 WHERE u.kaisai_nengappi_str >= '20230101'
