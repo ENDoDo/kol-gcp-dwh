@@ -110,15 +110,7 @@ SELECT
   -- 発走日時 (UTC)
   DATETIME_ADD(PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', '')), INTERVAL -9 HOUR) AS hasso_date_utc,
   -- 発走状況 (ex) ⑤アオル 1 馬身不利
-  CASE u.hasso_jokyo_sort_num
-    WHEN 1 THEN '①'
-    WHEN 2 THEN '②'
-    WHEN 3 THEN '③'
-    WHEN 4 THEN '④'
-    WHEN 5 THEN '⑤'
-    WHEN 6 THEN '⑥'
-    ELSE ''
-  END || u.hasso_jokyo_text AS hasso_jokyo,
+  u.hasso_jokyo_text AS hasso_jokyo,
   -- 発走状況 ソート用の連番 1～6
   u.hasso_jokyo_sort_num
 FROM unpivoted AS u
