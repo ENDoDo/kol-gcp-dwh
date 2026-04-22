@@ -1,0 +1,154 @@
+-- =================================================================
+-- race_kekka_hassojokyo.sqlx
+-- 説明: kol_sei1の発走状況（hasso_jokyo1～6）をアンピボットして
+--       レースごとのグループ別発走状況を整形したテーブル。
+-- =================================================================
+
+config {
+  type: "table",
+  description: "競走成績レース面（kol_sei1）の発走状況（hasso_jokyo1～6）をレース・グループ番号単位に展開したテーブル。",
+  columns: {
+    race_code_kol: "KOL仕様レースID 年月日8桁+KOL仕様開催場所コード2桁+開催回次2桁+開催日次2桁+レース番号2桁",
+    race_code_jvd: "JRA-VAN仕様レースID 年4桁+月2桁+日2桁+JRA-VAN仕様競馬場コード2桁+回次2桁+日次2桁+レース番号2桁",
+    schedule_date: "発走日 date型",
+    hasso_date: "発走日時 (JST)",
+    hasso_date_utc: "発走日時 (UTC)",
+    keibajo_code_jvd: "JRA-VAN仕様競馬場コード",
+    keibajo_code_kol: "KOL仕様競馬場コード",
+    keibajo_name: "競馬場名",
+    race_bango_num: "レース番号 整数型",
+    hasso_jokyo_no: "発走状況グループ番号 (1～6)",
+    hasso_jokyo_code: "発走状況コード (kol_sei1.hasso_jokyo1～6の値)",
+    hasso_jokyo_label: "発走状況ラベル"
+  },
+  bigquery: {
+    partitionBy: "schedule_date"
+  }
+}
+
+WITH
+  -- kol_sei1から発走状況と基本情報を取得
+  sei1_base AS (
+    SELECT
+      s1.race_code_kol,
+      s1.hasso_jokyo1,
+      s1.hasso_jokyo2,
+      s1.hasso_jokyo3,
+      s1.hasso_jokyo4,
+      s1.hasso_jokyo5,
+      s1.hasso_jokyo6
+    FROM ${ref("kol_sei1")} AS s1
+  ),
+
+  -- kol_den1からレース基本情報を取得
+  den1_base AS (
+    SELECT
+      d1.race_code_kol,
+      d1.keibajo_code,
+      d1.kaisai_nengappi,
+      d1.hasso_jikoku,
+      d1.kaisai_kaiji,
+      d1.kaisai_nichiji,
+      d1.race_num,
+      -- KOL → JRA-VAN 競馬場コード変換
+      CASE d1.keibajo_code
+        WHEN '08' THEN '01' -- 札幌
+        WHEN '09' THEN '02' -- 函館
+        WHEN '06' THEN '03' -- 福島
+        WHEN '07' THEN '04' -- 新潟
+        WHEN '04' THEN '05' -- 東京
+        WHEN '05' THEN '06' -- 中山
+        WHEN '02' THEN '07' -- 中京
+        WHEN '00' THEN '08' -- 京都
+        WHEN '01' THEN '09' -- 阪神
+        WHEN '03' THEN '10' -- 小倉
+        ELSE NULL
+      END AS keibajo_code_jvd
+    FROM ${ref("kol_den1")} AS d1
+  ),
+
+  -- SEI1とDEN1を結合してレース情報を付与
+  joined AS (
+    SELECT
+      s1.race_code_kol,
+      d1.keibajo_code_jvd,
+      d1.keibajo_code   AS keibajo_code_kol,
+      d1.kaisai_nengappi AS kaisai_nengappi_str,
+      d1.hasso_jikoku,
+      d1.kaisai_kaiji,
+      d1.kaisai_nichiji,
+      d1.race_num,
+      s1.hasso_jokyo1,
+      s1.hasso_jokyo2,
+      s1.hasso_jokyo3,
+      s1.hasso_jokyo4,
+      s1.hasso_jokyo5,
+      s1.hasso_jokyo6
+    FROM sei1_base AS s1
+    LEFT JOIN den1_base AS d1
+      ON s1.race_code_kol = d1.race_code_kol
+  ),
+
+  -- 発走状況をアンピボット (hasso_jokyo1～6 → 行展開)
+  unpivoted AS (
+    SELECT race_code_kol, keibajo_code_jvd, keibajo_code_kol, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 1 AS hasso_jokyo_no, hasso_jokyo1 AS hasso_jokyo_code FROM joined WHERE hasso_jokyo1 IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, keibajo_code_kol, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 2, hasso_jokyo2 FROM joined WHERE hasso_jokyo2 IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, keibajo_code_kol, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 3, hasso_jokyo3 FROM joined WHERE hasso_jokyo3 IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, keibajo_code_kol, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 4, hasso_jokyo4 FROM joined WHERE hasso_jokyo4 IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, keibajo_code_kol, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 5, hasso_jokyo5 FROM joined WHERE hasso_jokyo5 IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, keibajo_code_kol, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 6, hasso_jokyo6 FROM joined WHERE hasso_jokyo6 IS NOT NULL
+  )
+
+-- 最終SELECT
+SELECT
+  u.race_code_kol,
+  -- JRA-VAN仕様レースID 組み立て
+  u.kaisai_nengappi_str || u.keibajo_code_jvd || u.kaisai_kaiji || u.kaisai_nichiji || u.race_num AS race_code_jvd,
+  -- 発走日 (date型)
+  DATE(PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', ''))) AS schedule_date,
+  -- 発走日時 (JST)
+  PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', '')) AS hasso_date,
+  -- 発走日時 (UTC)
+  DATETIME_ADD(PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', '')), INTERVAL -9 HOUR) AS hasso_date_utc,
+  u.keibajo_code_jvd,
+  u.keibajo_code_kol,
+  CASE u.keibajo_code_jvd
+    WHEN '01' THEN '札幌'
+    WHEN '02' THEN '函館'
+    WHEN '03' THEN '福島'
+    WHEN '04' THEN '新潟'
+    WHEN '05' THEN '東京'
+    WHEN '06' THEN '中山'
+    WHEN '07' THEN '中京'
+    WHEN '08' THEN '京都'
+    WHEN '09' THEN '阪神'
+    WHEN '10' THEN '小倉'
+    ELSE NULL
+  END AS keibajo_name,
+  SAFE_CAST(u.race_num AS INT64) AS race_bango_num,
+  u.hasso_jokyo_no,
+  u.hasso_jokyo_code,
+  -- 発走状況コードラベル
+  CASE u.hasso_jokyo_code
+    WHEN '00' THEN '発走良好'
+    WHEN '01' THEN '出遅れ1'
+    WHEN '02' THEN '出遅れ2'
+    WHEN '03' THEN '出遅れ3'
+    WHEN '04' THEN '出遅れ4'
+    WHEN '05' THEN '出遅れ5'
+    WHEN '11' THEN '逸走'
+    WHEN '12' THEN '落馬'
+    WHEN '13' THEN '故障'
+    WHEN '14' THEN '騎手落馬'
+    WHEN '15' THEN '骨折'
+    WHEN '16' THEN '事故'
+    WHEN '99' THEN 'その他'
+    ELSE u.hasso_jokyo_code
+  END AS hasso_jokyo_label
+FROM unpivoted AS u
+WHERE u.kaisai_nengappi_str >= '20230101'
