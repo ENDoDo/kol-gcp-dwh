@@ -11,13 +11,14 @@ config {
     race_code_kol: "KOL仕様レースID 年月日8桁+KOL仕様開催場所コード2桁+開催回次2桁+開催日次2桁+レース番号2桁",
     race_code_jvd: "JRA-VAN仕様 年4桁+月2桁+日2桁+JRA-VAN仕様競馬場コード2桁+回次2桁+日次2桁+レース番号2桁",
     schedule_id: "発走日8文字 YYYYMMDD",
+    schedule_date: "発走日0時0分 date型",
     hasso_date: "発走日時のUTC時刻から9時間経過。 kaisai_nen ・ kaisai_nichiji ・ hasso_jikokuから算出",
     hasso_date_utc: "発走日時のUTC時刻",
     hasso_jokyo: "発走状況 (ex) ⑤アオル 1 馬身不利",
     hasso_jokyo_sort_num: "発走状況 ソート用の連番 1～6"
   },
   bigquery: {
-    partitionBy: "DATE(hasso_date)"
+    partitionBy: "schedule_date"
   }
 }
 
@@ -105,6 +106,8 @@ SELECT
   u.kaisai_nengappi_str || u.keibajo_code_jvd || u.kaisai_kaiji || u.kaisai_nichiji || u.race_num AS race_code_jvd,
   -- 発走日8文字 YYYYMMDD
   u.kaisai_nengappi_str AS schedule_id,
+  -- 発走日0時0分 date型
+  DATE(PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', ''))) AS schedule_date,
   -- 発走日時 (JST)
   PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', '')) AS hasso_date,
   -- 発走日時 (UTC)
