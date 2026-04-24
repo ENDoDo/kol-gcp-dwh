@@ -15,8 +15,9 @@ config {
     hasso_date: "発走日時のUTC時刻から9時間経過。 kaisai_nen ・ kaisai_nichiji ・ hasso_jikokuから算出",
     hasso_date_utc: "発走日時のUTC時刻",
     keika: "経過情報 (ex)11.12-2(1.3.13)(8.10)(7.9.5)-4.6",
-    keika_midashi1: "経過情報 見出し1 (KOL sei1では常にNULL)",
-    keika_midashi2: "経過情報 見出し2 (コード値を名称に変換済み)",
+    keika_midashi: "経過情報 見出し (midashi1とmidashi2を結合した名称。例: 1週4角)",
+    keika_midashi1: "経過情報 見出し1 (周回等のコード)",
+    keika_midashi2: "経過情報 見出し2 (コーナー等のコード)",
     keika_sort_label: "角 (ex)ソート用の連番が1のとき 角1",
     keika_sort_num: "経過情報 ソート用の連番 1～9"
   },
@@ -134,26 +135,36 @@ SELECT
   DATETIME_ADD(PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', '')), INTERVAL -9 HOUR) AS hasso_date_utc,
   -- 経過情報
   u.keika_text AS keika,
+  -- 経過見出しの結合ロジック (midashi1 + midashi2)
+  CONCAT(
+    CASE SAFE_CAST(u.midashi1 AS INT64)
+      WHEN 1 THEN '逆'
+      WHEN 2 THEN '１週'
+      WHEN 3 THEN '逆１週'
+      WHEN 4 THEN '２週'
+      ELSE ''
+    END,
+    CASE SAFE_CAST(u.midashi2 AS INT64)
+      WHEN 0 THEN 'スタンド前'
+      WHEN 1 THEN '向正面'
+      WHEN 2 THEN '２角'
+      WHEN 3 THEN '３角'
+      WHEN 4 THEN '４角'
+      WHEN 5 THEN 'タスキ'
+      WHEN 6 THEN 'バンケット'
+      WHEN 7 THEN '水濠'
+      WHEN 8 THEN '大竹柵'
+      WHEN 9 THEN '大土塁'
+      WHEN 10 THEN '赤レンガ'
+      WHEN 11 THEN '発馬'
+      WHEN 12 THEN '１角'
+      WHEN 13 THEN '大いけ垣'
+      WHEN 14 THEN '３Ｆ'
+      ELSE IFNULL(u.midashi2, '')
+    END
+  ) AS keika_midashi,
   u.midashi1 AS keika_midashi1,
-  -- 経過見出し2の変換ロジック (コード値を日本語名称に置き換え)
-  CASE SAFE_CAST(u.midashi2 AS INT64)
-    WHEN 0 THEN 'スタンド前'
-    WHEN 1 THEN '向正面'
-    WHEN 2 THEN '２角'
-    WHEN 3 THEN '３角'
-    WHEN 4 THEN '４角'
-    WHEN 5 THEN 'タスキ'
-    WHEN 6 THEN 'バンケット'
-    WHEN 7 THEN '水濠'
-    WHEN 8 THEN '大竹柵'
-    WHEN 9 THEN '大土塁'
-    WHEN 10 THEN '赤レンガ'
-    WHEN 11 THEN '発馬'
-    WHEN 12 THEN '１角'
-    WHEN 13 THEN '大いけ垣'
-    WHEN 14 THEN '３Ｆ'
-    ELSE u.midashi2
-  END AS keika_midashi2,
+  u.midashi2 AS keika_midashi2,
   -- 角 (ex)ソート用の連番が1のとき 角1
   CONCAT('角', CAST(u.keika_sort_num AS STRING)) AS keika_sort_label,
   -- 経過情報 ソート用の連番 1～9
