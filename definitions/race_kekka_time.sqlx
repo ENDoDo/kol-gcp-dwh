@@ -12,7 +12,7 @@ config {
     race_code_jvd: "JRA-VAN仕様 年4桁+月2桁+日2桁+JRA-VAN仕様競馬場コード2桁+回次2桁+日次2桁+レース番号2桁",
     schedule_id: "発走日8文字 YYYYMMDD",
     schedule_date: "発送日0時0分 date型",
-    hasso_date: "発走日時のJST時刻",
+    hasso_date: "発走日時のUTC時刻から9時間経過。kaisai_nen・kaisai_nichiji・hasso_jikokuから算出",
     hasso_date_utc: "発走日時のUTC時刻",
     agari_1mile: "上り1哩",
     lap_time1: "ラップタイム1",
@@ -33,13 +33,13 @@ config {
     lap_time16: "ラップタイム16",
     lap_time17: "ラップタイム17",
     lap_time18: "ラップタイム18",
-    lap_time_label: "ラップタイムをハイフン区切りで連結したラベル",
-    time_agari_label: "上り6F-5F-4F-3Fの累計タイムラベル",
-    time_tsuka_label: "ゴール前4地点の通過タイムラベル（2F刻み）",
-    average_1f: "1F平均タイム",
-    average_3f: "3F平均タイム",
-    pace_kekka: "ペース(結果) コード",
-    pace_kekka_label: "ペース(結果) ラベル (H/M/S)"
+    lap_time_label: "ラップタイム1～18をもとにハイフン区切りでラベル化したテキスト (ex)12.4-11.8-11.3-13.9-13.3-12.7-12.5-12.3-12.0-12.4",
+    time_agari_label: "上り ハイフン区切り (ex)68.5-57.4-45.8-34.3",
+    time_tsuka_label: "通過 ハイフン区切り (ex)34.1-45.7-57.2-68.7",
+    average_1f: "1F平均 (ex)11.4",
+    average_3f: "3F平均 (ex)34.3",
+    pace_kekka: "ペース(結果) 0/1/2",
+    pace_kekka_label: "paceをもとに対応 H/M/S"
   },
   bigquery: {
     partitionBy: "schedule_date"
@@ -153,14 +153,13 @@ WITH
         WHEN 13 THEN c13 WHEN 14 THEN c14 WHEN 15 THEN c15 WHEN 16 THEN c16 WHEN 17 THEN c17 WHEN 18 THEN c18
         ELSE 0
       END AS total_time,
-      -- ハロン数に応じた累計タイムの取得ヘルパー (Tsuka用)
-      -- 2F, 4F, 6F, 8F... 刻みを動的に取得するためにCASE文で分岐
+      -- ハロン数に応じた累計タイムの取得ヘルパー (Tsuka用: ゴール前5F, 4F, 3F, 2F地点)
       STRUCT(
-        CASE WHEN N-6 <= 0 THEN 0.0 ELSE
-          CASE N-6
+        CASE WHEN N-5 <= 0 THEN 0.0 ELSE
+          CASE N-5
             WHEN 1 THEN c1 WHEN 2 THEN c2 WHEN 3 THEN c3 WHEN 4 THEN c4 WHEN 5 THEN c5 WHEN 6 THEN c6
             WHEN 7 THEN c7 WHEN 8 THEN c8 WHEN 9 THEN c9 WHEN 10 THEN c10 WHEN 11 THEN c11 WHEN 12 THEN c12
-            ELSE 0 END
+            WHEN 13 THEN c13 ELSE 0 END
         END AS tsuka1,
         CASE WHEN N-4 <= 0 THEN 0.0 ELSE
           CASE N-4
@@ -168,12 +167,18 @@ WITH
             WHEN 7 THEN c7 WHEN 8 THEN c8 WHEN 9 THEN c9 WHEN 10 THEN c10 WHEN 11 THEN c11 WHEN 12 THEN c12
             WHEN 13 THEN c13 WHEN 14 THEN c14 ELSE 0 END
         END AS tsuka2,
+        CASE WHEN N-3 <= 0 THEN 0.0 ELSE
+          CASE N-3
+            WHEN 1 THEN c1 WHEN 2 THEN c2 WHEN 3 THEN c3 WHEN 4 THEN c4 WHEN 5 THEN c5 WHEN 6 THEN c6
+            WHEN 7 THEN c7 WHEN 8 THEN c8 WHEN 9 THEN c9 WHEN 10 THEN c10 WHEN 11 THEN c11 WHEN 12 THEN c12
+            WHEN 13 THEN c13 WHEN 14 THEN c14 WHEN 15 THEN c15 ELSE 0 END
+        END AS tsuka3,
         CASE WHEN N-2 <= 0 THEN 0.0 ELSE
           CASE N-2
             WHEN 1 THEN c1 WHEN 2 THEN c2 WHEN 3 THEN c3 WHEN 4 THEN c4 WHEN 5 THEN c5 WHEN 6 THEN c6
             WHEN 7 THEN c7 WHEN 8 THEN c8 WHEN 9 THEN c9 WHEN 10 THEN c10 WHEN 11 THEN c11 WHEN 12 THEN c12
             WHEN 13 THEN c13 WHEN 14 THEN c14 WHEN 15 THEN c15 WHEN 16 THEN c16 ELSE 0 END
-        END AS tsuka3
+        END AS tsuka4
       ) AS tsuka_points,
       -- 上り累計 (Agari用)
       STRUCT(
@@ -213,7 +218,9 @@ SELECT
   PARSE_DATETIME('%Y%m%d%H%M', kaisai_nengappi || REPLACE(hasso_jikoku, ':', '')) AS hasso_date,
   DATETIME_ADD(PARSE_DATETIME('%Y%m%d%H%M', kaisai_nengappi || REPLACE(hasso_jikoku, ':', '')), INTERVAL -9 HOUR) AS hasso_date_utc,
   agari_1mile,
-  lt1, lt2, lt3, lt4, lt5, lt6, lt7, lt8, lt9, lt10, lt11, lt12, lt13, lt14, lt15, lt16, lt17, lt18,
+  lt1 AS lap_time1, lt2 AS lap_time2, lt3 AS lap_time3, lt4 AS lap_time4, lt5 AS lap_time5, lt6 AS lap_time6,
+  lt7 AS lap_time7, lt8 AS lap_time8, lt9 AS lap_time9, lt10 AS lap_time10, lt11 AS lap_time11, lt12 AS lap_time12,
+  lt13 AS lap_time13, lt14 AS lap_time14, lt15 AS lap_time15, lt16 AS lap_time16, lt17 AS lap_time17, lt18 AS lap_time18,
   
   -- lap_time_label
   ARRAY_TO_STRING(ARRAY(SELECT CAST(x AS STRING) FROM UNNEST([lt1, lt2, lt3, lt4, lt5, lt6, lt7, lt8, lt9, lt10, lt11, lt12, lt13, lt14, lt15, lt16, lt17, lt18]) AS x WITH OFFSET off WHERE off < N AND x IS NOT NULL), '-') AS lap_time_label,
@@ -226,17 +233,17 @@ SELECT
     CAST(ROUND(total_time - agari_subs.ag3_sub, 1) AS STRING)
   ) AS time_agari_label,
 
-  -- time_tsuka_label (N-6, N-4, N-2, N)
+  -- time_tsuka_label (N-5, N-4, N-3, N-2)
   CONCAT(
     CAST(ROUND(tsuka_points.tsuka1, 1) AS STRING), '-',
     CAST(ROUND(tsuka_points.tsuka2, 1) AS STRING), '-',
     CAST(ROUND(tsuka_points.tsuka3, 1) AS STRING), '-',
-    CAST(ROUND(total_time, 1) AS STRING)
+    CAST(ROUND(tsuka_points.tsuka4, 1) AS STRING)
   ) AS time_tsuka_label,
 
   -- average_1f, average_3f
-  ROUND(total_time / NULLIF(N, 0), 2) AS average_1f,
-  ROUND((total_time / NULLIF(N, 0)) * 3, 2) AS average_3f,
+  ROUND(total_time / NULLIF(N, 0), 1) AS average_1f,
+  ROUND((total_time / NULLIF(N, 0)) * 3, 1) AS average_3f,
 
   pace_kekka,
   CASE pace_kekka
