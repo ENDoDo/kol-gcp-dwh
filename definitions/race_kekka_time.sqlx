@@ -1,0 +1,249 @@
+-- =================================================================
+-- race_kekka_time.sqlx
+-- 説明: kol_sei1からラップタイム情報を取得し、表示用の各種ラベルや
+--       平均タイムを算出して保持するテーブル。
+-- =================================================================
+
+config {
+  type: "table",
+  description: "ラップタイム情報および表示用加工データ（上り・通過・平均）を保持するテーブル。",
+  columns: {
+    race_code_kol: "KOL仕様馬毎レースID 年月日8桁+KOL仕様開催場所コード2桁+開催回次2桁+開催日次2桁+レース番号2桁",
+    race_code_jvd: "JRA-VAN仕様 年4桁+月2桁+日2桁+JRA-VAN仕様競馬場コード2桁+回次2桁+日次2桁+レース番号2桁",
+    schedule_id: "発走日8文字 YYYYMMDD",
+    schedule_date: "発送日0時0分 date型",
+    hasso_date: "発走日時のJST時刻",
+    hasso_date_utc: "発走日時のUTC時刻",
+    agari_1mile: "上り1哩",
+    lap_time1: "ラップタイム1",
+    lap_time2: "ラップタイム2",
+    lap_time3: "ラップタイム3",
+    lap_time4: "ラップタイム4",
+    lap_time5: "ラップタイム5",
+    lap_time6: "ラップタイム6",
+    lap_time7: "ラップタイム7",
+    lap_time8: "ラップタイム8",
+    lap_time9: "ラップタイム9",
+    lap_time10: "ラップタイム10",
+    lap_time11: "ラップタイム11",
+    lap_time12: "ラップタイム12",
+    lap_time13: "ラップタイム13",
+    lap_time14: "ラップタイム14",
+    lap_time15: "ラップタイム15",
+    lap_time16: "ラップタイム16",
+    lap_time17: "ラップタイム17",
+    lap_time18: "ラップタイム18",
+    lap_time_label: "ラップタイムをハイフン区切りで連結したラベル",
+    time_agari_label: "上り6F-5F-4F-3Fの累計タイムラベル",
+    time_tsuka_label: "ゴール前4地点の通過タイムラベル（2F刻み）",
+    average_1f: "1F平均タイム",
+    average_3f: "3F平均タイム",
+    pace_kekka: "ペース(結果) コード",
+    pace_kekka_label: "ペース(結果) ラベル (H/M/S)"
+  },
+  bigquery: {
+    partitionBy: "schedule_date"
+  }
+}
+
+WITH
+  -- ソースデータの準備
+  sei1_base AS (
+    SELECT
+      race_code_kol,
+      SAFE_CAST(agari_1mile AS FLOAT64) AS agari_1mile,
+      SAFE_CAST(lap_time1 AS FLOAT64) AS lt1,
+      SAFE_CAST(lap_time2 AS FLOAT64) AS lt2,
+      SAFE_CAST(lap_time3 AS FLOAT64) AS lt3,
+      SAFE_CAST(lap_time4 AS FLOAT64) AS lt4,
+      SAFE_CAST(lap_time5 AS FLOAT64) AS lt5,
+      SAFE_CAST(lap_time6 AS FLOAT64) AS lt6,
+      SAFE_CAST(lap_time7 AS FLOAT64) AS lt7,
+      SAFE_CAST(lap_time8 AS FLOAT64) AS lt8,
+      SAFE_CAST(lap_time9 AS FLOAT64) AS lt9,
+      SAFE_CAST(lap_time10 AS FLOAT64) AS lt10,
+      SAFE_CAST(lap_time11 AS FLOAT64) AS lt11,
+      SAFE_CAST(lap_time12 AS FLOAT64) AS lt12,
+      SAFE_CAST(lap_time13 AS FLOAT64) AS lt13,
+      SAFE_CAST(lap_time14 AS FLOAT64) AS lt14,
+      SAFE_CAST(lap_time15 AS FLOAT64) AS lt15,
+      SAFE_CAST(lap_time16 AS FLOAT64) AS lt16,
+      SAFE_CAST(lap_time17 AS FLOAT64) AS lt17,
+      SAFE_CAST(lap_time18 AS FLOAT64) AS lt18,
+      pace AS pace_kekka
+    FROM ${ref("kol_sei1")}
+  ),
+
+  den1_base AS (
+    SELECT
+      d1.race_code_kol,
+      d1.keibajo_code,
+      d1.kaisai_nengappi,
+      d1.hasso_jikoku,
+      d1.kaisai_kaiji,
+      d1.kaisai_nichiji,
+      d1.race_num,
+      SAFE_CAST(d1.kyori AS INT64) AS kyori,
+      -- 競馬場コード変換 (KOL -> JRA-VAN)
+      CASE d1.keibajo_code
+        WHEN '08' THEN '01' -- 札幌
+        WHEN '09' THEN '02' -- 函館
+        WHEN '06' THEN '03' -- 福島
+        WHEN '07' THEN '04' -- 新潟
+        WHEN '04' THEN '05' -- 東京
+        WHEN '05' THEN '06' -- 中山
+        WHEN '02' THEN '07' -- 中京
+        WHEN '00' THEN '08' -- 京都
+        WHEN '01' THEN '09' -- 阪神
+        WHEN '03' THEN '10' -- 小倉
+        ELSE NULL
+      END AS keibajo_code_jvd
+    FROM ${ref("kol_den1")} AS d1
+  ),
+
+  -- データの結合
+  joined AS (
+    SELECT
+      s.*,
+      d.kyori,
+      d.keibajo_code_jvd,
+      d.kaisai_nengappi,
+      d.hasso_jikoku,
+      d.kaisai_kaiji,
+      d.kaisai_nichiji,
+      d.race_num
+    FROM sei1_base AS s
+    LEFT JOIN den1_base AS d ON s.race_code_kol = d.race_code_kol
+  ),
+
+  -- 累計タイムの計算 (C1～C18)
+  calc_cum AS (
+    SELECT
+      *,
+      CAST(kyori / 200 AS INT64) AS N,
+      COALESCE(lt1, 0) AS c1,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) AS c2,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) AS c3,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) AS c4,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) AS c5,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) AS c6,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) AS c7,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) AS c8,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) AS c9,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) AS c10,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) + COALESCE(lt11, 0) AS c11,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) + COALESCE(lt11, 0) + COALESCE(lt12, 0) AS c12,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) + COALESCE(lt11, 0) + COALESCE(lt12, 0) + COALESCE(lt13, 0) AS c13,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) + COALESCE(lt11, 0) + COALESCE(lt12, 0) + COALESCE(lt13, 0) + COALESCE(lt14, 0) AS c14,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) + COALESCE(lt11, 0) + COALESCE(lt12, 0) + COALESCE(lt13, 0) + COALESCE(lt14, 0) + COALESCE(lt15, 0) AS c15,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) + COALESCE(lt11, 0) + COALESCE(lt12, 0) + COALESCE(lt13, 0) + COALESCE(lt14, 0) + COALESCE(lt15, 0) + COALESCE(lt16, 0) AS c16,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) + COALESCE(lt11, 0) + COALESCE(lt12, 0) + COALESCE(lt13, 0) + COALESCE(lt14, 0) + COALESCE(lt15, 0) + COALESCE(lt16, 0) + COALESCE(lt17, 0) AS c17,
+      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) + COALESCE(lt11, 0) + COALESCE(lt12, 0) + COALESCE(lt13, 0) + COALESCE(lt14, 0) + COALESCE(lt15, 0) + COALESCE(lt16, 0) + COALESCE(lt17, 0) + COALESCE(lt18, 0) AS c18
+    FROM joined
+  ),
+
+  -- 中間計算 (ラベル用の値生成)
+  calc_labels AS (
+    SELECT
+      *,
+      -- ハロン数に応じた最終タイムの取得
+      CASE N
+        WHEN 1 THEN c1 WHEN 2 THEN c2 WHEN 3 THEN c3 WHEN 4 THEN c4 WHEN 5 THEN c5 WHEN 6 THEN c6
+        WHEN 7 THEN c7 WHEN 8 THEN c8 WHEN 9 THEN c9 WHEN 10 THEN c10 WHEN 11 THEN c11 WHEN 12 THEN c12
+        WHEN 13 THEN c13 WHEN 14 THEN c14 WHEN 15 THEN c15 WHEN 16 THEN c16 WHEN 17 THEN c17 WHEN 18 THEN c18
+        ELSE 0
+      END AS total_time,
+      -- ハロン数に応じた累計タイムの取得ヘルパー (Tsuka用)
+      -- 2F, 4F, 6F, 8F... 刻みを動的に取得するためにCASE文で分岐
+      STRUCT(
+        CASE WHEN N-6 <= 0 THEN 0.0 ELSE
+          CASE N-6
+            WHEN 1 THEN c1 WHEN 2 THEN c2 WHEN 3 THEN c3 WHEN 4 THEN c4 WHEN 5 THEN c5 WHEN 6 THEN c6
+            WHEN 7 THEN c7 WHEN 8 THEN c8 WHEN 9 THEN c9 WHEN 10 THEN c10 WHEN 11 THEN c11 WHEN 12 THEN c12
+            ELSE 0 END
+        END AS tsuka1,
+        CASE WHEN N-4 <= 0 THEN 0.0 ELSE
+          CASE N-4
+            WHEN 1 THEN c1 WHEN 2 THEN c2 WHEN 3 THEN c3 WHEN 4 THEN c4 WHEN 5 THEN c5 WHEN 6 THEN c6
+            WHEN 7 THEN c7 WHEN 8 THEN c8 WHEN 9 THEN c9 WHEN 10 THEN c10 WHEN 11 THEN c11 WHEN 12 THEN c12
+            WHEN 13 THEN c13 WHEN 14 THEN c14 ELSE 0 END
+        END AS tsuka2,
+        CASE WHEN N-2 <= 0 THEN 0.0 ELSE
+          CASE N-2
+            WHEN 1 THEN c1 WHEN 2 THEN c2 WHEN 3 THEN c3 WHEN 4 THEN c4 WHEN 5 THEN c5 WHEN 6 THEN c6
+            WHEN 7 THEN c7 WHEN 8 THEN c8 WHEN 9 THEN c9 WHEN 10 THEN c10 WHEN 11 THEN c11 WHEN 12 THEN c12
+            WHEN 13 THEN c13 WHEN 14 THEN c14 WHEN 15 THEN c15 WHEN 16 THEN c16 ELSE 0 END
+        END AS tsuka3
+      ) AS tsuka_points,
+      -- 上り累計 (Agari用)
+      STRUCT(
+        CASE WHEN N-3 < 0 THEN 0.0 ELSE
+          CASE N-3
+            WHEN 1 THEN c1 WHEN 2 THEN c2 WHEN 3 THEN c3 WHEN 4 THEN c4 WHEN 5 THEN c5 WHEN 6 THEN c6
+            WHEN 7 THEN c7 WHEN 8 THEN c8 WHEN 9 THEN c9 WHEN 10 THEN c10 WHEN 11 THEN c11 WHEN 12 THEN c12
+            WHEN 13 THEN c13 WHEN 14 THEN c14 WHEN 15 THEN c15 ELSE 0 END
+        END AS ag3_sub,
+        CASE WHEN N-4 < 0 THEN 0.0 ELSE
+          CASE N-4
+            WHEN 1 THEN c1 WHEN 2 THEN c2 WHEN 3 THEN c3 WHEN 4 THEN c4 WHEN 5 THEN c5 WHEN 6 THEN c6
+            WHEN 7 THEN c7 WHEN 8 THEN c8 WHEN 9 THEN c9 WHEN 10 THEN c10 WHEN 11 THEN c11 WHEN 12 THEN c12
+            WHEN 13 THEN c13 WHEN 14 THEN c14 ELSE 0 END
+        END AS ag4_sub,
+        CASE WHEN N-5 < 0 THEN 0.0 ELSE
+          CASE N-5
+            WHEN 1 THEN c1 WHEN 2 THEN c2 WHEN 3 THEN c3 WHEN 4 THEN c4 WHEN 5 THEN c5 WHEN 6 THEN c6
+            WHEN 7 THEN c7 WHEN 8 THEN c8 WHEN 9 THEN c9 WHEN 10 THEN c10 WHEN 11 THEN c11 WHEN 12 THEN c12
+            WHEN 13 THEN c13 ELSE 0 END
+        END AS ag5_sub,
+        CASE WHEN N-6 < 0 THEN 0.0 ELSE
+          CASE N-6
+            WHEN 1 THEN c1 WHEN 2 THEN c2 WHEN 3 THEN c3 WHEN 4 THEN c4 WHEN 5 THEN c5 WHEN 6 THEN c6
+            WHEN 7 THEN c7 WHEN 8 THEN c8 WHEN 9 THEN c9 WHEN 10 THEN c10 WHEN 11 THEN c11 WHEN 12 THEN c12
+            ELSE 0 END
+        END AS ag6_sub
+      ) AS agari_subs
+    FROM calc_cum
+  )
+
+SELECT
+  race_code_kol,
+  kaisai_nengappi || keibajo_code_jvd || kaisai_kaiji || kaisai_nichiji || race_num AS race_code_jvd,
+  kaisai_nengappi AS schedule_id,
+  DATE(PARSE_DATETIME('%Y%m%d%H%M', kaisai_nengappi || REPLACE(hasso_jikoku, ':', ''))) AS schedule_date,
+  PARSE_DATETIME('%Y%m%d%H%M', kaisai_nengappi || REPLACE(hasso_jikoku, ':', '')) AS hasso_date,
+  DATETIME_ADD(PARSE_DATETIME('%Y%m%d%H%M', kaisai_nengappi || REPLACE(hasso_jikoku, ':', '')), INTERVAL -9 HOUR) AS hasso_date_utc,
+  agari_1mile,
+  lt1, lt2, lt3, lt4, lt5, lt6, lt7, lt8, lt9, lt10, lt11, lt12, lt13, lt14, lt15, lt16, lt17, lt18,
+  
+  -- lap_time_label
+  ARRAY_TO_STRING(ARRAY(SELECT CAST(x AS STRING) FROM UNNEST([lt1, lt2, lt3, lt4, lt5, lt6, lt7, lt8, lt9, lt10, lt11, lt12, lt13, lt14, lt15, lt16, lt17, lt18]) AS x WITH OFFSET off WHERE off < N AND x IS NOT NULL), '-') AS lap_time_label,
+
+  -- time_agari_label (6F-5F-4F-3F)
+  CONCAT(
+    CAST(ROUND(total_time - agari_subs.ag6_sub, 1) AS STRING), '-',
+    CAST(ROUND(total_time - agari_subs.ag5_sub, 1) AS STRING), '-',
+    CAST(ROUND(total_time - agari_subs.ag4_sub, 1) AS STRING), '-',
+    CAST(ROUND(total_time - agari_subs.ag3_sub, 1) AS STRING)
+  ) AS time_agari_label,
+
+  -- time_tsuka_label (N-6, N-4, N-2, N)
+  CONCAT(
+    CAST(ROUND(tsuka_points.tsuka1, 1) AS STRING), '-',
+    CAST(ROUND(tsuka_points.tsuka2, 1) AS STRING), '-',
+    CAST(ROUND(tsuka_points.tsuka3, 1) AS STRING), '-',
+    CAST(ROUND(total_time, 1) AS STRING)
+  ) AS time_tsuka_label,
+
+  -- average_1f, average_3f
+  ROUND(total_time / NULLIF(N, 0), 2) AS average_1f,
+  ROUND((total_time / NULLIF(N, 0)) * 3, 2) AS average_3f,
+
+  pace_kekka,
+  CASE pace_kekka
+    WHEN '0' THEN 'H'
+    WHEN '1' THEN 'M'
+    WHEN '2' THEN 'S'
+    ELSE NULL
+  END AS pace_kekka_label
+FROM calc_labels
+WHERE kaisai_nengappi >= '20230101'
