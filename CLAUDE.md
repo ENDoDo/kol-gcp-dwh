@@ -44,6 +44,7 @@ KOLデータ(ZIP)
 │   ├── race.sqlx         # レースマスター
 │   ├── race_uma.sqlx     # 出走馬ワイドテーブル（最大ファイル 92KB）
 │   ├── race_hit.sqlx     # 的中判定・配当テーブル
+│   ├── race_kekka_keika.sqlx  # レース経過情報
 │   ├── schedule.sqlx     # スケジュールテーブル
 │   ├── cross_chokyoshi_*.sqlx  # 調教師軸クロス集計テーブル群
 │   ├── cross_ketto_f_*.sqlx    # 父馬軸クロス集計テーブル群
