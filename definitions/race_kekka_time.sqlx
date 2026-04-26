@@ -199,27 +199,31 @@ SELECT
   ARRAY_TO_STRING(ARRAY(SELECT FORMAT("%.1f", x) FROM UNNEST([lt1, lt2, lt3, lt4, lt5, lt6, lt7, lt8, lt9, lt10, lt11, lt12, lt13, lt14, lt15, lt16, lt17, lt18]) AS x WITH OFFSET off WHERE off < N AND x IS NOT NULL), '-') AS lap_time_label,
 
   -- time_agari_label (6F-5F-4F-3F)
-  CONCAT(
-    FORMAT("%.1f", ROUND(total_time - agari_subs.ag6_sub, 1)), '-',
-    FORMAT("%.1f", ROUND(total_time - agari_subs.ag5_sub, 1)), '-',
-    FORMAT("%.1f", ROUND(total_time - agari_subs.ag4_sub, 1)), '-',
-    FORMAT("%.1f", ROUND(total_time - agari_subs.ag3_sub, 1))
+  IF(total_time > 0,
+    CONCAT(
+      FORMAT("%.1f", ROUND(total_time - agari_subs.ag6_sub, 1)), '-',
+      FORMAT("%.1f", ROUND(total_time - agari_subs.ag5_sub, 1)), '-',
+      FORMAT("%.1f", ROUND(total_time - agari_subs.ag4_sub, 1)), '-',
+      FORMAT("%.1f", ROUND(total_time - agari_subs.ag3_sub, 1))
+    ),
+    NULL
   ) AS time_agari_label,
 
   -- time_tsuka_label (3F-4F-5F-6F)
   CASE 
-    WHEN c3 IS NULL OR c4 IS NULL OR c5 IS NULL OR c6 IS NULL THEN NULL
-    ELSE CONCAT(
-      FORMAT("%.1f", ROUND(c3, 1)), '-',
-      FORMAT("%.1f", ROUND(c4, 1)), '-',
-      FORMAT("%.1f", ROUND(c5, 1)), '-',
-      FORMAT("%.1f", ROUND(c6, 1))
-    )
+    WHEN total_time > 0 AND c3 IS NOT NULL AND c4 IS NOT NULL AND c5 IS NOT NULL AND c6 IS NOT NULL THEN
+      CONCAT(
+        FORMAT("%.1f", ROUND(c3, 1)), '-',
+        FORMAT("%.1f", ROUND(c4, 1)), '-',
+        FORMAT("%.1f", ROUND(c5, 1)), '-',
+        FORMAT("%.1f", ROUND(c6, 1))
+      )
+    ELSE NULL
   END AS time_tsuka_label,
 
   -- average_1f, average_3f
-  ROUND(total_time / NULLIF(N, 0), 1) AS average_1f,
-  ROUND((total_time / NULLIF(N, 0)) * 3, 1) AS average_3f,
+  IF(total_time > 0, ROUND(total_time / NULLIF(N, 0), 1), NULL) AS average_1f,
+  IF(total_time > 0, ROUND((total_time / NULLIF(N, 0)) * 3, 1), NULL) AS average_3f,
 
   pace_kekka,
   CASE pace_kekka
