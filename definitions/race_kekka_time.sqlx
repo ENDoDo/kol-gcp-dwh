@@ -121,24 +121,24 @@ WITH
     SELECT
       *,
       CAST(kyori / 200 AS INT64) AS N,
-      COALESCE(lt1, 0) AS c1,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) AS c2,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) AS c3,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) AS c4,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) AS c5,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) AS c6,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) AS c7,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) AS c8,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) AS c9,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) AS c10,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) + COALESCE(lt11, 0) AS c11,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) + COALESCE(lt11, 0) + COALESCE(lt12, 0) AS c12,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) + COALESCE(lt11, 0) + COALESCE(lt12, 0) + COALESCE(lt13, 0) AS c13,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) + COALESCE(lt11, 0) + COALESCE(lt12, 0) + COALESCE(lt13, 0) + COALESCE(lt14, 0) AS c14,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) + COALESCE(lt11, 0) + COALESCE(lt12, 0) + COALESCE(lt13, 0) + COALESCE(lt14, 0) + COALESCE(lt15, 0) AS c15,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) + COALESCE(lt11, 0) + COALESCE(lt12, 0) + COALESCE(lt13, 0) + COALESCE(lt14, 0) + COALESCE(lt15, 0) + COALESCE(lt16, 0) AS c16,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) + COALESCE(lt11, 0) + COALESCE(lt12, 0) + COALESCE(lt13, 0) + COALESCE(lt14, 0) + COALESCE(lt15, 0) + COALESCE(lt16, 0) + COALESCE(lt17, 0) AS c17,
-      COALESCE(lt1, 0) + COALESCE(lt2, 0) + COALESCE(lt3, 0) + COALESCE(lt4, 0) + COALESCE(lt5, 0) + COALESCE(lt6, 0) + COALESCE(lt7, 0) + COALESCE(lt8, 0) + COALESCE(lt9, 0) + COALESCE(lt10, 0) + COALESCE(lt11, 0) + COALESCE(lt12, 0) + COALESCE(lt13, 0) + COALESCE(lt14, 0) + COALESCE(lt15, 0) + COALESCE(lt16, 0) + COALESCE(lt17, 0) + COALESCE(lt18, 0) AS c18
+      lt1 AS c1,
+      lt1 + lt2 AS c2,
+      lt1 + lt2 + lt3 AS c3,
+      lt1 + lt2 + lt3 + lt4 AS c4,
+      lt1 + lt2 + lt3 + lt4 + lt5 AS c5,
+      lt1 + lt2 + lt3 + lt4 + lt5 + lt6 AS c6,
+      lt1 + lt2 + lt3 + lt4 + lt5 + lt6 + lt7 AS c7,
+      lt1 + lt2 + lt3 + lt4 + lt5 + lt6 + lt7 + lt8 AS c8,
+      lt1 + lt2 + lt3 + lt4 + lt5 + lt6 + lt7 + lt8 + lt9 AS c9,
+      lt1 + lt2 + lt3 + lt4 + lt5 + lt6 + lt7 + lt8 + lt9 + lt10 AS c10,
+      lt1 + lt2 + lt3 + lt4 + lt5 + lt6 + lt7 + lt8 + lt9 + lt10 + lt11 AS c11,
+      lt1 + lt2 + lt3 + lt4 + lt5 + lt6 + lt7 + lt8 + lt9 + lt10 + lt11 + lt12 AS c12,
+      lt1 + lt2 + lt3 + lt4 + lt5 + lt6 + lt7 + lt8 + lt9 + lt10 + lt11 + lt12 + lt13 AS c13,
+      lt1 + lt2 + lt3 + lt4 + lt5 + lt6 + lt7 + lt8 + lt9 + lt10 + lt11 + lt12 + lt13 + lt14 AS c14,
+      lt1 + lt2 + lt3 + lt4 + lt5 + lt6 + lt7 + lt8 + lt9 + lt10 + lt11 + lt12 + lt13 + lt14 + lt15 AS c15,
+      lt1 + lt2 + lt3 + lt4 + lt5 + lt6 + lt7 + lt8 + lt9 + lt10 + lt11 + lt12 + lt13 + lt14 + lt15 + lt16 AS c16,
+      lt1 + lt2 + lt3 + lt4 + lt5 + lt6 + lt7 + lt8 + lt9 + lt10 + lt11 + lt12 + lt13 + lt14 + lt15 + lt16 + lt17 AS c17,
+      lt1 + lt2 + lt3 + lt4 + lt5 + lt6 + lt7 + lt8 + lt9 + lt10 + lt11 + lt12 + lt13 + lt14 + lt15 + lt16 + lt17 + lt18 AS c18
     FROM joined
   ),
 
@@ -153,33 +153,6 @@ WITH
         WHEN 13 THEN c13 WHEN 14 THEN c14 WHEN 15 THEN c15 WHEN 16 THEN c16 WHEN 17 THEN c17 WHEN 18 THEN c18
         ELSE 0
       END AS total_time,
-      -- ハロン数に応じた累計タイムの取得ヘルパー (Tsuka用: ゴール前5F, 4F, 3F, 2F地点)
-      STRUCT(
-        CASE WHEN N-5 <= 0 THEN 0.0 ELSE
-          CASE N-5
-            WHEN 1 THEN c1 WHEN 2 THEN c2 WHEN 3 THEN c3 WHEN 4 THEN c4 WHEN 5 THEN c5 WHEN 6 THEN c6
-            WHEN 7 THEN c7 WHEN 8 THEN c8 WHEN 9 THEN c9 WHEN 10 THEN c10 WHEN 11 THEN c11 WHEN 12 THEN c12
-            WHEN 13 THEN c13 ELSE 0 END
-        END AS tsuka1,
-        CASE WHEN N-4 <= 0 THEN 0.0 ELSE
-          CASE N-4
-            WHEN 1 THEN c1 WHEN 2 THEN c2 WHEN 3 THEN c3 WHEN 4 THEN c4 WHEN 5 THEN c5 WHEN 6 THEN c6
-            WHEN 7 THEN c7 WHEN 8 THEN c8 WHEN 9 THEN c9 WHEN 10 THEN c10 WHEN 11 THEN c11 WHEN 12 THEN c12
-            WHEN 13 THEN c13 WHEN 14 THEN c14 ELSE 0 END
-        END AS tsuka2,
-        CASE WHEN N-3 <= 0 THEN 0.0 ELSE
-          CASE N-3
-            WHEN 1 THEN c1 WHEN 2 THEN c2 WHEN 3 THEN c3 WHEN 4 THEN c4 WHEN 5 THEN c5 WHEN 6 THEN c6
-            WHEN 7 THEN c7 WHEN 8 THEN c8 WHEN 9 THEN c9 WHEN 10 THEN c10 WHEN 11 THEN c11 WHEN 12 THEN c12
-            WHEN 13 THEN c13 WHEN 14 THEN c14 WHEN 15 THEN c15 ELSE 0 END
-        END AS tsuka3,
-        CASE WHEN N-2 <= 0 THEN 0.0 ELSE
-          CASE N-2
-            WHEN 1 THEN c1 WHEN 2 THEN c2 WHEN 3 THEN c3 WHEN 4 THEN c4 WHEN 5 THEN c5 WHEN 6 THEN c6
-            WHEN 7 THEN c7 WHEN 8 THEN c8 WHEN 9 THEN c9 WHEN 10 THEN c10 WHEN 11 THEN c11 WHEN 12 THEN c12
-            WHEN 13 THEN c13 WHEN 14 THEN c14 WHEN 15 THEN c15 WHEN 16 THEN c16 ELSE 0 END
-        END AS tsuka4
-      ) AS tsuka_points,
       -- 上り累計 (Agari用)
       STRUCT(
         CASE WHEN N-3 < 0 THEN 0.0 ELSE
@@ -233,13 +206,16 @@ SELECT
     CAST(ROUND(total_time - agari_subs.ag3_sub, 1) AS STRING)
   ) AS time_agari_label,
 
-  -- time_tsuka_label (N-5, N-4, N-3, N-2)
-  CONCAT(
-    CAST(ROUND(tsuka_points.tsuka1, 1) AS STRING), '-',
-    CAST(ROUND(tsuka_points.tsuka2, 1) AS STRING), '-',
-    CAST(ROUND(tsuka_points.tsuka3, 1) AS STRING), '-',
-    CAST(ROUND(tsuka_points.tsuka4, 1) AS STRING)
-  ) AS time_tsuka_label,
+  -- time_tsuka_label (3F-4F-5F-6F)
+  CASE 
+    WHEN c3 IS NULL OR c4 IS NULL OR c5 IS NULL OR c6 IS NULL THEN NULL
+    ELSE CONCAT(
+      CAST(ROUND(c3, 1) AS STRING), '-',
+      CAST(ROUND(c4, 1) AS STRING), '-',
+      CAST(ROUND(c5, 1) AS STRING), '-',
+      CAST(ROUND(c6, 1) AS STRING)
+    )
+  END AS time_tsuka_label,
 
   -- average_1f, average_3f
   ROUND(total_time / NULLIF(N, 0), 1) AS average_1f,
