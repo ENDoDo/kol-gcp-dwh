@@ -1,6 +1,6 @@
 -- race_kekka_keikaテーブルのラベル変換（数値の半角化）を確認するクエリ
 -- 期待値: keika_midashi2 が '１角' のとき、keika_sort_label が '1角' になっていること
--- 期待値: keika_midashi2 が '３Ｆ' のとき、keika_sort_label が '3Ｆ' になっていること（Fは全角のまま）
+-- 期待値: keika_midashi2 が '３Ｆ' のとき、keika_sort_label が '3F' になっていること（Fも半角）
 
 SELECT
   keika_midashi2,

@@ -170,8 +170,8 @@ SELECT
   p.keika_text AS keika,
   p.keika_midashi1,
   p.keika_midashi2,
-  -- 見出し2を半角化したラベル（数字のみ）
-  TRANSLATE(p.keika_midashi2, '０１２３４５６７８９', '0123456789') AS keika_sort_label,
+  -- 見出し2を半角化したラベル（数字およびF）
+  TRANSLATE(p.keika_midashi2, '０１２３４５６７８９Ｆ', '0123456789F') AS keika_sort_label,
   -- 経過情報 ソート用の連番 1～9
   p.keika_sort_num
 FROM labels_prepared AS p
