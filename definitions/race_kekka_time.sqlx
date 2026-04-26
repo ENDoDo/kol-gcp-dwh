@@ -196,7 +196,7 @@ SELECT
   lt13 AS lap_time13, lt14 AS lap_time14, lt15 AS lap_time15, lt16 AS lap_time16, lt17 AS lap_time17, lt18 AS lap_time18,
   
   -- lap_time_label
-  ARRAY_TO_STRING(ARRAY(SELECT FORMAT("%.1f", x) FROM UNNEST([lt1, lt2, lt3, lt4, lt5, lt6, lt7, lt8, lt9, lt10, lt11, lt12, lt13, lt14, lt15, lt16, lt17, lt18]) AS x WITH OFFSET off WHERE off < N AND x IS NOT NULL), '-') AS lap_time_label,
+  IF(total_time > 0, NULLIF(ARRAY_TO_STRING(ARRAY(SELECT FORMAT("%.1f", x) FROM UNNEST([lt1, lt2, lt3, lt4, lt5, lt6, lt7, lt8, lt9, lt10, lt11, lt12, lt13, lt14, lt15, lt16, lt17, lt18]) AS x WITH OFFSET off WHERE off < N AND x IS NOT NULL), '-'), ''), NULL) AS lap_time_label,
 
   -- time_agari_label (6F-5F-4F-3F)
   IF(total_time > 0,
