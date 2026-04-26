@@ -17,7 +17,7 @@ config {
     keika: "経過情報 (ex)11.12-2(1.3.13)(8.10)(7.9.5)-4.6",
     keika_midashi1: "経過情報 見出し1 (周回等の名称)",
     keika_midashi2: "経過情報 見出し2 (コーナー等の名称)",
-    keika_sort_label: "角 (ex)ソート用の連番が1のとき 角1",
+    keika_sort_label: "経過情報 見出し2を半角化したラベル",
     keika_sort_num: "経過情報 ソート用の連番 1～9"
   },
   bigquery: {
@@ -117,53 +117,62 @@ WITH
       STRUCT(9 AS keika_sort_num, race_keika9_keika AS keika_text, race_keika9_keika_midashi1 AS midashi1, race_keika9_keika_midashi2 AS midashi2)
     ]) AS t
     WHERE t.keika_text IS NOT NULL AND t.keika_text != ''
+  ),
+
+  -- 見出し等のラベルを計算
+  labels_prepared AS (
+    SELECT
+      u.*,
+      -- 経過見出し1の変換ロジック
+      CASE SAFE_CAST(u.midashi1 AS INT64)
+        WHEN 1 THEN '逆'
+        WHEN 2 THEN '１週'
+        WHEN 3 THEN '逆１週'
+        WHEN 4 THEN '２週'
+        ELSE u.midashi1
+      END AS keika_midashi1,
+      -- 経過見出し2の変換ロジック
+      CASE SAFE_CAST(u.midashi2 AS INT64)
+        WHEN 0 THEN 'スタンド前'
+        WHEN 1 THEN '向正面'
+        WHEN 2 THEN '２角'
+        WHEN 3 THEN '３角'
+        WHEN 4 THEN '４角'
+        WHEN 5 THEN 'タスキ'
+        WHEN 6 THEN 'バンケット'
+        WHEN 7 THEN '水濠'
+        WHEN 8 THEN '大竹柵'
+        WHEN 9 THEN '大土塁'
+        WHEN 10 THEN '赤レンガ'
+        WHEN 11 THEN '発馬'
+        WHEN 12 THEN '１角'
+        WHEN 13 THEN '大いけ垣'
+        WHEN 14 THEN '３Ｆ'
+        ELSE u.midashi2
+      END AS keika_midashi2
+    FROM unpivoted AS u
   )
 
 -- 最終SELECT
 SELECT
-  u.race_code_kol,
+  p.race_code_kol,
   -- JRA-VAN仕様 年4桁+月2桁+日2桁+JRA-VAN仕様競馬場コード2桁+回次2桁+日次2桁+レース番号2桁
-  u.kaisai_nengappi_str || u.keibajo_code_jvd || u.kaisai_kaiji || u.kaisai_nichiji || u.race_num AS race_code_jvd,
+  p.kaisai_nengappi_str || p.keibajo_code_jvd || p.kaisai_kaiji || p.kaisai_nichiji || p.race_num AS race_code_jvd,
   -- 発走日8文字 YYYYMMDD
-  u.kaisai_nengappi_str AS schedule_id,
+  p.kaisai_nengappi_str AS schedule_id,
   -- 発走日0時0分 date型
-  DATE(PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', ''))) AS schedule_date,
+  DATE(PARSE_DATETIME('%Y%m%d%H%M', p.kaisai_nengappi_str || REPLACE(p.hasso_jikoku, ':', ''))) AS schedule_date,
   -- 発走日時 (JST)
-  PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', '')) AS hasso_date,
+  PARSE_DATETIME('%Y%m%d%H%M', p.kaisai_nengappi_str || REPLACE(p.hasso_jikoku, ':', '')) AS hasso_date,
   -- 発走日時 (UTC)
-  DATETIME_ADD(PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', '')), INTERVAL -9 HOUR) AS hasso_date_utc,
+  DATETIME_ADD(PARSE_DATETIME('%Y%m%d%H%M', p.kaisai_nengappi_str || REPLACE(p.hasso_jikoku, ':', '')), INTERVAL -9 HOUR) AS hasso_date_utc,
   -- 経過情報
-  u.keika_text AS keika,
-  -- 経過見出し1の変換ロジック
-  CASE SAFE_CAST(u.midashi1 AS INT64)
-    WHEN 1 THEN '逆'
-    WHEN 2 THEN '１週'
-    WHEN 3 THEN '逆１週'
-    WHEN 4 THEN '２週'
-    ELSE u.midashi1
-  END AS keika_midashi1,
-  -- 経過見出し2の変換ロジック
-  CASE SAFE_CAST(u.midashi2 AS INT64)
-    WHEN 0 THEN 'スタンド前'
-    WHEN 1 THEN '向正面'
-    WHEN 2 THEN '２角'
-    WHEN 3 THEN '３角'
-    WHEN 4 THEN '４角'
-    WHEN 5 THEN 'タスキ'
-    WHEN 6 THEN 'バンケット'
-    WHEN 7 THEN '水濠'
-    WHEN 8 THEN '大竹柵'
-    WHEN 9 THEN '大土塁'
-    WHEN 10 THEN '赤レンガ'
-    WHEN 11 THEN '発馬'
-    WHEN 12 THEN '１角'
-    WHEN 13 THEN '大いけ垣'
-    WHEN 14 THEN '３Ｆ'
-    ELSE u.midashi2
-  END AS keika_midashi2,
-  -- 角 (ex)ソート用の連番が1のとき 角1
-  CONCAT('角', CAST(u.keika_sort_num AS STRING)) AS keika_sort_label,
+  p.keika_text AS keika,
+  p.keika_midashi1,
+  p.keika_midashi2,
+  -- 見出し2を半角化したラベル（数字のみ）
+  TRANSLATE(p.keika_midashi2, '０１２３４５６７８９', '0123456789') AS keika_sort_label,
   -- 経過情報 ソート用の連番 1～9
-  u.keika_sort_num
-FROM unpivoted AS u
-WHERE u.kaisai_nengappi_str >= '20230101'
+  p.keika_sort_num
+FROM labels_prepared AS p
+WHERE p.kaisai_nengappi_str >= '20230101'
