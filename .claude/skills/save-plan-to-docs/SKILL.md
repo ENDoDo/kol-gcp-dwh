@@ -38,5 +38,6 @@ docs/plans/plan_<feature_name>_YYYYMMDD.md
 
 ## タイミング
 
-- 実装**完了後**に `docs/plans/` へ保存（実装前の一時プランは `~/.claude/plans/` に置いてよい）
+- プランを作成したら**即座に** `docs/plans/` へ保存する（実装前・実装後を問わず）
+- `~/.claude/plans/` への保存と同時に `docs/plans/` にも保存する
 - 検証結果が出た場合はプランファイルに追記する
