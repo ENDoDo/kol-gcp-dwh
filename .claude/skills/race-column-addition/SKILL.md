@@ -36,3 +36,36 @@ description: Use when adding or modifying columns in race.sqlx in the kol-gcp-dw
 
 両JSファイルの `query` 関数は `r.* EXCEPT(...)` でraceの全カラムを取得する。  
 SQLレベルでは新カラムは自動的に含まれるが、`columns` オブジェクト（Dataformのカラムドキュメント）は手動管理のため、追記しないと説明なしのカラムになる。
+
+## 検証クエリ
+
+```sql
+SELECT
+  race_code_kol,
+  kyosomei_15moji,
+  <追加したカラム名>,
+  kyoso_joken_kubun_label
+FROM `smartkeiba.kolbi_analysis_stg.race`
+WHERE schedule_id >= '20250101'
+ORDER BY hasso_date DESC
+LIMIT 100
+```
+
+確認ポイント:
+- 値が期待通りか（NULLがないか、分布がおかしくないか）
+- `kyosomei_15moji IS NOT NULL` の行と NULL の行で値が正しく分岐しているか（平場/特別系カラムの場合）
+
+## Notion用テキスト
+
+カラム追加後、DB仕様のNotionページに以下の形式で追記する。
+
+```
+| <カラム名> | | - | - | <説明文（race.sqlxのcolumns定義と同じ内容）> |
+```
+
+例:
+```
+| kyoso_hiraba_tokubetsu_kubun | | - | - | kyosomei_15mojiに値がある場合は特別、そうでない場合は平場 |
+```
+
+追記先: DB仕様 > raceテーブルのカラム一覧（`kyoso_joken_kubun_label` の直後）

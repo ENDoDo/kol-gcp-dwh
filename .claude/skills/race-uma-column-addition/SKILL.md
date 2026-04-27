@@ -40,3 +40,36 @@ description: Use when adding or modifying columns in race_uma.sqlx in the kol-gc
 | `includes/race_uma_detail_bubble.js` | Bubble向けのcolumns定義とquery関数 | **columns定義の追加必須** |
 | `includes/race_uma_detail_looker.js` | Looker向けのcolumns定義とquery関数 | **columns定義の追加必須** |
 | `functions/export_race_uma_detail_bubble/main.py` | BubbleへのCSVエクスポート | 通常不要（動的スキーマ取得） |
+
+## 検証クエリ
+
+```sql
+SELECT
+  race_code_uma_jvd,
+  bamei,
+  <追加したカラム名>,
+  kyoso_joken_kubun_label
+FROM `smartkeiba.kolbi_analysis_stg.race_uma`
+WHERE schedule_id >= '20250101'
+ORDER BY hasso_date DESC
+LIMIT 100
+```
+
+確認ポイント:
+- 値が期待通りか（NULLがないか、分布がおかしくないか）
+- 前走データが存在する行と初出走行で正しく値が分岐しているか（前走系カラムの場合）
+
+## Notion用テキスト
+
+カラム追加後、DB仕様のNotionページに以下の形式で追記する。
+
+```
+| <カラム名> | | - | - | <説明文（race_uma.sqlxのcolumns定義と同じ内容）> |
+```
+
+例:
+```
+| zensou_kankaku_num | | - | - | 前走との間隔を整数で表現。初出走:0、連闘:1、中1週:2、中N週:N+1 |
+```
+
+追記先: DB仕様 > race_umaテーブルのカラム一覧（関連カラムの直後）
