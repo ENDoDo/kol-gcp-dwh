@@ -169,6 +169,7 @@ const columns = {
 
 
     zensou_kankaku: "前走との間隔。日付（週）の差分をもとに判定 連闘/中1周/中2週/中3週/中4週/中5週/中6週/中7週",
+    zensou_kankaku_num: "前走との間隔を整数で表現。初出走:0、連闘:1、中1週:2、中N週:N+1",
     // 馬体重・前走比較
     bataiju: "馬体重(kg)",
     bataiju_zensou: "前走 馬体重kg",

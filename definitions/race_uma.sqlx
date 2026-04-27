@@ -168,6 +168,7 @@ config {
     // スピード指数・ローテーション
 
     zensou_kankaku: "前走との間隔。連闘～中15週以上、初出走",
+    zensou_kankaku_num: "前走との間隔を整数で表現。初出走:0、連闘:1、中1週:2、中N週:N+1",
     // 馬体重・前走比較
     bataiju: "馬体重(kg)",
     bataiju_zensou: "前走 馬体重kg",
@@ -967,7 +968,13 @@ WITH
         WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 15 THEN '中14週'
         WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) >= 16 THEN '中15週以上'
         ELSE NULL
-      END AS zensou_kankaku
+      END AS zensou_kankaku,
+
+      -- 前走間隔（整数）: 初出走=0、連闘=1、中1週=2、中N週=N+1
+      COALESCE(
+        DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK),
+        0
+      ) AS zensou_kankaku_num
     FROM
       with_lap_groups
   ),
@@ -1664,6 +1671,7 @@ SELECT
   z.chokyo_sei_reigai,
 
   z.zensou_kankaku,
+  z.zensou_kankaku_num,
   CASE
     WHEN z.toroku_tosu_num <= 8 THEN '中'
     WHEN z.wakuban = '1' THEN '内枠'
