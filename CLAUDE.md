@@ -44,7 +44,9 @@ KOLデータ(ZIP)
 │   ├── race.sqlx         # レースマスター
 │   ├── race_uma.sqlx     # 出走馬ワイドテーブル（最大ファイル 92KB）
 │   ├── race_hit.sqlx     # 的中判定・配当テーブル
-│   ├── race_kekka_keika.sqlx  # レース経過情報
+│   ├── race_kekka_hassojokyo.sqlx  # 発走状況（hasso_jokyo1〜6 アンピボット）
+│   ├── race_kekka_keika.sqlx       # レース経過情報（race_keika1〜9 アンピボット）
+│   ├── race_kekka_time.sqlx        # ラップタイム・通過・上り・ペース
 │   ├── schedule.sqlx     # スケジュールテーブル
 │   ├── cross_chokyoshi_*.sqlx  # 調教師軸クロス集計テーブル群
 │   ├── cross_ketto_f_*.sqlx    # 父馬軸クロス集計テーブル群
@@ -103,6 +105,27 @@ KOLデータ(ZIP)
 
 ### `schedule.sqlx`
 - 開催日スケジュール（`schedule_id = YYYYMMDD`）
+
+### `race_kekka_hassojokyo.sqlx`
+- `kol_sei1.hasso_jokyo1～6`（発走状況）をアンピボットして行展開
+- ソース: `kol_sei1` + `kol_den1`（JOIN on `race_code_kol`）
+- `schedule_date` でパーティション分割、2023-01-01 以降のデータのみ保持
+
+### `race_kekka_keika.sqlx`
+- `kol_sei1.race_keika1～9`（経過情報）をアンピボットして行展開
+- `keika_midashi1`（周回等）・`keika_midashi2`（コーナー等）を数値コード → 日本語ラベルに変換
+- `keika_sort_label`：`keika_midashi2` を全角数字・全角Ｆ → 半角に変換（`TRANSLATE` 関数使用）
+- `schedule_date` でパーティション分割、2023-01-01 以降のデータのみ保持
+
+### `race_kekka_time.sqlx`
+- `kol_sei1` のラップタイム（`lap_time1～18`）・ペース・上り1哩を保持
+- KOLソース値は0.1秒単位（整数）のため `/10.0` で秒変換して格納
+- `lap_time_label`：有効ラップをハイフン区切りでラベル化（例: `12.4-11.8-11.3`）
+- `time_agari_label`：上り 6F-5F-4F-3F の累積タイム
+- `time_tsuka_label`：通過 3F-4F-5F-6F の累積タイム
+- `average_1f` / `average_3f`：1F・3F 平均タイム
+- `pace_kekka_label`：`0→H / 1→M / 2→S`
+- `schedule_date` でパーティション分割、2023-01-01 以降のデータのみ保持
 
 ### `cross_chokyoshi_*.sqlx` / `cross_ketto_f_*.sqlx`
 - 調教師軸・父馬軸のクロス集計テーブル群
@@ -164,3 +187,5 @@ KOLデータ(ZIP)
 - **ポリトラック判定**: `chokyo_course = 'Ｐ'`（全角P）で判定。半角Pではないことに注意。
 - **`race_uma_detail_bubble.sqlx` と `race_uma_detail_looker.sqlx`**: ロジック本体はそれぞれ`includes/`の対応JSファイルに分離済み。
 - **状態管理テーブル**: Export CF群は差分検知のためBigQuery上に`*_export_state`テーブルを維持している（初回実行時に自動作成）。
+- **ラップタイム単位**: KOLソース（`kol_sei1.lap_time*`）は0.1秒単位の整数格納 → `race_kekka_time.sqlx` で `/10.0` して秒単位に変換している。
+- **全角文字のTRANSLATE変換**: `race_kekka_keika` の `keika_sort_label` では `TRANSLATE` 関数で全角数字・全角Ｆを半角に変換（`０～９Ｆ` → `0～9F`）。他テーブルで同種の変換が必要な場合も同パターンを使用する。
