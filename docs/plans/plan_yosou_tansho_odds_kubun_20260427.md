@@ -69,4 +69,58 @@ yosou_tansho_odds_kubun: "予想単勝オッズ区分",
 
 ## 検証結果
 
-→ 実装後に `verification_queries/` に追記予定
+### STG（`kolbi_analysis_stg`）
+
+```sql
+SELECT yosou_tansho_odds_kubun, COUNT(*) AS cnt,
+  MIN(yosou_tansho_odds_float) AS odds_min, MAX(yosou_tansho_odds_float) AS odds_max
+FROM `smartkeiba.kolbi_analysis_stg.race_uma`
+WHERE schedule_id >= '20250101'
+GROUP BY yosou_tansho_odds_kubun ORDER BY odds_min NULLS LAST
+```
+
+| kubun | cnt | odds_min | odds_max |
+|-------|----:|----------|----------|
+| 1.0〜1.4 | 12 | 1.2 | 1.4 |
+| 1.5〜1.9 | 432 | 1.5 | 1.9 |
+| 2.0〜2.9 | 2,718 | 2.0 | 2.9 |
+| 3.0〜3.9 | 3,008 | 3.0 | 3.9 |
+| 4.0〜4.9 | 2,766 | 4.0 | 4.9 |
+| 5.0〜6.9 | 4,413 | 5.0 | 6.9 |
+| 7.0〜9.9 | 5,270 | 7.0 | 9.9 |
+| 10.0〜14.9 | 6,629 | 10.0 | 14.9 |
+| 15.0〜19.9 | 5,023 | 15.0 | 19.9 |
+| 20.0〜29.9 | 7,161 | 20.0 | 29.9 |
+| 30.0〜49.9 | 9,384 | 30.0 | 49.9 |
+| 50以上 | 11,000 | 50.0 | 50.0 |
+| NULL | 0 | - | - |
+
+→ 全12区分にデータあり、境界値正常、NULL なし
+
+### PRD（`kolbi_analysis`）
+
+```sql
+SELECT yosou_tansho_odds_kubun, COUNT(*) AS cnt,
+  MIN(yosou_tansho_odds_float) AS odds_min, MAX(yosou_tansho_odds_float) AS odds_max
+FROM `smartkeiba.kolbi_analysis.race_uma`
+WHERE schedule_id >= '20250101'
+GROUP BY yosou_tansho_odds_kubun ORDER BY odds_min NULLS LAST
+```
+
+| kubun | cnt | odds_min | odds_max |
+|-------|----:|----------|----------|
+| 1.0〜1.4 | 14 | 1.2 | 1.4 |
+| 1.5〜1.9 | 486 | 1.5 | 1.9 |
+| 2.0〜2.9 | 3,044 | 2.0 | 2.9 |
+| 3.0〜3.9 | 3,341 | 3.0 | 3.9 |
+| 4.0〜4.9 | 3,054 | 4.0 | 4.9 |
+| 5.0〜6.9 | 4,970 | 5.0 | 6.9 |
+| 7.0〜9.9 | 5,857 | 7.0 | 9.9 |
+| 10.0〜14.9 | 7,368 | 10.0 | 14.9 |
+| 15.0〜19.9 | 5,599 | 15.0 | 19.9 |
+| 20.0〜29.9 | 7,981 | 20.0 | 29.9 |
+| 30.0〜49.9 | 10,521 | 30.0 | 49.9 |
+| 50以上 | 12,372 | 50.0 | 50.0 |
+| NULL | 1 | - | - |
+
+→ 全12区分にデータあり、境界値正常。NULL 1件は odds が NULL の行（正常動作）

@@ -24,6 +24,28 @@ description: Use when adding or modifying columns in race.sqlx in the kol-gcp-dw
 - [ ] `columns` オブジェクトの同セクションに同じ説明を追加（bubble.js と同じ内容）
 - **SQLの修正は不要**（同上）
 
+### 4. Dataform コンパイル確認
+- [ ] `npx @dataform/cli compile` でエラーがないか確認
+
+### 5. Dataform 手動実行 STG → 完了待ち
+- [ ] GCP Dataform コンソール > `kol-dataform-repo-stg` からワークフローを手動実行
+- [ ] 実行完了（race テーブルの更新）を確認してから次へ進む
+
+### 6. BigQuery 検証 STG
+- [ ] 分布確認クエリを `kolbi_analysis_stg` に対して実行（下記参照）
+- [ ] 値が期待通りか確認（**クエリと結果を必ずプランファイルと会話内に記録する**）
+
+### 7. Dataform 手動実行 PRD → 完了待ち
+- [ ] GCP Dataform コンソール > `kol-dataform-repo` からワークフローを手動実行
+- [ ] 実行完了を確認してから次へ進む
+
+### 8. BigQuery 検証 PRD
+- [ ] 同じクエリを `kolbi_analysis` に対して実行
+- [ ] STG と同様の分布になっているか確認
+
+### 9. Notion DB仕様を更新
+- [ ] 検証結果をもとに Notion 用テキストを作成し追記（下記参照）
+
 ## 各ファイルの役割
 
 | ファイル | 役割 | カラム追加時の作業 |
@@ -37,9 +59,28 @@ description: Use when adding or modifying columns in race.sqlx in the kol-gcp-dw
 両JSファイルの `query` 関数は `r.* EXCEPT(...)` でraceの全カラムを取得する。  
 SQLレベルでは新カラムは自動的に含まれるが、`columns` オブジェクト（Dataformのカラムドキュメント）は手動管理のため、追記しないと説明なしのカラムになる。
 
-## 検証クエリ
+## 検証クエリ（STG / PRD 両方で実行）
+
+`mcp__claude_ai_Google_Cloud_BigQuery__execute_sql_readonly` で実行し、**クエリと結果を必ずプランファイルと会話内に記録する**。
+
+| 環境 | dataset |
+|------|---------|
+| STG | `kolbi_analysis_stg` |
+| PRD | `kolbi_analysis` |
 
 ```sql
+-- 区分・ラベル系カラムの場合：分布確認（STGは kolbi_analysis_stg、PRDは kolbi_analysis に変更）
+SELECT
+  <追加したカラム名>,
+  COUNT(*) AS cnt
+FROM `smartkeiba.kolbi_analysis_stg.race`
+WHERE schedule_id >= '20250101'
+GROUP BY <追加したカラム名>
+ORDER BY cnt DESC
+```
+
+```sql
+-- 数値・フラグ系カラムの場合：サンプル確認
 SELECT
   race_code_kol,
   kyosomei_15moji,
@@ -54,10 +95,11 @@ LIMIT 100
 確認ポイント:
 - 値が期待通りか（NULLがないか、分布がおかしくないか）
 - `kyosomei_15moji IS NOT NULL` の行と NULL の行で値が正しく分岐しているか（平場/特別系カラムの場合）
+- STG と PRD で同様の分布になっているか
 
 ## Notion用テキスト
 
-カラム追加後、DB仕様のNotionページに以下の形式で追記する。
+検証後、DB仕様のNotionページに以下の形式で追記する。**検証結果（件数・分布）も合わせてコメントとして記録する。**
 
 ```
 | <カラム名> | | - | - | <説明文（race.sqlxのcolumns定義と同じ内容）> |
