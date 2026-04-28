@@ -1,0 +1,137 @@
+---
+name: dataform-execute
+description: Use when manually triggering a Dataform workflow run for this project (STG or PRD), polling for completion, and running BigQuery verification queries. gcloud does not have a native dataform command — use the Python REST API approach documented here.
+---
+
+# Dataform 手動実行スキル
+
+## 概要
+
+このプロジェクトの Dataform ワークフローは `gcloud` に `dataform` サブコマンドがないため、**Python + REST API** で実行する。ADC（Application Default Credentials）から OAuth2 トークンを取得し、Dataform API と BigQuery API を直接呼び出す。
+
+## 環境情報
+
+| 項目 | 値 |
+|------|----|
+| GCP プロジェクト | `smartkeiba` |
+| リージョン | `asia-northeast1` |
+| STG リポジトリ | `kol-dataform-repo-stg` |
+| PRD リポジトリ | `kol-dataform-repo` |
+| STG ワークフロー | `daily-race-table-update-stg` |
+| PRD ワークフロー | `daily-race-table-update` |
+| ADC ファイル | `~/.config/gcloud/application_default_credentials.json` |
+
+## 共通ヘルパー
+
+```python
+import json, urllib.request, urllib.parse, time
+
+with open('/Users/endodo/.config/gcloud/application_default_credentials.json') as f:
+    creds = json.load(f)
+
+def get_token():
+    data = urllib.parse.urlencode({
+        'client_id': creds['client_id'],
+        'client_secret': creds['client_secret'],
+        'refresh_token': creds['refresh_token'],
+        'grant_type': 'refresh_token'
+    }).encode()
+    req = urllib.request.Request('https://oauth2.googleapis.com/token', data=data,
+        headers={'Content-Type': 'application/x-www-form-urlencoded'})
+    with urllib.request.urlopen(req) as resp:
+        return json.load(resp)['access_token']
+```
+
+## Dataform ワークフロー実行
+
+```python
+# ENV: 'stg' or 'prd'
+ENV = 'stg'
+REPO = 'kol-dataform-repo-stg' if ENV == 'stg' else 'kol-dataform-repo'
+WF   = 'daily-race-table-update-stg' if ENV == 'stg' else 'daily-race-table-update'
+LOC  = 'asia-northeast1'
+
+body = json.dumps({
+    "workflowConfig": f"projects/smartkeiba/locations/{LOC}/repositories/{REPO}/workflowConfigs/{WF}"
+}).encode()
+
+req = urllib.request.Request(
+    f'https://dataform.googleapis.com/v1beta1/projects/smartkeiba/locations/{LOC}/repositories/{REPO}/workflowInvocations',
+    data=body, method='POST',
+    headers={'Authorization': f'Bearer {get_token()}', 'Content-Type': 'application/json'}
+)
+with urllib.request.urlopen(req) as resp:
+    inv = json.load(resp)
+
+invocation_name = inv['name']
+print(f"Started: {inv['state']}")
+
+# Poll until done (30s intervals)
+for i in range(40):
+    time.sleep(30)
+    req2 = urllib.request.Request(
+        f'https://dataform.googleapis.com/v1beta1/{invocation_name}',
+        headers={'Authorization': f'Bearer {get_token()}'}
+    )
+    with urllib.request.urlopen(req2) as resp:
+        status = json.load(resp)
+    state = status['state']
+    print(f"[{(i+1)*30}s] {state}")
+    if state not in ('RUNNING', 'PENDING'):
+        break
+```
+
+## BigQuery 検証クエリ実行
+
+```python
+DATASET = 'kolbi_analysis_stg' if ENV == 'stg' else 'kolbi_analysis'
+
+def run_bq(query):
+    body = json.dumps({
+        "configuration": {"query": {"query": query, "useLegacySql": False}},
+        "jobReference": {"projectId": "smartkeiba", "location": "asia-northeast1"}
+    }).encode()
+    req = urllib.request.Request(
+        'https://bigquery.googleapis.com/bigquery/v2/projects/smartkeiba/jobs',
+        data=body, method='POST',
+        headers={'Authorization': f'Bearer {get_token()}', 'Content-Type': 'application/json'}
+    )
+    with urllib.request.urlopen(req) as resp:
+        job = json.load(resp)
+    job_id = job['jobReference']['jobId']
+
+    for _ in range(20):
+        time.sleep(3)
+        req2 = urllib.request.Request(
+            f'https://bigquery.googleapis.com/bigquery/v2/projects/smartkeiba/jobs/{job_id}?location=asia-northeast1',
+            headers={'Authorization': f'Bearer {get_token()}'}
+        )
+        with urllib.request.urlopen(req2) as resp:
+            status = json.load(resp)
+        if status['status']['state'] == 'DONE':
+            break
+
+    if 'errorResult' in status['status']:
+        print("ERROR:", status['status']['errorResult'])
+        return
+
+    req3 = urllib.request.Request(
+        f'https://bigquery.googleapis.com/bigquery/v2/projects/smartkeiba/queries/{job_id}?location=asia-northeast1&maxResults=100&timeoutMs=30000',
+        headers={'Authorization': f'Bearer {get_token()}'}
+    )
+    with urllib.request.urlopen(req3) as resp:
+        results = json.load(resp)
+
+    fields = [f['name'] for f in results['schema']['fields']]
+    print('\t'.join(fields))
+    for row in results.get('rows', []):
+        vals = [v.get('v', '') if v.get('v') is not None else 'NULL' for v in row['f']]
+        print('\t'.join(vals))
+```
+
+## 注意点
+
+- `gcloud auth print-access-token` はセッション外で認証エラーになる → 必ず ADC ファイルから直接トークンを取得する
+- BigQuery ジョブのリージョンは `asia-northeast1`（US ではない）→ `location` パラメータを必ず指定する
+- STG → PRD の順番で実行し、両環境で検証してから Notion を更新する
+- Dataform 実行は通常 30 秒以内に SUCCEEDED になる

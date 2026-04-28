@@ -951,31 +951,34 @@ WITH
 
       -- 前走間隔
       CASE
-        WHEN LAG(hasso_date) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) IS NULL THEN '初出走'
-        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 1 THEN '連闘'
-        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 2 THEN '中1週'
-        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 3 THEN '中2週'
-        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 4 THEN '中3週'
-        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 5 THEN '中4週'
-        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 6 THEN '中5週'
-        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 7 THEN '中6週'
-        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 8 THEN '中7週'
-        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 9 THEN '中8週'
-        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 10 THEN '中9週'
-        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 11 THEN '中10週'
-        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 12 THEN '中11週'
-        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 13 THEN '中12週'
-        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 14 THEN '中13週'
-        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) = 15 THEN '中14週'
-        WHEN DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK) >= 16 THEN '中15週以上'
-        ELSE NULL
+        WHEN LAG(DATE(hasso_date)) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) IS NULL THEN '初出走'
+        ELSE
+          CASE CAST(CEIL(DATE_DIFF(DATE(hasso_date), LAG(DATE(hasso_date)) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), DAY) / 7.0) AS INT64)
+            WHEN 0 THEN NULL
+            WHEN 1 THEN '連闘'
+            WHEN 2 THEN '中1週'
+            WHEN 3 THEN '中2週'
+            WHEN 4 THEN '中3週'
+            WHEN 5 THEN '中4週'
+            WHEN 6 THEN '中5週'
+            WHEN 7 THEN '中6週'
+            WHEN 8 THEN '中7週'
+            WHEN 9 THEN '中8週'
+            WHEN 10 THEN '中9週'
+            WHEN 11 THEN '中10週'
+            WHEN 12 THEN '中11週'
+            WHEN 13 THEN '中12週'
+            WHEN 14 THEN '中13週'
+            WHEN 15 THEN '中14週'
+            ELSE '中15週以上'
+          END
       END AS zensou_kankaku,
 
       -- 前走間隔（整数）: 初出走=0、連闘=1、中1週=2、中N週=N+1
-      COALESCE(
-        DATE_DIFF(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY)), LAG(DATE_TRUNC(DATE(hasso_date), WEEK(MONDAY))) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), WEEK),
-        0
-      ) AS zensou_kankaku_num
+      CASE
+        WHEN LAG(DATE(hasso_date)) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) IS NULL THEN 0
+        ELSE CAST(CEIL(DATE_DIFF(DATE(hasso_date), LAG(DATE(hasso_date)) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), DAY) / 7.0) AS INT64)
+      END AS zensou_kankaku_num
     FROM
       with_lap_groups
   ),
