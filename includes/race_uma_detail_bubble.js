@@ -131,6 +131,7 @@ const columns = {
     chokyo_sei_course: "競走成績出走馬データ  追い切り 調教コース (例)A/B/C/CW/D/E/本/内/芝/ダ/障/牧/坂/W/DW/外",
     chokyo_sei_course_kubun: "競走成績出走馬データ  追い切り 調教コース区分",
     chokyo_sei_basho_course_label: "競走成績出走馬データ  追い切り 調教場所とコースを結合したラベル (例)栗東坂",
+    chokyo_sei_basho_course_label_zensou: "競走成績出走馬データ  追い切り 調教場所コース 前走",
     chokyo_sei_babajotai: "競走成績出走馬データ  追い切り 調教馬場状態 良/重/不/稍",
     chokyo_sei_hanro_pool_kaisu_int: "競走成績出走馬データ  追い切り 坂路またはプール:chokyo_6f それ以外:null (例)1",
     chokyo_sei_8f: "競走成績出走馬データ  追い切り 調教タイム 8F",

@@ -125,6 +125,7 @@ config {
     chokyo_sei_course: "競走成績出走馬データ  追い切り 調教コース (例)A/B/C/CW/D/E/本/内/芝/ダ/障/牧/坂/W/DW/外",
     chokyo_sei_course_kubun: "競走成績出走馬データ 追い切り chokyo_courseをもとに判定 「坂」の場合:「坂路」 / 「Ｐ」の場合:「ポリトラック」 / 「プール」の場合:「プール」 / 「坂」「Ｐ」「プール」以外の場合:「コース」",
     chokyo_sei_basho_course_label: "競走成績出走馬データ  追い切り 調教場所とコースを結合したラベル (例)栗東坂",
+    chokyo_sei_basho_course_label_zensou: "競走成績出走馬データ  追い切り 調教場所コース 前走",
     chokyo_sei_babajotai: "競走成績出走馬データ  追い切り 調教馬場状態 良/重/不/稍",
     chokyo_sei_hanro_pool_kaisu_int: "競走成績出走馬データ  追い切り 坂路またはプール:chokyo_6f それ以外:null (例)1",
     chokyo_sei_8f: "競走成績出走馬データ  追い切り 調教タイム 8F",
@@ -876,6 +877,8 @@ WITH
 
       LAG(chokyo_den_oikiri_lap_group, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS chokyo_den_oikiri_lap_group_zensou,
       LAG(chokyo_sei_lap_group, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS chokyo_sei_lap_group_zensou,
+      LAG(chokyo_sei_basho, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS chokyo_sei_basho_zensou,
+      LAG(chokyo_sei_course, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS chokyo_sei_course_zensou,
       LAG(kakutei_chakujun, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kakutei_chakujun_zensou_raw,
 
       LAG(kishu_code, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kishu_code_zensou,
@@ -1570,6 +1573,10 @@ SELECT
     WHEN z.chokyo_sei_basho IS NULL AND z.chokyo_sei_course IS NULL THEN NULL
     ELSE COALESCE(z.chokyo_sei_basho, '') || COALESCE(z.chokyo_sei_course, '')
   END AS chokyo_sei_basho_course_label,
+  CASE
+    WHEN z.chokyo_sei_basho_zensou IS NULL AND z.chokyo_sei_course_zensou IS NULL THEN NULL
+    ELSE COALESCE(z.chokyo_sei_basho_zensou, '') || COALESCE(z.chokyo_sei_course_zensou, '')
+  END AS chokyo_sei_basho_course_label_zensou,
   z.chokyo_sei_babajotai,
 
   -- 調教タイム関連フィールド (chokyo_sei_course の略語 '坂', 'P' を使用)
