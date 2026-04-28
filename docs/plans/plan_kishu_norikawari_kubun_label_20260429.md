@@ -1,7 +1,7 @@
 # 実装プラン: kishu_norikawari_kubun_label null統一修正
 
 **実施日**: 2026-04-29
-**ステータス**: 実施中
+**ステータス**: 完了
 
 ## Context
 
@@ -79,7 +79,22 @@ WHERE schedule_id >= '20250101'
 GROUP BY kishu_norikawari_kubun_label
 ORDER BY kishu_norikawari_kubun_label NULLS LAST
 ```
-期待: `'はい'` と `NULL` の2グループのみ（`'いいえ'` が消えること）
+
+**結果（2026-04-29）:**
+| kishu_norikawari_kubun_label | cnt |
+|---|---|
+| はい | 32,668 |
+| NULL | 25,148 |
+
+✅ `'いいえ'` 消滅、`'はい'` / `NULL` の2グループに統一
 
 ### PRD 検証クエリ
-同クエリを `kolbi_analysis` で実行し、STG と同様の分布を確認。
+同クエリを `kolbi_analysis` で実行。
+
+**結果（2026-04-29）:**
+| kishu_norikawari_kubun_label | cnt |
+|---|---|
+| はい | 36,936 |
+| NULL | 27,672 |
+
+✅ STG と同様の分布を確認
