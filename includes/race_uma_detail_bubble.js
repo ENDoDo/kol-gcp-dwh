@@ -247,13 +247,13 @@ const columns = {
     yosou_tansho_odds_kubun: "予想単勝オッズ区分",
     kakutei_tansho_ninkijun_num: "確定 単勝 人気順 整数型",
     kakutei_tansho_odds_float: "確定 単勝 オッズ 小数点第一位まで",
-    
+
     // 展開予想
     tenkai_kyakushitsu_kubun: "展開予想 脚質 逃げ/先行/差し/追い込み",
     tenkai_position: "展開予想 脚質内の順番。一団時は全員同値 1～4",
     tenkai_ittai_flag: "展開予想 一団フラグ。該当する場合「はい」該当しない場合はnull",
     tenkai_order: "展開予想 全体通し順位。一団時は同値になる。1～28",
-    
+
     // --- raceテーブル由来のカラム ---
     race_name: "レース名。オープン競走では競走名とグレード、それ以外では条件を組み合わせて生成",
     kyori_kubun: "短距離(～1399m)/マイル(1400m～1699m)/中距離(1700m～2099m)/長距離(2100m～)",
