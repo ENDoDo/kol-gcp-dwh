@@ -44,6 +44,7 @@ KOLデータ(ZIP)
 │   ├── race.sqlx         # レースマスター
 │   ├── race_uma.sqlx     # 出走馬ワイドテーブル（最大ファイル 92KB）
 │   ├── race_hit.sqlx     # 的中判定・配当テーブル
+│   ├── race_kekka_haraimodoshi.sqlx # 払戻情報テーブル
 │   ├── race_kekka_hassojokyo.sqlx  # 発走状況（hasso_jokyo1〜6 アンピボット）
 │   ├── race_kekka_keika.sqlx       # レース経過情報（race_keika1〜9 アンピボット）
 │   ├── race_kekka_time.sqlx        # ラップタイム・通過・上り・ペース
@@ -165,6 +166,13 @@ KOLデータ(ZIP)
 - レスポンスキーの表記ゆれあり: `is_import_success` と `is import success`（スペース区切り）の両方を考慮済み
 - 「短時間で同じファイルの取り込みを検知したため中止」エラーは例外扱いせず `WARNING` ログのみ
 
+### ポータルからの手動実行（force_resend）
+- kol-gcp-management の Bubble連携タブから HTTP POST で `from_date` / `to_date` / `force_resend: true` を渡すと手動再送できる
+- `force_resend=true` 時は差分検知をスキップ・`ENABLE_BUBBLE_API` を無視して全件送信し、SSE ストリームで進捗を返す
+- FTP 送信完了後は `*_export_state` テーブルを MERGE 更新するため、次回の自動差分検知には影響しない
+- パラメータ省略時は従来の自動フローとして動作（後方互換）
+- ポータル向け API 仕様は `docs/bubble-sync-cf-api.md` を参照
+
 ---
 
 ## Secret Manager の登録名
@@ -189,3 +197,4 @@ KOLデータ(ZIP)
 - **状態管理テーブル**: Export CF群は差分検知のためBigQuery上に`*_export_state`テーブルを維持している（初回実行時に自動作成）。
 - **ラップタイム単位**: KOLソース（`kol_sei1.lap_time*`）は0.1秒単位の整数格納 → `race_kekka_time.sqlx` で `/10.0` して秒単位に変換している。
 - **全角文字のTRANSLATE変換**: `race_kekka_keika` の `keika_sort_label` では `TRANSLATE` 関数で全角数字・全角Ｆを半角に変換（`０～９Ｆ` → `0～9F`）。他テーブルで同種の変換が必要な場合も同パターンを使用する。
+- **払戻テーブル（race_kekka_haraimodoshi）**: `race_kekka_haraimodoshi.sqlx` で定義。券種ごとの払戻金・組み合わせを格納。

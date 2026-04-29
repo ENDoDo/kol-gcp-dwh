@@ -97,6 +97,16 @@ graph TD
 - レースの経過情報（コーナー通過順位など）を展開したテーブル。
 - 1レースあたりの経過ポイント（角1〜角9）をレコードとして保持。
 
+### `race_kekka_hassojokyo.sqlx`
+- 発走状況（`hasso_jokyo1〜6`）をアンピボットして行展開したテーブル。
+
+### `race_kekka_time.sqlx`
+- ラップタイム・ペース・上り・通過タイムを保持するテーブル。
+- KOLソース値は0.1秒単位整数のため `/10.0` で秒変換して格納。
+
+### `race_kekka_haraimodoshi.sqlx`
+- 払戻情報テーブル。券種ごとの払戻金・組み合わせを格納。
+
 ## ディレクトリ構成
 
 ```
@@ -108,9 +118,9 @@ graph TD
 │   └── ...
 ├── functions/          # Cloud Functions ソースコード
 │   ├── dispatcher/     # Dataform起動用Dispatcher
-│   ├── export_races/   # レース情報エクスポート
-│   ├── export_schedules/ # スケジュール情報エクスポート
-│   └── export_race_uma_details/ # 馬詳細情報エクスポート
+│   ├── export_races/   # レース情報エクスポート → FTP + Bubble
+│   ├── export_schedules/ # スケジュール情報エクスポート → FTP + Bubble
+│   └── export_race_uma_detail_bubble/ # 馬詳細情報エクスポート → FTP + Bubble
 ├── terraform/          # GCPインフラ定義
 │   ├── main.tf
 │   ├── scheduler.tf    # Cloud Scheduler定義
@@ -154,7 +164,7 @@ terraform apply -var-file="prd.tfvars" -auto-approve
 
 ## Bubble API連携の制御
 
-各エクスポート用 Cloud Function (`export_schedules`, `export_races`, `export_race_uma_details`, `export_race_uma_odds`) による Bubble API への通知処理は、Terraform の変数 `enable_bubble_api` で制御可能です。
+各エクスポート用 Cloud Function (`export_schedules`, `export_races`, `export_race_uma_detail_bubble`) による Bubble API への通知処理は、Terraform の変数 `enable_bubble_api` で制御可能です。
 
 ### 設定の切り替え
 
@@ -182,3 +192,7 @@ terraform apply -var-file="prd.tfvars" -auto-approve
 1.  Terraform が `ENABLE_BUBBLE_API` という環境変数を Cloud Functions に渡します。
 2.  Python コード内で `os.environ.get("ENABLE_BUBBLE_API")` を確認します。
 3.  値が `false` の場合、API リクエストを送信せずに処理を完了し、その旨をログに出力します。
+
+### 手動実行（ポータルからの強制再送）
+
+kol-gcp-management ポータルの「Bubble連携」タブから、日付範囲を指定して手動で再送できます。`force_resend=true` を指定した場合は `ENABLE_BUBBLE_API` の値に関わらず FTP + Bubble の両方を実行し、SSE ストリームでリアルタイムの進捗を返します。詳細は [`docs/bubble-sync-cf-api.md`](docs/bubble-sync-cf-api.md) を参照してください。
