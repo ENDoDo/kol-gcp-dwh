@@ -1,0 +1,256 @@
+-- =================================================================
+-- race_kekka_haraimodoshi.sqlx
+-- 説明: kol_sei1の払戻情報（全賭式）を賭式別・人気順に行展開したテーブル。
+--       1レース1行のワイド形式 → 1賭式1行の正規化形式に変換。
+-- =================================================================
+
+config {
+  type: "table",
+  description: "kol_sei1の払戻情報（単勝/複勝/枠連/馬連/ワイド/馬単/3連複/3連単）を賭式別・人気順に行展開したテーブル",
+  columns: {
+    race_code_kol: "KOL仕様レースID 年月日8桁+KOL仕様開催場所コード2桁+開催回次2桁+開催日次2桁+レース番号2桁",
+    race_code_jvd: "JRA-VAN仕様 年4桁+月2桁+日2桁+JRA-VAN仕様競馬場コード2桁+回次2桁+日次2桁+レース番号2桁",
+    schedule_id: "発走日8文字 YYYYMMDD",
+    schedule_date: "発走日0時0分 date型",
+    hasso_date: "発走日時のUTC時刻から9時間経過（JST）",
+    hasso_date_utc: "発走日時のUTC時刻",
+    kakeshiki_kubun: "賭式 単勝/複勝/枠連/馬連/ワイド/馬単/3連複/3連単",
+    kakeshiki_sort_num: "賭式別 ソート用の連番 1=単勝 2=複勝 3=枠連 4=馬連 5=ワイド 6=馬単 7=3連複 8=3連単",
+    ninki_num: "賭式と組番の人気順（単勝・複勝はNULL）",
+    kumiban_label: "組番 ex)馬連の場合\"5-6\" 3連単の場合\"6→8→13\" 単勝の場合\"6\"",
+    haraimodoshikin: "払戻金 整数型"
+  },
+  bigquery: {
+    partitionBy: "schedule_date"
+  }
+}
+
+WITH
+  -- kol_sei1から払戻全フィールドを取得
+  sei1_base AS (
+    SELECT
+      race_code_kol,
+      -- 単勝 (1-3)
+      tansho1_umaban, tansho1_haraimodoshikin,
+      tansho2_umaban, tansho2_haraimodoshikin,
+      tansho3_umaban, tansho3_haraimodoshikin,
+      -- 複勝 (1-5)
+      fukusho1_umaban, fukusho1_haraimodoshikin,
+      fukusho2_umaban, fukusho2_haraimodoshikin,
+      fukusho3_umaban, fukusho3_haraimodoshikin,
+      fukusho4_umaban, fukusho4_haraimodoshikin,
+      fukusho5_umaban, fukusho5_haraimodoshikin,
+      -- 枠連 (1-3)
+      wakuren1_kumiban, wakuren1_ninkijun, wakuren1_haraimodoshikin,
+      wakuren2_kumiban, wakuren2_ninkijun, wakuren2_haraimodoshikin,
+      wakuren3_kumiban, wakuren3_ninkijun, wakuren3_haraimodoshikin,
+      -- 馬連 (1-3)
+      umaren1_kumiban, umaren1_ninkijun, umaren1_haraimodoshikin,
+      umaren2_kumiban, umaren2_ninkijun, umaren2_haraimodoshikin,
+      umaren3_kumiban, umaren3_ninkijun, umaren3_haraimodoshikin,
+      -- ワイド (1-7)
+      wide1_kumiban, wide1_ninkijun, wide1_haraimodoshikin,
+      wide2_kumiban, wide2_ninkijun, wide2_haraimodoshikin,
+      wide3_kumiban, wide3_ninkijun, wide3_haraimodoshikin,
+      wide4_kumiban, wide4_ninkijun, wide4_haraimodoshikin,
+      wide5_kumiban, wide5_ninkijun, wide5_haraimodoshikin,
+      wide6_kumiban, wide6_ninkijun, wide6_haraimodoshikin,
+      wide7_kumiban, wide7_ninkijun, wide7_haraimodoshikin,
+      -- 馬単 (1-6)
+      umatan1_kumiban, umatan1_ninkijun, umatan1_haraimodoshikin,
+      umatan2_kumiban, umatan2_ninkijun, umatan2_haraimodoshikin,
+      umatan3_kumiban, umatan3_ninkijun, umatan3_haraimodoshikin,
+      umatan4_kumiban, umatan4_ninkijun, umatan4_haraimodoshikin,
+      umatan5_kumiban, umatan5_ninkijun, umatan5_haraimodoshikin,
+      umatan6_kumiban, umatan6_ninkijun, umatan6_haraimodoshikin,
+      -- 3連複 (1-3)
+      sanrenpuku1_kumiban, sanrenpuku1_ninkijun, sanrenpuku1_haraimodoshikin,
+      sanrenpuku2_kumiban, sanrenpuku2_ninkijun, sanrenpuku2_haraimodoshikin,
+      sanrenpuku3_kumiban, sanrenpuku3_ninkijun, sanrenpuku3_haraimodoshikin,
+      -- 3連単 (1-6)
+      sanrentan1_kumiban, sanrentan1_ninkijun, sanrentan1_haraimodoshikin,
+      sanrentan2_kumiban, sanrentan2_ninkijun, sanrentan2_haraimodoshikin,
+      sanrentan3_kumiban, sanrentan3_ninkijun, sanrentan3_haraimodoshikin,
+      sanrentan4_kumiban, sanrentan4_ninkijun, sanrentan4_haraimodoshikin,
+      sanrentan5_kumiban, sanrentan5_ninkijun, sanrentan5_haraimodoshikin,
+      sanrentan6_kumiban, sanrentan6_ninkijun, sanrentan6_haraimodoshikin
+    FROM ${ref("kol_sei1")}
+  ),
+
+  -- kol_den1からレース基本情報を取得（race_kekka_hassojokyo.sqlxと同一）
+  den1_base AS (
+    SELECT
+      d1.race_code_kol,
+      d1.keibajo_code,
+      d1.kaisai_nengappi,
+      d1.hasso_jikoku,
+      d1.kaisai_kaiji,
+      d1.kaisai_nichiji,
+      d1.race_num,
+      CASE d1.keibajo_code
+        WHEN '08' THEN '01' -- 札幌
+        WHEN '09' THEN '02' -- 函館
+        WHEN '06' THEN '03' -- 福島
+        WHEN '07' THEN '04' -- 新潟
+        WHEN '04' THEN '05' -- 東京
+        WHEN '05' THEN '06' -- 中山
+        WHEN '02' THEN '07' -- 中京
+        WHEN '00' THEN '08' -- 京都
+        WHEN '01' THEN '09' -- 阪神
+        WHEN '03' THEN '10' -- 小倉
+        ELSE NULL
+      END AS keibajo_code_jvd
+    FROM ${ref("kol_den1")} AS d1
+  ),
+
+  -- SEI1とDEN1を結合
+  joined AS (
+    SELECT
+      s1.*,
+      d1.keibajo_code_jvd,
+      d1.kaisai_nengappi AS kaisai_nengappi_str,
+      d1.hasso_jikoku,
+      d1.kaisai_kaiji,
+      d1.kaisai_nichiji,
+      d1.race_num
+    FROM sei1_base AS s1
+    LEFT JOIN den1_base AS d1
+      ON s1.race_code_kol = d1.race_code_kol
+  ),
+
+  -- 全賭式をUNION ALLでアンピボット
+  -- 各枝の列: race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku,
+  --           kaisai_kaiji, kaisai_nichiji, race_num,
+  --           kakeshiki_kubun, kakeshiki_sort_num, ninki_num, raw_kumiban, haraimodoshikin
+  unpivoted AS (
+    -- 単勝 (sort=1, ninki=NULL)
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '単勝' AS kakeshiki_kubun, 1 AS kakeshiki_sort_num, NULL AS ninki_num, tansho1_umaban AS raw_kumiban, tansho1_haraimodoshikin AS haraimodoshikin FROM joined WHERE tansho1_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '単勝', 1, NULL, tansho2_umaban, tansho2_haraimodoshikin FROM joined WHERE tansho2_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '単勝', 1, NULL, tansho3_umaban, tansho3_haraimodoshikin FROM joined WHERE tansho3_haraimodoshikin IS NOT NULL
+    UNION ALL
+
+    -- 複勝 (sort=2, ninki=NULL)
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '複勝', 2, NULL, fukusho1_umaban, fukusho1_haraimodoshikin FROM joined WHERE fukusho1_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '複勝', 2, NULL, fukusho2_umaban, fukusho2_haraimodoshikin FROM joined WHERE fukusho2_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '複勝', 2, NULL, fukusho3_umaban, fukusho3_haraimodoshikin FROM joined WHERE fukusho3_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '複勝', 2, NULL, fukusho4_umaban, fukusho4_haraimodoshikin FROM joined WHERE fukusho4_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '複勝', 2, NULL, fukusho5_umaban, fukusho5_haraimodoshikin FROM joined WHERE fukusho5_haraimodoshikin IS NOT NULL
+    UNION ALL
+
+    -- 枠連 (sort=3, ninki=wakuren{N}_ninkijun)
+    -- kumiban形式: "56" = ブラケット5と6（1文字ずつ格納）
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '枠連', 3, SAFE_CAST(wakuren1_ninkijun AS INT64), wakuren1_kumiban, wakuren1_haraimodoshikin FROM joined WHERE wakuren1_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '枠連', 3, SAFE_CAST(wakuren2_ninkijun AS INT64), wakuren2_kumiban, wakuren2_haraimodoshikin FROM joined WHERE wakuren2_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '枠連', 3, SAFE_CAST(wakuren3_ninkijun AS INT64), wakuren3_kumiban, wakuren3_haraimodoshikin FROM joined WHERE wakuren3_haraimodoshikin IS NOT NULL
+    UNION ALL
+
+    -- 馬連 (sort=4, ninki=umaren{N}_ninkijun)
+    -- kumiban形式: "0507" = 馬番05と07（2文字ずつ格納）
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬連', 4, SAFE_CAST(umaren1_ninkijun AS INT64), umaren1_kumiban, umaren1_haraimodoshikin FROM joined WHERE umaren1_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬連', 4, SAFE_CAST(umaren2_ninkijun AS INT64), umaren2_kumiban, umaren2_haraimodoshikin FROM joined WHERE umaren2_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬連', 4, SAFE_CAST(umaren3_ninkijun AS INT64), umaren3_kumiban, umaren3_haraimodoshikin FROM joined WHERE umaren3_haraimodoshikin IS NOT NULL
+    UNION ALL
+
+    -- ワイド (sort=5, ninki=wide{N}_ninkijun)
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, SAFE_CAST(wide1_ninkijun AS INT64), wide1_kumiban, wide1_haraimodoshikin FROM joined WHERE wide1_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, SAFE_CAST(wide2_ninkijun AS INT64), wide2_kumiban, wide2_haraimodoshikin FROM joined WHERE wide2_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, SAFE_CAST(wide3_ninkijun AS INT64), wide3_kumiban, wide3_haraimodoshikin FROM joined WHERE wide3_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, SAFE_CAST(wide4_ninkijun AS INT64), wide4_kumiban, wide4_haraimodoshikin FROM joined WHERE wide4_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, SAFE_CAST(wide5_ninkijun AS INT64), wide5_kumiban, wide5_haraimodoshikin FROM joined WHERE wide5_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, SAFE_CAST(wide6_ninkijun AS INT64), wide6_kumiban, wide6_haraimodoshikin FROM joined WHERE wide6_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, SAFE_CAST(wide7_ninkijun AS INT64), wide7_kumiban, wide7_haraimodoshikin FROM joined WHERE wide7_haraimodoshikin IS NOT NULL
+    UNION ALL
+
+    -- 馬単 (sort=6, ninki=umatan{N}_ninkijun)
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, SAFE_CAST(umatan1_ninkijun AS INT64), umatan1_kumiban, umatan1_haraimodoshikin FROM joined WHERE umatan1_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, SAFE_CAST(umatan2_ninkijun AS INT64), umatan2_kumiban, umatan2_haraimodoshikin FROM joined WHERE umatan2_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, SAFE_CAST(umatan3_ninkijun AS INT64), umatan3_kumiban, umatan3_haraimodoshikin FROM joined WHERE umatan3_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, SAFE_CAST(umatan4_ninkijun AS INT64), umatan4_kumiban, umatan4_haraimodoshikin FROM joined WHERE umatan4_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, SAFE_CAST(umatan5_ninkijun AS INT64), umatan5_kumiban, umatan5_haraimodoshikin FROM joined WHERE umatan5_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, SAFE_CAST(umatan6_ninkijun AS INT64), umatan6_kumiban, umatan6_haraimodoshikin FROM joined WHERE umatan6_haraimodoshikin IS NOT NULL
+    UNION ALL
+
+    -- 3連複 (sort=7, ninki=sanrenpuku{N}_ninkijun)
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連複', 7, SAFE_CAST(sanrenpuku1_ninkijun AS INT64), sanrenpuku1_kumiban, sanrenpuku1_haraimodoshikin FROM joined WHERE sanrenpuku1_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連複', 7, SAFE_CAST(sanrenpuku2_ninkijun AS INT64), sanrenpuku2_kumiban, sanrenpuku2_haraimodoshikin FROM joined WHERE sanrenpuku2_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連複', 7, SAFE_CAST(sanrenpuku3_ninkijun AS INT64), sanrenpuku3_kumiban, sanrenpuku3_haraimodoshikin FROM joined WHERE sanrenpuku3_haraimodoshikin IS NOT NULL
+    UNION ALL
+
+    -- 3連単 (sort=8, ninki=sanrentan{N}_ninkijun)
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, SAFE_CAST(sanrentan1_ninkijun AS INT64), sanrentan1_kumiban, sanrentan1_haraimodoshikin FROM joined WHERE sanrentan1_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, SAFE_CAST(sanrentan2_ninkijun AS INT64), sanrentan2_kumiban, sanrentan2_haraimodoshikin FROM joined WHERE sanrentan2_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, SAFE_CAST(sanrentan3_ninkijun AS INT64), sanrentan3_kumiban, sanrentan3_haraimodoshikin FROM joined WHERE sanrentan3_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, SAFE_CAST(sanrentan4_ninkijun AS INT64), sanrentan4_kumiban, sanrentan4_haraimodoshikin FROM joined WHERE sanrentan4_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, SAFE_CAST(sanrentan5_ninkijun AS INT64), sanrentan5_kumiban, sanrentan5_haraimodoshikin FROM joined WHERE sanrentan5_haraimodoshikin IS NOT NULL
+    UNION ALL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, SAFE_CAST(sanrentan6_ninkijun AS INT64), sanrentan6_kumiban, sanrentan6_haraimodoshikin FROM joined WHERE sanrentan6_haraimodoshikin IS NOT NULL
+  )
+
+-- 最終SELECT
+SELECT
+  u.race_code_kol,
+  u.kaisai_nengappi_str || u.keibajo_code_jvd || u.kaisai_kaiji || u.kaisai_nichiji || u.race_num AS race_code_jvd,
+  u.kaisai_nengappi_str AS schedule_id,
+  DATE(PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', ''))) AS schedule_date,
+  PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', '')) AS hasso_date,
+  DATETIME_ADD(PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', '')), INTERVAL -9 HOUR) AS hasso_date_utc,
+  u.kakeshiki_kubun,
+  u.kakeshiki_sort_num,
+  u.ninki_num,
+  CASE u.kakeshiki_kubun
+    -- 単勝・複勝: 2桁ゼロパディング馬番をそのままキャスト → "06" → "6"
+    WHEN '単勝' THEN CAST(SAFE_CAST(u.raw_kumiban AS INT64) AS STRING)
+    WHEN '複勝' THEN CAST(SAFE_CAST(u.raw_kumiban AS INT64) AS STRING)
+    -- 枠連: 1文字ずつ格納 ("56" = 枠5-6) → 1文字ずつ分割して "-" で結合
+    WHEN '枠連' THEN ARRAY_TO_STRING(
+      ARRAY(SELECT seg FROM UNNEST(REGEXP_EXTRACT_ALL(u.raw_kumiban, r'.{1}')) AS seg),
+      '-')
+    -- 馬連・ワイド・3連複: 2文字ずつ格納 ("0507" = 5-7) → 2文字ずつ分割、ゼロ除去、"-" で結合
+    WHEN '馬連' THEN ARRAY_TO_STRING(
+      ARRAY(SELECT CAST(SAFE_CAST(seg AS INT64) AS STRING) FROM UNNEST(REGEXP_EXTRACT_ALL(u.raw_kumiban, r'.{2}')) AS seg),
+      '-')
+    WHEN 'ワイド' THEN ARRAY_TO_STRING(
+      ARRAY(SELECT CAST(SAFE_CAST(seg AS INT64) AS STRING) FROM UNNEST(REGEXP_EXTRACT_ALL(u.raw_kumiban, r'.{2}')) AS seg),
+      '-')
+    WHEN '3連複' THEN ARRAY_TO_STRING(
+      ARRAY(SELECT CAST(SAFE_CAST(seg AS INT64) AS STRING) FROM UNNEST(REGEXP_EXTRACT_ALL(u.raw_kumiban, r'.{2}')) AS seg),
+      '-')
+    -- 馬単・3連単: 2文字ずつ格納 ("0705" = 7→5) → 2文字ずつ分割、ゼロ除去、"→" で結合
+    WHEN '馬単' THEN ARRAY_TO_STRING(
+      ARRAY(SELECT CAST(SAFE_CAST(seg AS INT64) AS STRING) FROM UNNEST(REGEXP_EXTRACT_ALL(u.raw_kumiban, r'.{2}')) AS seg),
+      '→')
+    WHEN '3連単' THEN ARRAY_TO_STRING(
+      ARRAY(SELECT CAST(SAFE_CAST(seg AS INT64) AS STRING) FROM UNNEST(REGEXP_EXTRACT_ALL(u.raw_kumiban, r'.{2}')) AS seg),
+      '→')
+    ELSE u.raw_kumiban
+  END AS kumiban_label,
+  SAFE_CAST(u.haraimodoshikin AS INT64) AS haraimodoshikin
+FROM unpivoted AS u
+WHERE u.kaisai_nengappi_str >= '20230101'
