@@ -145,72 +145,72 @@ WITH
 
     -- 枠連 (sort=3, ninki=wakuren{N}_ninkijun)
     -- kumiban形式: "56" = ブラケット5と6（1文字ずつ格納）
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '枠連', 3, SAFE_CAST(wakuren1_ninkijun AS INT64), wakuren1_kumiban, wakuren1_haraimodoshikin FROM joined WHERE wakuren1_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '枠連', 3, NULLIF(SAFE_CAST(wakuren1_ninkijun AS INT64), 0), wakuren1_kumiban, wakuren1_haraimodoshikin FROM joined WHERE wakuren1_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '枠連', 3, SAFE_CAST(wakuren2_ninkijun AS INT64), wakuren2_kumiban, wakuren2_haraimodoshikin FROM joined WHERE wakuren2_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '枠連', 3, NULLIF(SAFE_CAST(wakuren2_ninkijun AS INT64), 0), wakuren2_kumiban, wakuren2_haraimodoshikin FROM joined WHERE wakuren2_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '枠連', 3, SAFE_CAST(wakuren3_ninkijun AS INT64), wakuren3_kumiban, wakuren3_haraimodoshikin FROM joined WHERE wakuren3_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '枠連', 3, NULLIF(SAFE_CAST(wakuren3_ninkijun AS INT64), 0), wakuren3_kumiban, wakuren3_haraimodoshikin FROM joined WHERE wakuren3_haraimodoshikin IS NOT NULL
     UNION ALL
 
     -- 馬連 (sort=4, ninki=umaren{N}_ninkijun)
     -- kumiban形式: "0507" = 馬番05と07（2文字ずつ格納）
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬連', 4, SAFE_CAST(umaren1_ninkijun AS INT64), umaren1_kumiban, umaren1_haraimodoshikin FROM joined WHERE umaren1_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬連', 4, NULLIF(SAFE_CAST(umaren1_ninkijun AS INT64), 0), umaren1_kumiban, umaren1_haraimodoshikin FROM joined WHERE umaren1_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬連', 4, SAFE_CAST(umaren2_ninkijun AS INT64), umaren2_kumiban, umaren2_haraimodoshikin FROM joined WHERE umaren2_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬連', 4, NULLIF(SAFE_CAST(umaren2_ninkijun AS INT64), 0), umaren2_kumiban, umaren2_haraimodoshikin FROM joined WHERE umaren2_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬連', 4, SAFE_CAST(umaren3_ninkijun AS INT64), umaren3_kumiban, umaren3_haraimodoshikin FROM joined WHERE umaren3_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬連', 4, NULLIF(SAFE_CAST(umaren3_ninkijun AS INT64), 0), umaren3_kumiban, umaren3_haraimodoshikin FROM joined WHERE umaren3_haraimodoshikin IS NOT NULL
     UNION ALL
 
     -- ワイド (sort=5, ninki=wide{N}_ninkijun)
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, SAFE_CAST(wide1_ninkijun AS INT64), wide1_kumiban, wide1_haraimodoshikin FROM joined WHERE wide1_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, NULLIF(SAFE_CAST(wide1_ninkijun AS INT64), 0), wide1_kumiban, wide1_haraimodoshikin FROM joined WHERE wide1_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, SAFE_CAST(wide2_ninkijun AS INT64), wide2_kumiban, wide2_haraimodoshikin FROM joined WHERE wide2_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, NULLIF(SAFE_CAST(wide2_ninkijun AS INT64), 0), wide2_kumiban, wide2_haraimodoshikin FROM joined WHERE wide2_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, SAFE_CAST(wide3_ninkijun AS INT64), wide3_kumiban, wide3_haraimodoshikin FROM joined WHERE wide3_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, NULLIF(SAFE_CAST(wide3_ninkijun AS INT64), 0), wide3_kumiban, wide3_haraimodoshikin FROM joined WHERE wide3_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, SAFE_CAST(wide4_ninkijun AS INT64), wide4_kumiban, wide4_haraimodoshikin FROM joined WHERE wide4_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, NULLIF(SAFE_CAST(wide4_ninkijun AS INT64), 0), wide4_kumiban, wide4_haraimodoshikin FROM joined WHERE wide4_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, SAFE_CAST(wide5_ninkijun AS INT64), wide5_kumiban, wide5_haraimodoshikin FROM joined WHERE wide5_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, NULLIF(SAFE_CAST(wide5_ninkijun AS INT64), 0), wide5_kumiban, wide5_haraimodoshikin FROM joined WHERE wide5_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, SAFE_CAST(wide6_ninkijun AS INT64), wide6_kumiban, wide6_haraimodoshikin FROM joined WHERE wide6_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, NULLIF(SAFE_CAST(wide6_ninkijun AS INT64), 0), wide6_kumiban, wide6_haraimodoshikin FROM joined WHERE wide6_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, SAFE_CAST(wide7_ninkijun AS INT64), wide7_kumiban, wide7_haraimodoshikin FROM joined WHERE wide7_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, 'ワイド', 5, NULLIF(SAFE_CAST(wide7_ninkijun AS INT64), 0), wide7_kumiban, wide7_haraimodoshikin FROM joined WHERE wide7_haraimodoshikin IS NOT NULL
     UNION ALL
 
     -- 馬単 (sort=6, ninki=umatan{N}_ninkijun)
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, SAFE_CAST(umatan1_ninkijun AS INT64), umatan1_kumiban, umatan1_haraimodoshikin FROM joined WHERE umatan1_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, NULLIF(SAFE_CAST(umatan1_ninkijun AS INT64), 0), umatan1_kumiban, umatan1_haraimodoshikin FROM joined WHERE umatan1_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, SAFE_CAST(umatan2_ninkijun AS INT64), umatan2_kumiban, umatan2_haraimodoshikin FROM joined WHERE umatan2_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, NULLIF(SAFE_CAST(umatan2_ninkijun AS INT64), 0), umatan2_kumiban, umatan2_haraimodoshikin FROM joined WHERE umatan2_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, SAFE_CAST(umatan3_ninkijun AS INT64), umatan3_kumiban, umatan3_haraimodoshikin FROM joined WHERE umatan3_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, NULLIF(SAFE_CAST(umatan3_ninkijun AS INT64), 0), umatan3_kumiban, umatan3_haraimodoshikin FROM joined WHERE umatan3_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, SAFE_CAST(umatan4_ninkijun AS INT64), umatan4_kumiban, umatan4_haraimodoshikin FROM joined WHERE umatan4_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, NULLIF(SAFE_CAST(umatan4_ninkijun AS INT64), 0), umatan4_kumiban, umatan4_haraimodoshikin FROM joined WHERE umatan4_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, SAFE_CAST(umatan5_ninkijun AS INT64), umatan5_kumiban, umatan5_haraimodoshikin FROM joined WHERE umatan5_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, NULLIF(SAFE_CAST(umatan5_ninkijun AS INT64), 0), umatan5_kumiban, umatan5_haraimodoshikin FROM joined WHERE umatan5_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, SAFE_CAST(umatan6_ninkijun AS INT64), umatan6_kumiban, umatan6_haraimodoshikin FROM joined WHERE umatan6_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '馬単', 6, NULLIF(SAFE_CAST(umatan6_ninkijun AS INT64), 0), umatan6_kumiban, umatan6_haraimodoshikin FROM joined WHERE umatan6_haraimodoshikin IS NOT NULL
     UNION ALL
 
     -- 3連複 (sort=7, ninki=sanrenpuku{N}_ninkijun)
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連複', 7, SAFE_CAST(sanrenpuku1_ninkijun AS INT64), sanrenpuku1_kumiban, sanrenpuku1_haraimodoshikin FROM joined WHERE sanrenpuku1_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連複', 7, NULLIF(SAFE_CAST(sanrenpuku1_ninkijun AS INT64), 0), sanrenpuku1_kumiban, sanrenpuku1_haraimodoshikin FROM joined WHERE sanrenpuku1_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連複', 7, SAFE_CAST(sanrenpuku2_ninkijun AS INT64), sanrenpuku2_kumiban, sanrenpuku2_haraimodoshikin FROM joined WHERE sanrenpuku2_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連複', 7, NULLIF(SAFE_CAST(sanrenpuku2_ninkijun AS INT64), 0), sanrenpuku2_kumiban, sanrenpuku2_haraimodoshikin FROM joined WHERE sanrenpuku2_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連複', 7, SAFE_CAST(sanrenpuku3_ninkijun AS INT64), sanrenpuku3_kumiban, sanrenpuku3_haraimodoshikin FROM joined WHERE sanrenpuku3_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連複', 7, NULLIF(SAFE_CAST(sanrenpuku3_ninkijun AS INT64), 0), sanrenpuku3_kumiban, sanrenpuku3_haraimodoshikin FROM joined WHERE sanrenpuku3_haraimodoshikin IS NOT NULL
     UNION ALL
 
     -- 3連単 (sort=8, ninki=sanrentan{N}_ninkijun)
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, SAFE_CAST(sanrentan1_ninkijun AS INT64), sanrentan1_kumiban, sanrentan1_haraimodoshikin FROM joined WHERE sanrentan1_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, NULLIF(SAFE_CAST(sanrentan1_ninkijun AS INT64), 0), sanrentan1_kumiban, sanrentan1_haraimodoshikin FROM joined WHERE sanrentan1_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, SAFE_CAST(sanrentan2_ninkijun AS INT64), sanrentan2_kumiban, sanrentan2_haraimodoshikin FROM joined WHERE sanrentan2_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, NULLIF(SAFE_CAST(sanrentan2_ninkijun AS INT64), 0), sanrentan2_kumiban, sanrentan2_haraimodoshikin FROM joined WHERE sanrentan2_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, SAFE_CAST(sanrentan3_ninkijun AS INT64), sanrentan3_kumiban, sanrentan3_haraimodoshikin FROM joined WHERE sanrentan3_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, NULLIF(SAFE_CAST(sanrentan3_ninkijun AS INT64), 0), sanrentan3_kumiban, sanrentan3_haraimodoshikin FROM joined WHERE sanrentan3_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, SAFE_CAST(sanrentan4_ninkijun AS INT64), sanrentan4_kumiban, sanrentan4_haraimodoshikin FROM joined WHERE sanrentan4_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, NULLIF(SAFE_CAST(sanrentan4_ninkijun AS INT64), 0), sanrentan4_kumiban, sanrentan4_haraimodoshikin FROM joined WHERE sanrentan4_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, SAFE_CAST(sanrentan5_ninkijun AS INT64), sanrentan5_kumiban, sanrentan5_haraimodoshikin FROM joined WHERE sanrentan5_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, NULLIF(SAFE_CAST(sanrentan5_ninkijun AS INT64), 0), sanrentan5_kumiban, sanrentan5_haraimodoshikin FROM joined WHERE sanrentan5_haraimodoshikin IS NOT NULL
     UNION ALL
-    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, SAFE_CAST(sanrentan6_ninkijun AS INT64), sanrentan6_kumiban, sanrentan6_haraimodoshikin FROM joined WHERE sanrentan6_haraimodoshikin IS NOT NULL
+    SELECT race_code_kol, keibajo_code_jvd, kaisai_nengappi_str, hasso_jikoku, kaisai_kaiji, kaisai_nichiji, race_num, '3連単', 8, NULLIF(SAFE_CAST(sanrentan6_ninkijun AS INT64), 0), sanrentan6_kumiban, sanrentan6_haraimodoshikin FROM joined WHERE sanrentan6_haraimodoshikin IS NOT NULL
   )
 
 -- 最終SELECT
