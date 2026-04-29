@@ -10,6 +10,7 @@ from google.cloud import bigquery
 from google.cloud import secretmanager
 import datetime
 import requests
+from flask import Response, stream_with_context
 
 import sys
 
@@ -69,53 +70,18 @@ def export_race_uma_detail_bubble(request):
         # 3. 状態管理テーブルの確認
         ensure_state_table(bq_client, DATASET_ID, STATE_TABLE_NAME)
 
-        # 4. 更新のクエリ
-        # BigQuery側でハッシュ計算と差分抽出を行い、Python側のメモリ負荷を軽減する
-        # created, modified は更新のたびに変わるため、ハッシュ計算から除外する
-        query = f"""
-            WITH SourceWithHash AS (
-                SELECT
-                    *,
-                    TO_HEX(MD5(TO_JSON_STRING(
-                        (SELECT AS STRUCT * EXCEPT(
-                            created, modified,
-                            shirushi_shirushi_label, shirushi_shirushi_num, torikeshi_tosu_num, toroku_tosu_num,
-                            yosou_tansho_ninkijun_num,
-                            yosou_tansho_odds_float
-                        ) FROM UNNEST([t]))
-                    ))) as current_hash
-                FROM `{PROJECT_ID}.{DATASET_ID}.race_uma_detail_bubble` t
-            ),
-            State AS (
-                SELECT
-                    race_code_uma_kol,
-                    content_hash
-                FROM `{PROJECT_ID}.{DATASET_ID}.{STATE_TABLE_NAME}`
-            )
-            SELECT
-                s.*
-            FROM SourceWithHash s
-            LEFT JOIN State st ON s.race_code_uma_kol = st.race_code_uma_kol
-            WHERE
-                st.content_hash IS NULL
-                OR st.content_hash != s.current_hash
-            ORDER BY s.hasso_date
-        """
+        # リクエストパラメータ解析
+        request_json = request.get_json(silent=True) or {}
+        from_date    = request_json.get("from_date")
+        to_date      = request_json.get("to_date")
+        force_resend = request_json.get("force_resend", False)
+        enable_bubble = force_resend or ENABLE_BUBBLE_API
 
-        logger.info("BigQueryで変更をクエリ中(SQL側でハッシュ計算)...")
-        query_job = bq_client.query(query)
-        # iteratorを取得（list()で全件取得しない）
-        rows_iterator = query_job.result()
-
-        updates_chunk = []
-        state_updates = {}
+        # テーブルスキーマから出力用フィールドを自動取得（両パスで共通）
         CHUNK_SIZE = 1000
-        part_num = 1
-
-        # テーブルスキーマから出力用フィールドを自動取得
-        table_ref = f"{PROJECT_ID}.{DATASET_ID}.race_uma_detail_bubble"
-        table_info = bq_client.get_table(table_ref)
+        table_info = bq_client.get_table(f"{PROJECT_ID}.{DATASET_ID}.race_uma_detail_bubble")
         fieldnames = [field.name for field in table_info.schema]
+        ftp_directory = os.environ.get("FTP_DIRECTORY")
 
         def upload_chunk(ftp_conn, chunk, current_part_num):
             """チャンクデータをFTPにアップロードする内部関数"""
@@ -154,8 +120,7 @@ def export_race_uma_detail_bubble(request):
                 logger.info(f"{filename} のアップロード完了")
 
                 # Bubble APIへの通知
-                if ENABLE_BUBBLE_API and BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
-                    ftp_directory = os.environ.get("FTP_DIRECTORY")
+                if enable_bubble and BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
                     if ftp_directory:
                         dir_path = ftp_directory.strip("/")
                         csv_url = f"{CSV_BASE_URL}/{dir_path}/{filename}"
@@ -220,15 +185,177 @@ def export_race_uma_detail_bubble(request):
                         raise e
                 else:
                     if current_part_num == 1: # ログ過多防止のため初回のみログ出力
-                        if not ENABLE_BUBBLE_API:
+                        if not enable_bubble:
                              logger.info("ENABLE_BUBBLE_APIがfalseのため、通知をスキップします。")
                         else:
                              logger.info("Bubble API設定がされていないため、通知をスキップします。")
             except Exception as e:
                 logger.error(f"FTPアップロードエラー: {filename}, {e}")
-                # 再送ロジックを入れるか、ここではエラーとして処理を継続するか
-                # 今回はログを出して再送せず、例外を送出して止める
                 raise e
+
+        # force_resend モード: 日付範囲指定 + 差分検知スキップ + SSE ストリーム
+        if force_resend and from_date and to_date:
+            date_params = [
+                bigquery.ScalarQueryParameter("from_date", "DATE", from_date),
+                bigquery.ScalarQueryParameter("to_date",   "DATE", to_date),
+            ]
+            count_job = bq_client.query(
+                f"SELECT COUNT(*) AS total FROM `{PROJECT_ID}.{DATASET_ID}.race_uma_detail_bubble` WHERE schedule_date BETWEEN @from_date AND @to_date",
+                job_config=bigquery.QueryJobConfig(query_parameters=date_params)
+            )
+            total = list(count_job.result())[0].total
+
+            force_query = f"""
+                WITH SourceWithHash AS (
+                    SELECT
+                        *,
+                        TO_HEX(MD5(TO_JSON_STRING(
+                            (SELECT AS STRUCT * EXCEPT(
+                                created, modified,
+                                shirushi_shirushi_label, shirushi_shirushi_num, torikeshi_tosu_num, toroku_tosu_num,
+                                yosou_tansho_ninkijun_num,
+                                yosou_tansho_odds_float
+                            ) FROM UNNEST([t]))
+                        ))) as current_hash
+                    FROM `{PROJECT_ID}.{DATASET_ID}.race_uma_detail_bubble` t
+                )
+                SELECT * FROM SourceWithHash
+                WHERE schedule_date BETWEEN @from_date AND @to_date
+                ORDER BY schedule_date
+            """
+
+            def generate_sse():
+                state_upd = {}
+                processed = 0
+                try:
+                    force_rows_iter = bq_client.query(
+                        force_query,
+                        job_config=bigquery.QueryJobConfig(query_parameters=date_params)
+                    ).result()
+
+                    updates_chunk = []
+                    part_num = 1
+
+                    with ftplib.FTP(FTP_HOST) as ftp_conn:
+                        ftp_conn.login(user=ftp_user, passwd=ftp_pass)
+                        if ftp_directory:
+                            try:
+                                ftp_conn.cwd(ftp_directory)
+                            except ftplib.error_perm:
+                                logger.info(f"ディレクトリ {ftp_directory} が存在しないため作成します。")
+                                ftp_conn.mkd(ftp_directory)
+                                ftp_conn.cwd(ftp_directory)
+
+                        for row in force_rows_iter:
+                            row_data = {f: row[f] for f in fieldnames}
+                            current_hash = row["current_hash"]
+                            updates_chunk.append(row_data)
+                            state_upd[row_data["race_code_uma_kol"]] = {
+                                "race_code_uma_kol": row_data["race_code_uma_kol"],
+                                "content_hash": current_hash
+                            }
+
+                            if len(updates_chunk) >= CHUNK_SIZE:
+                                upload_chunk(ftp_conn, updates_chunk, part_num)
+                                processed += len(updates_chunk)
+                                current_date = str(max(r["schedule_date"] for r in updates_chunk))
+                                pct = int(processed / total * 100) if total > 0 else 100
+                                yield f"event: progress\ndata: {json.dumps({'current_date': current_date, 'processed': processed, 'total': total, 'pct': pct})}\n\n"
+                                updates_chunk = []
+                                part_num += 1
+
+                        if updates_chunk:
+                            upload_chunk(ftp_conn, updates_chunk, part_num)
+                            processed += len(updates_chunk)
+
+                    if state_upd:
+                        rows_to_insert = [
+                            {
+                                "race_code_uma_kol": u["race_code_uma_kol"],
+                                "content_hash": u["content_hash"],
+                                "exported_at": datetime.datetime.now().isoformat()
+                            }
+                            for u in state_upd.values()
+                        ]
+                        temp_table_id = f"{PROJECT_ID}.{DATASET_ID}.temp_race_uma_detail_bubble_state_updates"
+                        load_job = bq_client.load_table_from_json(
+                            rows_to_insert, temp_table_id,
+                            job_config=bigquery.LoadJobConfig(
+                                write_disposition="WRITE_TRUNCATE",
+                                schema=[
+                                    bigquery.SchemaField("race_code_uma_kol", "STRING"),
+                                    bigquery.SchemaField("content_hash", "STRING"),
+                                    bigquery.SchemaField("exported_at", "TIMESTAMP"),
+                                ]
+                            )
+                        )
+                        load_job.result()
+                        bq_client.query(f"""
+                            MERGE `{PROJECT_ID}.{DATASET_ID}.{STATE_TABLE_NAME}` T
+                            USING `{temp_table_id}` S
+                            ON T.race_code_uma_kol = S.race_code_uma_kol
+                            WHEN MATCHED THEN
+                              UPDATE SET content_hash = S.content_hash, exported_at = S.exported_at
+                            WHEN NOT MATCHED THEN
+                              INSERT (race_code_uma_kol, content_hash, exported_at)
+                              VALUES (race_code_uma_kol, content_hash, exported_at)
+                        """).result()
+                        bq_client.delete_table(temp_table_id, not_found_ok=True)
+                        logger.info("状態管理テーブルが更新されました。")
+
+                    yield f"event: result\ndata: {json.dumps({'status': 'success', 'records': processed})}\n\n"
+
+                except Exception as e:
+                    logger.exception("force_resend 処理中にエラー")
+                    yield f"event: result\ndata: {json.dumps({'status': 'error', 'message': str(e)})}\n\n"
+
+            return Response(
+                stream_with_context(generate_sse()),
+                mimetype="text/event-stream",
+                headers={"X-Accel-Buffering": "no", "Cache-Control": "no-cache"},
+            )
+
+        # 4. 更新のクエリ
+        # BigQuery側でハッシュ計算と差分抽出を行い、Python側のメモリ負荷を軽減する
+        # created, modified は更新のたびに変わるため、ハッシュ計算から除外する
+        query = f"""
+            WITH SourceWithHash AS (
+                SELECT
+                    *,
+                    TO_HEX(MD5(TO_JSON_STRING(
+                        (SELECT AS STRUCT * EXCEPT(
+                            created, modified,
+                            shirushi_shirushi_label, shirushi_shirushi_num, torikeshi_tosu_num, toroku_tosu_num,
+                            yosou_tansho_ninkijun_num,
+                            yosou_tansho_odds_float
+                        ) FROM UNNEST([t]))
+                    ))) as current_hash
+                FROM `{PROJECT_ID}.{DATASET_ID}.race_uma_detail_bubble` t
+            ),
+            State AS (
+                SELECT
+                    race_code_uma_kol,
+                    content_hash
+                FROM `{PROJECT_ID}.{DATASET_ID}.{STATE_TABLE_NAME}`
+            )
+            SELECT
+                s.*
+            FROM SourceWithHash s
+            LEFT JOIN State st ON s.race_code_uma_kol = st.race_code_uma_kol
+            WHERE
+                st.content_hash IS NULL
+                OR st.content_hash != s.current_hash
+            ORDER BY s.hasso_date
+        """
+
+        logger.info("BigQueryで変更をクエリ中(SQL側でハッシュ計算)...")
+        query_job = bq_client.query(query)
+        # iteratorを取得（list()で全件取得しない）
+        rows_iterator = query_job.result()
+
+        updates_chunk = []
+        state_updates = {}
+        part_num = 1
 
         processed_count = 0
 
@@ -238,7 +365,6 @@ def export_race_uma_detail_bubble(request):
             ftp_conn.login(user=ftp_user, passwd=ftp_pass)
 
             # ディレクトリ移動確認 (接続直後に1回だけ実行)
-            ftp_directory = os.environ.get("FTP_DIRECTORY")
             if ftp_directory:
                 try:
                     ftp_conn.cwd(ftp_directory)
