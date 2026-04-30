@@ -26,6 +26,14 @@
 | `export-races-function` | `race` | `DATE(hasso_date_utc)` | `races_export_state` |
 | `export-race-uma-details-function` | `race_uma_detail_bubble` | `schedule_date` | `race_uma_detail_bubble_export_state` |
 
+### エンドポイント URL
+
+| CF名 | STG | PRD |
+|------|-----|-----|
+| `export-schedules-function` | `https://export-schedules-function-stg-3bjqesjq2q-an.a.run.app` | `https://export-schedules-function-3bjqesjq2q-an.a.run.app` |
+| `export-races-function` | `https://export-races-function-stg-3bjqesjq2q-an.a.run.app` | `https://export-races-function-3bjqesjq2q-an.a.run.app` |
+| `export-race-uma-details-function` | `https://export-race-uma-details-function-stg-3bjqesjq2q-an.a.run.app` | `https://export-race-uma-details-function-3bjqesjq2q-an.a.run.app` |
+
 ---
 
 ## リクエスト仕様
