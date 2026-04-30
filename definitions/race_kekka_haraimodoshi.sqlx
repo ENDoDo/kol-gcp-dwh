@@ -104,9 +104,10 @@ WITH
   ),
 
   -- kol_sei2から単勝人気順を取得（単勝・複勝のninki_num用）
+  -- kol_sei2はrace_code_uma_kol（馬別コード）を持つため、先頭16桁でrace_code_kolを生成
   sei2_base AS (
     SELECT
-      race_code_kol,
+      SUBSTR(race_code_uma_kol, 1, 16) AS race_code_kol,
       umaban,
       NULLIF(SAFE_CAST(tansho_ninkijun AS INT64), 0) AS tansho_ninkijun_num
     FROM ${ref("kol_sei2")}
