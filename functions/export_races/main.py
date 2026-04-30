@@ -10,6 +10,7 @@ from google.cloud import bigquery
 from google.cloud import secretmanager
 import datetime
 import requests
+from flask import Response, stream_with_context
 
 import sys
 
@@ -55,8 +56,6 @@ def ensure_state_table(bq_client, dataset_id, table_name):
 
 def calculate_hash(row):
     """行の内容のハッシュを計算し、変更を検知する"""
-    # 行の値を文字列に変換し、ハッシュ化のために連結する
-    # ソートして順序を一貫させる
     row_str = json.dumps(dict(row), sort_keys=True, default=str)
     return hashlib.sha256(row_str.encode('utf-8')).hexdigest()
 
@@ -74,6 +73,154 @@ def export_races(request):
 
         # 3. 状態管理テーブルの確認
         ensure_state_table(bq_client, DATASET_ID, STATE_TABLE_NAME)
+
+        # リクエストパラメータ解析
+        request_json = request.get_json(silent=True) or {}
+        from_date    = request_json.get("from_date")
+        to_date      = request_json.get("to_date")
+        force_resend = request_json.get("force_resend", False)
+        enable_bubble = force_resend or ENABLE_BUBBLE_API
+
+        # force_resend モード: 日付範囲指定 + 差分検知スキップ + SSE ストリーム
+        if force_resend and from_date and to_date:
+            date_params = [
+                bigquery.ScalarQueryParameter("from_date", "DATE", from_date),
+                bigquery.ScalarQueryParameter("to_date",   "DATE", to_date),
+            ]
+            count_job = bq_client.query(
+                f"SELECT COUNT(*) AS total FROM `{PROJECT_ID}.{DATASET_ID}.race` WHERE DATE(hasso_date_utc) BETWEEN @from_date AND @to_date",
+                job_config=bigquery.QueryJobConfig(query_parameters=date_params)
+            )
+            total = list(count_job.result())[0].total
+
+            data_job = bq_client.query(
+                f"SELECT * FROM `{PROJECT_ID}.{DATASET_ID}.race` WHERE DATE(hasso_date_utc) BETWEEN @from_date AND @to_date ORDER BY hasso_date_utc",
+                job_config=bigquery.QueryJobConfig(query_parameters=date_params)
+            )
+            rows_result = list(data_job.result())
+
+            if not rows_result:
+                return "更新はありませんでした。", 200
+
+            table_info_fr = bq_client.get_table(f"{PROJECT_ID}.{DATASET_ID}.race")
+            fn = [field.name for field in table_info_fr.schema]
+            all_data = [{f: row[f] for f in fn} for row in rows_result]
+            chunks_fr = [all_data[i:i+1000] for i in range(0, len(all_data), 1000)]
+            total_parts_fr = len(chunks_fr)
+            ftp_dir = os.environ.get("FTP_DIRECTORY")
+
+            def generate_sse():
+                state_upd = []
+                processed = 0
+                try:
+                    with ftplib.FTP(FTP_HOST) as ftp:
+                        ftp.login(user=ftp_user, passwd=ftp_pass)
+                        if ftp_dir:
+                            try:
+                                ftp.cwd(ftp_dir)
+                            except ftplib.error_perm as e:
+                                logger.warning(f"ディレクトリ {ftp_dir} への移動に失敗: {e}")
+
+                        for i, chunk in enumerate(chunks_fr):
+                            for row_data in chunk:
+                                hash_data = {k: v for k, v in row_data.items() if k not in ("created", "modified")}
+                                state_upd.append({
+                                    "race_code_kol": row_data["race_code_kol"],
+                                    "content_hash": calculate_hash(hash_data)
+                                })
+
+                            chunk_dates = [str(r["hasso_date_utc"])[:8].replace("-", "") for r in chunk]
+                            c_min, c_max = min(chunk_dates), max(chunk_dates)
+                            filename = f"race_{c_min}_{c_max}_part{i+1:03d}.csv" if total_parts_fr > 1 else f"race_{c_min}_{c_max}.csv"
+
+                            csv_buf = io.StringIO()
+                            writer = csv.DictWriter(csv_buf, fieldnames=fn)
+                            writer.writeheader()
+                            writer.writerows(chunk)
+                            ftp.storbinary(f"STOR {filename}", io.BytesIO(csv_buf.getvalue().encode("utf-8")))
+                            logger.info(f"{filename} のアップロード完了")
+
+                            if enable_bubble and BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
+                                dir_path = ftp_dir.strip("/") if ftp_dir else None
+                                csv_url = f"{CSV_BASE_URL}/{dir_path}/{filename}" if dir_path else f"{CSV_BASE_URL}/{filename}"
+                                api_key = get_secret(BUBBLE_API_KEY_SECRET_ID)
+                                resp = requests.post(
+                                    BUBBLE_API_URL,
+                                    json={"csv_url": csv_url},
+                                    headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
+                                )
+                                resp_json = None
+                                try:
+                                    resp_json = resp.json()
+                                except Exception:
+                                    pass
+                                if not resp.ok:
+                                    if resp_json and "message" in resp_json:
+                                        raise Exception(f"Bubble API Error ({resp.status_code}): {resp_json['message']}")
+                                    resp.raise_for_status()
+                                if resp_json:
+                                    resp_data = resp_json.get("response", {})
+                                    is_success = resp_data.get("is_import_success")
+                                    if is_success is None:
+                                        is_success = resp_data.get("is import success")
+                                    if is_success is False:
+                                        error_text = resp_data.get("error_text") or resp_data.get("error text", "Unknown error")
+                                        if "短時間で同じファイルの取り込みを検知したため中止" in error_text:
+                                            logger.warning(f"Bubble API Warning (Duplicate): {error_text}")
+                                        else:
+                                            raise Exception(f"Bubble Import Failed: {error_text}")
+
+                            processed += len(chunk)
+                            current_date = str(max(r["hasso_date_utc"] for r in chunk))[:10]
+                            pct = int(processed / total * 100) if total > 0 else 100
+                            yield f"event: progress\ndata: {json.dumps({'current_date': current_date, 'processed': processed, 'total': total, 'pct': pct})}\n\n"
+
+                    if state_upd:
+                        rows_to_insert = [
+                            {
+                                "race_code_kol": u["race_code_kol"],
+                                "content_hash": u["content_hash"],
+                                "exported_at": datetime.datetime.now().isoformat()
+                            }
+                            for u in state_upd
+                        ]
+                        temp_table_id = f"{PROJECT_ID}.{DATASET_ID}.temp_races_state_updates"
+                        load_job = bq_client.load_table_from_json(
+                            rows_to_insert, temp_table_id,
+                            job_config=bigquery.LoadJobConfig(
+                                write_disposition="WRITE_TRUNCATE",
+                                schema=[
+                                    bigquery.SchemaField("race_code_kol", "STRING"),
+                                    bigquery.SchemaField("content_hash", "STRING"),
+                                    bigquery.SchemaField("exported_at", "TIMESTAMP"),
+                                ]
+                            )
+                        )
+                        load_job.result()
+                        bq_client.query(f"""
+                            MERGE `{PROJECT_ID}.{DATASET_ID}.{STATE_TABLE_NAME}` T
+                            USING `{temp_table_id}` S
+                            ON T.race_code_kol = S.race_code_kol
+                            WHEN MATCHED THEN
+                              UPDATE SET content_hash = S.content_hash, exported_at = S.exported_at
+                            WHEN NOT MATCHED THEN
+                              INSERT (race_code_kol, content_hash, exported_at)
+                              VALUES (race_code_kol, content_hash, exported_at)
+                        """).result()
+                        bq_client.delete_table(temp_table_id, not_found_ok=True)
+                        logger.info("状態管理テーブルが更新されました。")
+
+                    yield f"event: result\ndata: {json.dumps({'status': 'success', 'records': processed})}\n\n"
+
+                except Exception as e:
+                    logger.exception("force_resend 処理中にエラー")
+                    yield f"event: result\ndata: {json.dumps({'status': 'error', 'message': str(e)})}\n\n"
+
+            return Response(
+                stream_with_context(generate_sse()),
+                mimetype="text/event-stream",
+                headers={"X-Accel-Buffering": "no", "Cache-Control": "no-cache"},
+            )
 
         # 4. 更新のクエリ
         query = f"""
@@ -203,7 +350,7 @@ def export_races(request):
                     logger.info(f"{filename} のアップロードに成功しました。")
 
                     # Bubble APIへの通知
-                    if ENABLE_BUBBLE_API and BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
+                    if enable_bubble and BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
                         try:
                             if ftp_directory:
                                 dir_path = ftp_directory.strip("/")
@@ -268,7 +415,7 @@ def export_races(request):
                             raise e
                     else:
                         if i == 0: # ログ過多防止のため初回のみログ出力
-                             if not ENABLE_BUBBLE_API:
+                             if not enable_bubble:
                                   logger.info("ENABLE_BUBBLE_APIがfalseのため、通知をスキップします。")
                              else:
                                   logger.info("Bubble API設定がされていないため、通知をスキップします。")
