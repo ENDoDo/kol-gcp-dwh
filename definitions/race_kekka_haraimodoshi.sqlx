@@ -103,6 +103,15 @@ WITH
     FROM ${ref("kol_den1")} AS d1
   ),
 
+  -- kol_sei2から単勝人気順を取得（単勝・複勝のninki_num用）
+  sei2_base AS (
+    SELECT
+      race_code_kol,
+      umaban,
+      NULLIF(SAFE_CAST(tansho_ninkijun AS INT64), 0) AS tansho_ninkijun_num
+    FROM ${ref("kol_sei2")}
+  ),
+
   -- SEI1とDEN1を結合
   joined AS (
     SELECT
@@ -223,8 +232,11 @@ SELECT
   DATETIME_ADD(PARSE_DATETIME('%Y%m%d%H%M', u.kaisai_nengappi_str || REPLACE(u.hasso_jikoku, ':', '')), INTERVAL -9 HOUR) AS hasso_date_utc,
   u.kakeshiki_kubun,
   u.kakeshiki_sort_num,
-  u.ninki_num,
-  CASE u.kakeshiki_kubun
+  CASE
+    WHEN u.kakeshiki_kubun IN ('単勝', '複勝') THEN s2.tansho_ninkijun_num
+    ELSE u.ninki_num
+  END AS ninki_num,
+  NULLIF(CASE u.kakeshiki_kubun
     -- 単勝・複勝: 2桁ゼロパディング馬番をそのままキャスト → "06" → "6"
     WHEN '単勝' THEN CAST(SAFE_CAST(u.raw_kumiban AS INT64) AS STRING)
     WHEN '複勝' THEN CAST(SAFE_CAST(u.raw_kumiban AS INT64) AS STRING)
@@ -250,7 +262,12 @@ SELECT
       ARRAY(SELECT CAST(SAFE_CAST(seg AS INT64) AS STRING) FROM UNNEST(REGEXP_EXTRACT_ALL(u.raw_kumiban, r'.{2}')) AS seg),
       '→')
     ELSE u.raw_kumiban
-  END AS kumiban_label,
+  END, '') AS kumiban_label,
   SAFE_CAST(u.haraimodoshikin AS INT64) AS haraimodoshikin
 FROM unpivoted AS u
+LEFT JOIN sei2_base AS s2
+  ON u.kakeshiki_kubun IN ('単勝', '複勝')
+  AND u.race_code_kol = s2.race_code_kol
+  AND u.raw_kumiban = s2.umaban
 WHERE u.kaisai_nengappi_str >= '20230101'
+  AND SAFE_CAST(u.haraimodoshikin AS INT64) > 0
