@@ -185,7 +185,7 @@ WITH
         WHEN '1' THEN '障害'
         ELSE NULL
       END AS heichi_shogai_kubun_label,
-      CASE d1.ippan_tokubetsu_kubun
+      CASE s1.ippan_tokubetsu_kubun
         WHEN '0' THEN '一般'
         WHEN '1' THEN '特別'
         WHEN '2' THEN '準重賞'
