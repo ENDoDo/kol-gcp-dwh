@@ -157,6 +157,8 @@ SELECT
   keibajo_code AS keibajo_code_kol,
   kaisai_nengappi AS schedule_id,
   DATE(hasso_date) AS schedule_date,
+  hasso_date,
+  hasso_date_utc,
   kaisai_kaiji AS kaiji,
   kaisai_nichiji AS nichiji,
   SAFE_CAST(barei AS INT64) AS barei_num,

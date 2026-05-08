@@ -67,7 +67,7 @@ WITH
   ),
   labels AS (
     SELECT
-      d1.*,
+      d1.* EXCEPT (ippan_tokubetsu_kubun),
       s1.ippan_tokubetsu_kubun,
       COALESCE(s1.track_code1_dirtsiba, d1.track_code1) AS track_code1_dirtsiba,
       COALESCE(s1.track_code2_LRS, d1.track_code2) AS track_code2_LRS,
