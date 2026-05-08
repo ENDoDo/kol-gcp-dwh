@@ -105,6 +105,7 @@ config {
     chokyo_den_awase_uma_class: "出馬表出走馬データ 調教併せ馬 併せ当時のkyoso_joken_kubun_labelをもとに対応",
     chokyo_den_awase_uma_kaku_kubun: "出馬表出走馬データ 調教併せ馬 併せ当時の馬のクラスとの比較区分 格上/同格/格下",
     chokyo_den_awase_uma_kakuue_win_flag: "出馬表出走馬データ 調教併せ馬 格上に対して先着した場合は「はい」該当しない場合はnull",
+    chokyo_den_awase_uma_this_week_race_code_uma_jvd: "出馬表出走馬データ 調教併せ馬 今週出走する場合のrace_code_uma_jvd（土曜開催：当日または翌日特別/重賞、日曜開催：当日または前日）今週出走しない場合はnull",
     chokyo_den_awase_time_sa_float: "出馬表出走馬データ 調教併せのテキストからタイム差を抽出(「秒」は除く)",
     chokyo_den_awase_kubun: "出馬表出走馬データ 調教併せ区分",
     chokyo_den_awase_flag: "出馬表出走馬データ 調教併せフラグ",
@@ -1044,6 +1045,54 @@ WITH
       ROW_NUMBER() OVER (PARTITION BY z.race_code_uma_kol ORDER BY p.kaisai_nengappi DESC) = 1
   ),
 
+  this_week_partner_lookup AS (
+    SELECT
+      z.race_code_uma_kol,
+      SUBSTR(p.race_code_uma_kol, 1, 8)
+      || CASE SUBSTR(p.race_code_uma_kol, 9, 2)
+           WHEN '08' THEN '01' WHEN '09' THEN '02' WHEN '06' THEN '03'
+           WHEN '07' THEN '04' WHEN '04' THEN '05' WHEN '05' THEN '06'
+           WHEN '02' THEN '07' WHEN '00' THEN '08' WHEN '01' THEN '09'
+           WHEN '03' THEN '10' ELSE NULL
+         END
+      || SUBSTR(p.race_code_uma_kol, 11, 8) AS this_week_race_code_uma_jvd
+    FROM
+      with_zensou_data AS z
+    INNER JOIN
+      ${ref("kol_den2")} AS p
+      ON z.chokyo_den_oikiri_awase_uma_bamei = p.bamei
+    LEFT JOIN
+      ${ref("kol_den1")} AS d1
+      ON SUBSTR(p.race_code_uma_kol, 1, 16) = d1.race_code_kol
+    WHERE
+      z.chokyo_den_oikiri_awase_uma_bamei IS NOT NULL
+      AND z.chokyo_den_oikiri_awase_uma_bamei != ''
+      AND (
+        -- 土曜日開催の場合
+        (
+          EXTRACT(DAYOFWEEK FROM PARSE_DATE('%Y%m%d', z.kaisai_nengappi)) = 7
+          AND (
+            p.kaisai_nengappi = z.kaisai_nengappi
+            OR (
+              p.kaisai_nengappi = FORMAT_DATE('%Y%m%d', DATE_ADD(PARSE_DATE('%Y%m%d', z.kaisai_nengappi), INTERVAL 1 DAY))
+              AND d1.ippan_tokubetsu_kubun IN ('1', '2', '3')
+            )
+          )
+        )
+        OR
+        -- 日曜日開催の場合
+        (
+          EXTRACT(DAYOFWEEK FROM PARSE_DATE('%Y%m%d', z.kaisai_nengappi)) = 1
+          AND (
+            p.kaisai_nengappi = z.kaisai_nengappi
+            OR p.kaisai_nengappi = FORMAT_DATE('%Y%m%d', DATE_SUB(PARSE_DATE('%Y%m%d', z.kaisai_nengappi), INTERVAL 1 DAY))
+          )
+        )
+      )
+    QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY z.race_code_uma_kol ORDER BY p.kaisai_nengappi ASC, p.race_num ASC) = 1
+  ),
+
   -- CTE: Shirushi Logic Calculation
   shirushi_calc_raw AS (
     SELECT
@@ -1525,6 +1574,8 @@ SELECT
     THEN 'はい'
     ELSE NULL
   END AS chokyo_den_awase_uma_kakuue_win_flag,
+
+  CASE WHEN z.chokyo_den_oikiri_awase IS NOT NULL THEN twpl.this_week_race_code_uma_jvd ELSE NULL END AS chokyo_den_awase_uma_this_week_race_code_uma_jvd,
 
   REGEXP_EXTRACT(z.chokyo_den_oikiri_awase, r'([\d\.]+)秒') AS chokyo_den_awase_time_sa_float,
 
@@ -2009,6 +2060,10 @@ FROM
 LEFT JOIN
   partner_lookup AS pl
   ON z.race_code_uma_kol = pl.race_code_uma_kol
+
+LEFT JOIN
+  this_week_partner_lookup AS twpl
+  ON z.race_code_uma_kol = twpl.race_code_uma_kol
 
 LEFT JOIN
   shirushi_final AS sc

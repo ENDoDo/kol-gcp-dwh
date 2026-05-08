@@ -110,6 +110,7 @@ const columns = {
     chokyo_den_awase_uma_class: "出馬表出走馬データ 調教併せ馬 併せ当時のkyoso_joken_kubun_labelをもとに対応",
     chokyo_den_awase_uma_kaku_kubun: "出馬表出走馬データ 調教併せ馬 併せ当時の馬のクラスとの比較区分 格上/同格/格下",
     chokyo_den_awase_uma_kakuue_win_flag: "出馬表出走馬データ 調教併せ馬 格上に対して先着した場合は「はい」該当しない場合はnull",
+    chokyo_den_awase_uma_this_week_race_code_uma_jvd: "出馬表出走馬データ 調教併せ馬 今週出走する場合のrace_code_uma_jvd（土曜開催：当日または翌日特別/重賞、日曜開催：当日または前日）今週出走しない場合はnull",
     chokyo_den_awase_time_sa_float: "出馬表出走馬データ 調教併せのテキストからタイム差を抽出(「秒」は除く)",
     chokyo_den_awase_kubun: "出馬表出走馬データ 調教併せ区分",
     chokyo_den_awase_flag: "出馬表出走馬データ 調教併せフラグ",
