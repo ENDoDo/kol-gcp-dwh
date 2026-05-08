@@ -313,7 +313,7 @@ SELECT
   r.* EXCEPT (
     -- race_umaと重複するカラムをraceテーブルから除外
     race_code_kol, race_code_jvd, hasso_date, hasso_date_utc, kaiji, nichiji, race_bango_num,
-    keibajo_code_jvd, keibajo_code_kol, created, modified, schedule_id
+    keibajo_code_jvd, keibajo_code_kol, created, modified, schedule_id, schedule_date
   )
 FROM
   ${ref("race_uma")} AS ru

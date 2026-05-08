@@ -14,6 +14,7 @@ config {
     schedule_id: "発走日8文字 YYYYMMDD",
     hasso_date: "発走日時。kaisai_nengappi・hasso_jikokuから算出",
     hasso_date_utc: "発走日時(UTC)",
+    schedule_date: "発走日0時0分 date型",
     kaiji: "開催回次",
     nichiji: "開催日次",
 
@@ -72,7 +73,7 @@ config {
     modified: "データ更新日時"
   },
   bigquery: {
-    partitionBy: "DATE(hasso_date_utc)"
+    partitionBy: "schedule_date"
   }
 }
 
@@ -203,6 +204,7 @@ SELECT
   kaisai_nengappi AS schedule_id,
   PARSE_DATETIME('%Y%m%d%H%M', kaisai_nengappi || REPLACE(hasso_jikoku, ':', '')) AS hasso_date,
   DATETIME_ADD(PARSE_DATETIME('%Y%m%d%H%M', kaisai_nengappi || REPLACE(hasso_jikoku, ':', '')), INTERVAL -9 HOUR) AS hasso_date_utc,
+  DATE(PARSE_DATETIME('%Y%m%d%H%M', kaisai_nengappi || REPLACE(hasso_jikoku, ':', ''))) AS schedule_date,
   kaisai_kaiji AS kaiji,
   kaisai_nichiji AS nichiji,
   SAFE_CAST(race_num AS INT64) AS race_bango_num,
