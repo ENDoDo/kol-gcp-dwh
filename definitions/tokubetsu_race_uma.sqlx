@@ -1,0 +1,222 @@
+-- =================================================================
+-- tokubetsu_race_uma.sqlx
+-- 説明: kol_den2をベースに、特別・準重賞・重賞レース（ippan_tokubetsu_kubun != '0'）の
+--       出走馬情報を整形したテーブル。Looker Studio参照用。
+--       前走系カラム（race_code_uma_kol_zensou等）はtokubetsu以外の前走も含む全レースを
+--       対象にLAGを計算してから絞り込む。
+-- =================================================================
+
+config {
+  type: "table",
+  description: "特別・準重賞・重賞レースの出走馬情報テーブル。kol_den2をベースにkol_den1/kol_sei1/kol_uma_kettoを結合。Looker Studio参照用。",
+  columns: {
+    race_code_uma_kol: "KOL仕様馬毎レースID 年月日8桁+KOL仕様開催場所コード2桁+開催回次2桁+開催日次2桁+レース番号2桁+馬番2桁",
+    race_code_uma_kol_zensou: "前走のKOL仕様馬毎レースID",
+    race_code_uma_jvd: "JRA-VAN仕様馬毎レースID 年月日8桁+JRA-VAN仕様開催場所コード2桁+開催回次2桁+開催日次2桁+レース番号2桁+馬番2桁",
+    race_code_uma_jvd_zensou: "前走のJRA-VAN仕様馬毎レースID",
+    race_code_kol: "KOL仕様レースID 年月日8桁+KOL仕様開催場所コード2桁+開催回次2桁+開催日次2桁+レース番号2桁",
+    race_code_jvd: "JRA-VAN仕様 年4桁+月2桁+日2桁+JRA-VAN仕様競馬場コード2桁+回次2桁+日次2桁+レース番号2桁",
+    keibajo_code_jvd: "JRA-VAN仕様競馬場コード",
+    keibajo_code_kol: "KOL仕様競馬場コード",
+    schedule_id: "発走日8文字 YYYYMMDD",
+    schedule_date: "発走日0時0分 date型",
+    kaiji: "開催回次",
+    nichiji: "開催日次",
+    barei_num: "馬齢 整数型",
+    race_bango_num: "レース番号 整数型",
+    umaban_num: "馬番 整数型",
+    bamei: "馬名",
+    renban: "連番（2023年以降の全レースを対象に馬ごとの出走順序番号）",
+    ketto_toroku_bango_kol: "KOL仕様 血統登録番号(馬コード)",
+    seibetsu_code_label: "性別 牡/牝/せん",
+    futan_juryo_float: "負担重量 小数点第一位まで",
+    blinker_shiyo_kubun_label: "blinker_shiyo_kubunをもとに対応 はい/いいえ",
+    ketto1_f_hanshoku_toroku_bango: "血統情報1 父 繁殖登録番号",
+    ketto1_f_bamei: "血統情報1 父 馬名",
+    ketto2_m_hanshoku_toroku_bango: "血統情報2 母 繁殖登録番号",
+    ketto2_m_bamei: "血統情報2 母 馬名",
+    ketto5_mf_hanshoku_toroku_bango: "血統情報5 母父 繁殖登録番号",
+    ketto5_mf_bamei: "血統情報5 母父 馬名",
+    kishu_code: "騎手コード",
+    kishu_code_zensou: "騎手コード 前走",
+    kishumei: "騎手名",
+    kishumei_zensou: "騎手名 前走",
+    kishu_tozai_shozoku_code: "騎手東西所属区分",
+    kishu_tozai_shozoku_code_label: "kishu_tozai_shozoku_codeをもとに対応 西/東/招待",
+    kishu_shozokubasho_code_label: "kishu_shozokubasho_codeをもとに対応 (例)栗東/美浦南/美浦北",
+    kishu_shozoku_chokyoshi_code: "騎手が所属する調教師コード5桁",
+    chokyoshi_code: "調教師コード",
+    chokyoshimei: "調教師名",
+    chokyoshi_shozokubasho_code_label: "chokyoshi_shozokubasho_codeをもとに対応 (例)栗東/美浦南/美浦北",
+    chokyoshi_tracen_kubun_label: "chokyoshi_tracen_kubunをもとに対応 栗東/美浦南/美浦北",
+    modified: "データ更新日時",
+    created: "データ作成日時"
+  },
+  bigquery: {
+    partitionBy: "DATE(hasso_date_utc)"
+  }
+}
+
+WITH
+  all_races AS (
+    SELECT
+      d2.race_code_uma_kol,
+      SUBSTR(d2.race_code_uma_kol, 1, 16) AS race_code_kol,
+      CASE d2.keibajo_code
+        WHEN '08' THEN '01' -- 札幌
+        WHEN '09' THEN '02' -- 函館
+        WHEN '06' THEN '03' -- 福島
+        WHEN '07' THEN '04' -- 新潟
+        WHEN '04' THEN '05' -- 東京
+        WHEN '05' THEN '06' -- 中山
+        WHEN '02' THEN '07' -- 中京
+        WHEN '00' THEN '08' -- 京都
+        WHEN '01' THEN '09' -- 阪神
+        WHEN '03' THEN '10' -- 小倉
+        ELSE NULL
+      END AS keibajo_code_jvd_from_kol,
+      d2.keibajo_code,
+      d2.kaisai_nengappi,
+      d2.kaisai_kaiji,
+      d2.kaisai_nichiji,
+      d2.race_num,
+      d2.umaban,
+      d2.ketto_toroku_bango,
+      PARSE_DATETIME('%Y%m%d%H%M', d2.kaisai_nengappi || REPLACE(d1.hasso_jikoku, ':', '')) AS hasso_date,
+      DATETIME_ADD(PARSE_DATETIME('%Y%m%d%H%M', d2.kaisai_nengappi || REPLACE(d1.hasso_jikoku, ':', '')), INTERVAL -9 HOUR) AS hasso_date_utc,
+      d2.bamei,
+      d2.seibetsu_code,
+      d2.barei,
+      d2.futan_juryo,
+      d2.blinker_shiyo_kubun,
+      d2.kishu_code,
+      d2.kishumei,
+      d2.kishu_tozai_shozoku_code,
+      d2.kishu_shozokubasho_code,
+      d2.kishu_shozoku_chokyoshi_code,
+      d2.chokyoshi_code,
+      d2.chokyoshimei,
+      d2.chokyoshi_shozokubasho_code,
+      d2.chokyoshi_tracen_kubun,
+      k.ketto1_f_hanshoku_toroku_bango,
+      k.ketto1_f_bamei,
+      k.ketto2_m_hanshoku_toroku_bango,
+      k.ketto2_m_bamei,
+      k.ketto5_mf_hanshoku_toroku_bango,
+      k.ketto5_mf_bamei,
+      s1.ippan_tokubetsu_kubun
+    FROM
+      ${ref("kol_den2")} AS d2
+    LEFT JOIN
+      ${ref("kol_den1")} AS d1 ON SUBSTR(d2.race_code_uma_kol, 1, 16) = d1.race_code_kol
+    LEFT JOIN
+      ${ref("kol_sei1")} AS s1 ON SUBSTR(d2.race_code_uma_kol, 1, 16) = s1.race_code_kol
+    LEFT JOIN
+      ${ref("kol_uma_ketto")} AS k ON d2.ketto_toroku_bango = k.ketto_toroku_bango_uma
+    WHERE
+      d2.kaisai_nengappi >= '20230101'
+    QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY d2.race_code_uma_kol ORDER BY d2.race_code_uma_kol) = 1
+  ),
+  with_zensou AS (
+    SELECT
+      *,
+      ROW_NUMBER() OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date, race_code_uma_kol) AS renban,
+      LAG(race_code_uma_kol) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date, race_code_kol) AS race_code_uma_kol_zensou,
+      LAG(kishu_code, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kishu_code_zensou,
+      LAG(kishumei, 1) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS kishumei_zensou
+    FROM
+      all_races
+  )
+SELECT
+  race_code_uma_kol,
+  race_code_uma_kol_zensou,
+  kaisai_nengappi || keibajo_code_jvd_from_kol || kaisai_kaiji || kaisai_nichiji || race_num || umaban AS race_code_uma_jvd,
+  CASE
+    WHEN race_code_uma_kol_zensou IS NULL THEN NULL
+    ELSE
+      SUBSTR(race_code_uma_kol_zensou, 1, 8)
+      || CASE SUBSTR(race_code_uma_kol_zensou, 9, 2)
+           WHEN '08' THEN '01'
+           WHEN '09' THEN '02'
+           WHEN '06' THEN '03'
+           WHEN '07' THEN '04'
+           WHEN '04' THEN '05'
+           WHEN '05' THEN '06'
+           WHEN '02' THEN '07'
+           WHEN '00' THEN '08'
+           WHEN '01' THEN '09'
+           WHEN '03' THEN '10'
+           ELSE NULL
+         END
+      || SUBSTR(race_code_uma_kol_zensou, 11, 8)
+  END AS race_code_uma_jvd_zensou,
+  race_code_kol,
+  kaisai_nengappi || keibajo_code_jvd_from_kol || kaisai_kaiji || kaisai_nichiji || race_num AS race_code_jvd,
+  keibajo_code_jvd_from_kol AS keibajo_code_jvd,
+  keibajo_code AS keibajo_code_kol,
+  kaisai_nengappi AS schedule_id,
+  DATE(hasso_date) AS schedule_date,
+  kaisai_kaiji AS kaiji,
+  kaisai_nichiji AS nichiji,
+  SAFE_CAST(barei AS INT64) AS barei_num,
+  SAFE_CAST(race_num AS INT64) AS race_bango_num,
+  SAFE_CAST(umaban AS INT64) AS umaban_num,
+  bamei,
+  renban,
+  ketto_toroku_bango AS ketto_toroku_bango_kol,
+  CASE seibetsu_code
+    WHEN '0' THEN '牡'
+    WHEN '1' THEN '牝'
+    WHEN '2' THEN 'せん'
+    ELSE NULL
+  END AS seibetsu_code_label,
+  SAFE_CAST(futan_juryo AS FLOAT64) / 10 AS futan_juryo_float,
+  CASE
+    WHEN blinker_shiyo_kubun = '1' THEN 'はい'
+    ELSE 'いいえ'
+  END AS blinker_shiyo_kubun_label,
+  ketto1_f_hanshoku_toroku_bango,
+  ketto1_f_bamei,
+  ketto2_m_hanshoku_toroku_bango,
+  ketto2_m_bamei,
+  ketto5_mf_hanshoku_toroku_bango,
+  ketto5_mf_bamei,
+  kishu_code,
+  kishu_code_zensou,
+  kishumei,
+  kishumei_zensou,
+  kishu_tozai_shozoku_code,
+  CASE kishu_tozai_shozoku_code
+    WHEN '1' THEN '西'
+    WHEN '2' THEN '東'
+    WHEN '3' THEN '招待'
+    ELSE NULL
+  END AS kishu_tozai_shozoku_code_label,
+  CASE kishu_shozokubasho_code
+    WHEN '001' THEN '栗東'
+    WHEN '002' THEN '美浦南'
+    WHEN '003' THEN '美浦北'
+    ELSE NULL
+  END AS kishu_shozokubasho_code_label,
+  kishu_shozoku_chokyoshi_code,
+  chokyoshi_code,
+  chokyoshimei,
+  CASE chokyoshi_shozokubasho_code
+    WHEN '001' THEN '栗東'
+    WHEN '002' THEN '美浦南'
+    WHEN '003' THEN '美浦北'
+    ELSE NULL
+  END AS chokyoshi_shozokubasho_code_label,
+  CASE chokyoshi_tracen_kubun
+    WHEN '1' THEN '栗東'
+    WHEN '2' THEN '美浦南'
+    WHEN '3' THEN '美浦北'
+    ELSE NULL
+  END AS chokyoshi_tracen_kubun_label,
+  CURRENT_TIMESTAMP() AS modified,
+  CURRENT_TIMESTAMP() AS created
+FROM
+  with_zensou
+WHERE
+  ippan_tokubetsu_kubun IN ('1', '2', '3')

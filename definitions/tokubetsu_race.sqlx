@@ -1,0 +1,229 @@
+-- =================================================================
+-- tokubetsu_race.sqlx
+-- 説明: race.sqlxと同じソース（kol_den1 + kol_sei1）から
+--       特別・準重賞・重賞レース（ippan_tokubetsu_kubun != '0'）のみを抽出したテーブル。
+--       Looker Studio での特別競走参照用。
+-- =================================================================
+
+config {
+  type: "table",
+  description: "kol_den1とkol_sei1を結合し、特別・準重賞・重賞レースに絞り込んだテーブル。Looker Studio参照用。",
+  columns: {
+    race_code_kol: "KOL仕様レースID 年月日8桁+KOL仕様開催場所コード2桁+開催回次2桁+開催日次2桁+レース番号2桁",
+    race_code_jvd: "JRA-VAN仕様 年4桁+月2桁+日2桁+JRA-VAN仕様競馬場コード2桁+回次2桁+日次2桁+レース番号2桁",
+    schedule_id: "発走日8文字 YYYYMMDD",
+    schedule_date: "発走日0時0分 date型",
+    hasso_date: "発走日時。kaisai_nengappi・hasso_jikokuから算出",
+    hasso_date_utc: "発走日時(UTC)",
+    kaiji: "開催回次",
+    nichiji: "開催日次",
+    race_bango_num: "レース番号 整数型",
+    race_name: "レース名。競走名がある場合はそちらを優先、それ以外は条件から生成",
+    keibajo_code_jvd: "JRA-VAN仕様競馬場コード",
+    keibajo_code_kol: "KOL仕様競馬場コード",
+    keibajo_name: "札幌/函館/福島/新潟/東京/中山/中京/京都/阪神/小倉",
+    kyori: "距離",
+    kyosomei_15moji: "競走名15文字",
+    kyosomei_7moji: "競走名7文字",
+    grade_code_label: "grade_codeをもとに対応 GⅠ/GⅡ/GⅢ/JGⅠ/JGⅡ/JGⅢ",
+    jpn_flag_label: "jpn_flagをもとに対応 国際格付けレース（G）/それ以外の重賞（Jpn）",
+    bettei_barei_handicap_summary_code_label: "bettei_barei_handicap_summary_codeをもとに対応 別定/馬齢/ハンデ/定量/規定(道営のみ)",
+    bettei_barei_handicap_detail: "別定/馬齢/ハンデ/定量/規定（道営のみ）/牡 55 K/牝 53 K/牝2K減",
+    kyoso_joken_cut_label: "kyoso_joken_cutをもとに判定 2歳/3歳/3歳以上/4歳以上",
+    kyoso_joken_age_limit_label: "kyoso_joken_age_limitをもとに対応 2歳/3歳/4歳/3,4,5歳/4,5,6歳/3歳以上/4歳以上/3,4歳/4,5歳",
+    kyoso_joken_kubun_label: "kyoso_joken_kubunをもとに対応 新馬/未出走/未勝利/1勝クラス/2勝クラス/3勝クラス/オープン",
+    heichi_shogai_kubun_label: "heichi_shogai_kubunをもとに対応 平地/障害",
+    track_code1_dirtsiba_label: "track_code1をもとに対応 ダ/芝",
+    track_code2_LRS_label: "track_code2をもとに対応 右/左/直線",
+    track_code3_inout_label: "track_code3をもとに対応 内/外/外→内/タスキ/大障害/内２週/内→外",
+    course_kubun_label: "course_kubunをもとに対応 A/B/C/D/A1/A2/E",
+    modified: "データ更新日時",
+    created: "データ作成日時"
+  },
+  bigquery: {
+    partitionBy: "DATE(hasso_date_utc)"
+  }
+}
+
+WITH
+  d1_with_converted_code AS (
+    SELECT
+      *,
+      CASE keibajo_code
+        WHEN '08' THEN '01' -- 札幌
+        WHEN '09' THEN '02' -- 函館
+        WHEN '06' THEN '03' -- 福島
+        WHEN '07' THEN '04' -- 新潟
+        WHEN '04' THEN '05' -- 東京
+        WHEN '05' THEN '06' -- 中山
+        WHEN '02' THEN '07' -- 中京
+        WHEN '00' THEN '08' -- 京都
+        WHEN '01' THEN '09' -- 阪神
+        WHEN '03' THEN '10' -- 小倉
+        ELSE NULL
+      END AS keibajo_code_jvd_from_kol
+    FROM
+      ${ref("kol_den1")}
+  ),
+  labels AS (
+    SELECT
+      d1.*,
+      s1.ippan_tokubetsu_kubun,
+      COALESCE(s1.track_code1_dirtsiba, d1.track_code1) AS track_code1_dirtsiba,
+      COALESCE(s1.track_code2_LRS, d1.track_code2) AS track_code2_LRS,
+      COALESCE(s1.track_code3_inout, d1.track_code3) AS track_code3_inout,
+      CASE d1.keibajo_code_jvd_from_kol
+        WHEN '01' THEN '札幌'
+        WHEN '02' THEN '函館'
+        WHEN '03' THEN '福島'
+        WHEN '04' THEN '新潟'
+        WHEN '05' THEN '東京'
+        WHEN '06' THEN '中山'
+        WHEN '07' THEN '中京'
+        WHEN '08' THEN '京都'
+        WHEN '09' THEN '阪神'
+        WHEN '10' THEN '小倉'
+        ELSE NULL
+      END AS keibajo_name,
+      CASE d1.grade_code
+        WHEN '0' THEN 'GⅠ'
+        WHEN '1' THEN 'GⅡ'
+        WHEN '2' THEN 'GⅢ'
+        WHEN '3' THEN 'JGⅠ'
+        WHEN '4' THEN 'JGⅡ'
+        WHEN '5' THEN 'JGⅢ'
+        ELSE NULL
+      END AS grade_code_label,
+      CASE d1.bettei_barei_handicap_summary_code
+        WHEN '00' THEN '別定'
+        WHEN '01' THEN '馬齢'
+        WHEN '02' THEN 'ハンデ'
+        WHEN '03' THEN '定量'
+        WHEN '90' THEN '規定(道営のみ)'
+        ELSE NULL
+      END AS bettei_barei_handicap_summary_code_label,
+      CASE d1.kyoso_joken_age_limit
+        WHEN '0' THEN '2歳'
+        WHEN '1' THEN '3歳'
+        WHEN '2' THEN '4歳'
+        WHEN '3' THEN '3,4,5歳'
+        WHEN '4' THEN '4,5,6歳'
+        WHEN '5' THEN '3歳以上'
+        WHEN '6' THEN '4歳以上'
+        WHEN '7' THEN '3,4歳'
+        WHEN '8' THEN '4,5歳'
+        ELSE NULL
+      END AS kyoso_joken_age_limit_label,
+      CASE d1.kyoso_joken_cut
+        WHEN '1' THEN '2歳'
+        WHEN '2' THEN '3歳'
+        WHEN '3' THEN '3歳以上'
+        WHEN '4' THEN '4歳以上'
+        WHEN '5' THEN '2歳'
+        WHEN '6' THEN '3歳'
+        WHEN '7' THEN '3歳以上'
+        WHEN '8' THEN '3歳以上'
+        WHEN '9' THEN '4歳以上'
+        WHEN 'A' THEN '4歳以上'
+        WHEN 'B' THEN '4歳'
+        WHEN 'C' THEN '4歳'
+        ELSE NULL
+      END AS kyoso_joken_cut_label,
+      CASE d1.kyoso_joken_kubun
+        WHEN '00001' THEN '新馬'
+        WHEN '00002' THEN '未出走'
+        WHEN '00003' THEN '未勝利'
+        WHEN '05000' THEN '1勝クラス'
+        WHEN '10000' THEN '2勝クラス'
+        WHEN '16000' THEN '3勝クラス'
+        WHEN '00004' THEN 'オープン'
+        ELSE NULL
+      END AS kyoso_joken_kubun_label,
+      CASE d1.heichi_shogai_kubun
+        WHEN '0' THEN '平地'
+        WHEN '1' THEN '障害'
+        ELSE NULL
+      END AS heichi_shogai_kubun_label
+    FROM
+      d1_with_converted_code AS d1
+    LEFT JOIN
+      ${ref("kol_sei1")} AS s1 ON d1.race_code_kol = s1.race_code_kol
+  )
+SELECT
+  race_code_kol,
+  kaisai_nengappi || keibajo_code_jvd_from_kol || kaisai_kaiji || kaisai_nichiji || race_num AS race_code_jvd,
+  kaisai_nengappi AS schedule_id,
+  PARSE_DATE('%Y%m%d', kaisai_nengappi) AS schedule_date,
+  PARSE_DATETIME('%Y%m%d%H%M', kaisai_nengappi || REPLACE(hasso_jikoku, ':', '')) AS hasso_date,
+  DATETIME_ADD(PARSE_DATETIME('%Y%m%d%H%M', kaisai_nengappi || REPLACE(hasso_jikoku, ':', '')), INTERVAL -9 HOUR) AS hasso_date_utc,
+  kaisai_kaiji AS kaiji,
+  kaisai_nichiji AS nichiji,
+  SAFE_CAST(race_num AS INT64) AS race_bango_num,
+  CASE
+    WHEN kyosomei_15moji IS NOT NULL THEN
+      CONCAT(
+        kyosomei_15moji,
+        COALESCE(CONCAT('(', grade_code_label, ')'), '')
+      )
+    ELSE
+      CONCAT(
+        IF(heichi_shogai_kubun_label = '障害', '障害', ''),
+        COALESCE(kyoso_joken_age_limit_label, kyoso_joken_cut_label, ''),
+        COALESCE(kyoso_joken_kubun_label, '')
+      )
+  END AS race_name,
+  keibajo_code_jvd_from_kol AS keibajo_code_jvd,
+  keibajo_code AS keibajo_code_kol,
+  keibajo_name,
+  SAFE_CAST(kyori AS INT64) AS kyori,
+  kyosomei_15moji,
+  kyosomei_7moji,
+  grade_code_label,
+  CASE jpn_flag
+    WHEN '1' THEN '国際格付けレース(G)'
+    ELSE 'それ以外の重賞(Jpn)'
+  END AS jpn_flag_label,
+  bettei_barei_handicap_summary_code_label,
+  bettei_barei_handicap_detail,
+  kyoso_joken_cut_label,
+  kyoso_joken_age_limit_label,
+  kyoso_joken_kubun_label,
+  heichi_shogai_kubun_label,
+  CASE track_code1_dirtsiba
+    WHEN '1' THEN '芝'
+    WHEN '0' THEN 'ダ'
+    ELSE NULL
+  END AS track_code1_dirtsiba_label,
+  CASE track_code2_LRS
+    WHEN '0' THEN '右'
+    WHEN '1' THEN '左'
+    WHEN '2' THEN '直線'
+    ELSE NULL
+  END AS track_code2_LRS_label,
+  CASE track_code3_inout
+    WHEN '0' THEN '内'
+    WHEN '1' THEN '外'
+    WHEN '2' THEN '外→内'
+    WHEN '3' THEN 'タスキ'
+    WHEN '4' THEN '大障害'
+    WHEN '5' THEN '内２週'
+    WHEN '6' THEN '内→外'
+    ELSE NULL
+  END AS track_code3_inout_label,
+  CASE course_kubun
+    WHEN '0' THEN 'A'
+    WHEN '1' THEN 'B'
+    WHEN '2' THEN 'C'
+    WHEN '3' THEN 'D'
+    WHEN '4' THEN 'A1'
+    WHEN '5' THEN 'A2'
+    WHEN '6' THEN 'E'
+    ELSE NULL
+  END AS course_kubun_label,
+  CURRENT_TIMESTAMP() AS modified,
+  CURRENT_TIMESTAMP() AS created
+FROM
+  labels
+WHERE
+  kaisai_nengappi >= '20230101'
+  AND ippan_tokubetsu_kubun IN ('1', '2', '3')
