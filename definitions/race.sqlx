@@ -186,7 +186,7 @@ WITH
         WHEN '1' THEN '障害'
         ELSE NULL
       END AS heichi_shogai_kubun_label,
-      IF(kyosomei_15moji IS NOT NULL, '特別', '平場') AS kyoso_hiraba_tokubetsu_kubun
+      IF(d1.kyosomei_15moji IS NOT NULL, '特別', '平場') AS kyoso_hiraba_tokubetsu_kubun
     FROM
       d1_with_converted_code AS d1
     LEFT JOIN
