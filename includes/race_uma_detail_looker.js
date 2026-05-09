@@ -274,7 +274,7 @@ const columns = {
     kyoso_joken_age_limit_label: "kyoso_joken_age_limitをもとに対応 2歳/3歳/4歳/3,4,5歳/4,5,6歳/3歳以上/4歳以上/3,4歳/4,5歳",
     kyoso_joken_kubun: "競走条件コード1 競走条件区分",
     kyoso_joken_kubun_label: "kyoso_joken_kubunをもとに対応 新馬/未出走/未勝利/1勝クラス/2勝クラス/3勝クラス/オープン",
-    kyoso_ippan_tokubetsu_kubun_label: "ippan_tokubetsu_kubunをもとに判定 一般/特別/準重賞/重賞",
+    kyoso_hiraba_tokubetsu_kubun: "kyosomei_15mojiに値がある場合は特別、そうでない場合は平場",
     heichi_shogai_kubun: "平地･障害 区分",
     heichi_shogai_kubun_label: "heichi_shogai_kubunをもとに対応 平地/障害",
     track_code1_dirtsiba: "トラックコード ダ･芝",
