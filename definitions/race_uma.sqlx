@@ -1075,7 +1075,7 @@ WITH
             p.kaisai_nengappi = z.kaisai_nengappi
             OR (
               p.kaisai_nengappi = FORMAT_DATE('%Y%m%d', DATE_ADD(PARSE_DATE('%Y%m%d', z.kaisai_nengappi), INTERVAL 1 DAY))
-              AND d1.ippan_tokubetsu_kubun IN ('1', '2', '3')
+              AND d1.kyosomei_15moji IS NOT NULL
             )
           )
         )
