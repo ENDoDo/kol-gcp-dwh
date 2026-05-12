@@ -1,0 +1,20 @@
+-- =================================================================
+-- race_uma_detail_looker_mv.sqlx
+-- 説明: race_uma_detail_lookerと同内容のBigQuery Materialized View。
+--       Looker StudioからのキャッシュヒットによるBQ読み取りコスト削減を目的とする。
+--       このファイルはDataformワークフローでは実行されない（included_targets外）。
+--       MVはBigQuery APIで直接管理（CREATE OR REPLACE MATERIALIZED VIEW）。
+-- =================================================================
+
+config {
+  type: "operations",
+  dependencies: [ "race", "race_uma" ],
+  description: "race_uma_detail_lookerと同内容のBigQuery Materialized View。(Looker Studio用キャッシュ)"
+}
+
+-- BigQuery Materialized View (BigQuery APIで直接管理。Dataformワークフローでは実行されない)
+-- DDL: CREATE OR REPLACE MATERIALIZED VIEW `<project>.<dataset>.race_uma_detail_looker_mv`
+--      PARTITION BY schedule_date
+--      OPTIONS (enable_refresh = true, refresh_interval_minutes = 30)
+--      AS <race_uma_detail_looker.query>
+SELECT 1

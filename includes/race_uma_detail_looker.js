@@ -590,12 +590,7 @@ FROM
   ON ru.race_code_jvd = r.race_code_jvd
 `;
 
-// ref("race") を使ってスキーマを動的に解決し、race_uma_detail_looker の完全修飾名を返す
-// （self() は hasOutput: true が必要なため、このヘルパーで代替）
-const targetName = (ref) => ref("race").replace(/\.race`$/, '.race_uma_detail_looker`');
-
 module.exports = {
   columns,
-  query,
-  targetName
+  query
 };
