@@ -1,6 +1,6 @@
 {
   "name": "kol-gcp-dataform",
   "dependencies": {
-    "@dataform/core": "^3.0.0"
+    "@dataform/core": "^3.0.56"
   }
 }

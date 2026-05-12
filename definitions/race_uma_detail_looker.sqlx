@@ -4,13 +4,14 @@
 -- =================================================================
 
 config {
-  type: "operations",
+  type: "view",
   dependencies: [ "race", "race_uma" ],
-  description: "馬毎のレース情報(race_uma)とレース自体の情報(race)を結合した詳細テーブル。(Looker Studio用)"
+  description: "馬毎のレース情報(race_uma)とレース自体の情報(race)を結合した詳細テーブル。(Looker Studio用)",
+  columns: race_uma_detail_looker.columns,
+  bigquery: {
+    materialized: true,
+    partitionBy: "schedule_date"
+  }
 }
 
-CREATE OR REPLACE MATERIALIZED VIEW ${race_uma_detail_looker.targetName(ref)}
-PARTITION BY schedule_date
-OPTIONS (enable_refresh = true, refresh_interval_minutes = 30)
-AS
 ${race_uma_detail_looker.query(ref)}
