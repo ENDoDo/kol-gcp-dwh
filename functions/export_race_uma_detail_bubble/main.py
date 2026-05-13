@@ -72,10 +72,11 @@ def export_race_uma_detail_bubble(request):
 
         # リクエストパラメータ解析
         request_json = request.get_json(silent=True) or {}
-        from_date    = request_json.get("from_date")
-        to_date      = request_json.get("to_date")
-        force_resend = request_json.get("force_resend", False)
-        enable_bubble = force_resend or ENABLE_BUBBLE_API
+        from_date      = request_json.get("from_date")
+        to_date        = request_json.get("to_date")
+        force_resend   = request_json.get("force_resend", False)
+        bubble_api_url = request_json.get("bubble_api_url") or BUBBLE_API_URL
+        enable_bubble  = force_resend or ENABLE_BUBBLE_API
 
         # テーブルスキーマから出力用フィールドを自動取得（両パスで共通）
         CHUNK_SIZE = 1000
@@ -120,7 +121,7 @@ def export_race_uma_detail_bubble(request):
                 logger.info(f"{filename} のアップロード完了")
 
                 # Bubble APIへの通知
-                if enable_bubble and BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
+                if enable_bubble and bubble_api_url and BUBBLE_API_KEY_SECRET_ID:
                     if ftp_directory:
                         dir_path = ftp_directory.strip("/")
                         csv_url = f"{CSV_BASE_URL}/{dir_path}/{filename}"
@@ -137,8 +138,8 @@ def export_race_uma_detail_bubble(request):
                         "csv_url": csv_url
                     }
                     try:
-                        logger.info(f"Bubble APIへリクエストを送信します: URL={BUBBLE_API_URL}")
-                        response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
+                        logger.info(f"Bubble APIへリクエストを送信します: URL={bubble_api_url}")
+                        response = requests.post(bubble_api_url, json=payload, headers=headers)
 
                         # エラーレスポンスでもJSONが含まれている可能性があるため、まずデコードを試みる
                         resp_json = None
