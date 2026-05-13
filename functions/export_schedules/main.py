@@ -26,6 +26,7 @@ SECRET_PASS = os.environ.get("SECRET_PASS") # パスワードのシークレッ�
 STATE_TABLE_NAME = "schedules_export_state"
 FTP_HOST = "smartkb.mixh.jp"
 BUBBLE_API_URL = os.environ.get("BUBBLE_API_URL")
+BUBBLE_API_URL_SECRET_ID = os.environ.get("BUBBLE_API_URL_SECRET_ID")
 BUBBLE_API_KEY_SECRET_ID = os.environ.get("BUBBLE_API_KEY_SECRET_ID")
 CSV_BASE_URL = os.environ.get("CSV_BASE_URL", "https://kol-bi.jp/umasiri.dev")
 ENABLE_BUBBLE_API = str(os.environ.get("ENABLE_BUBBLE_API", "true")).lower() == "true"
@@ -36,6 +37,17 @@ def get_secret(secret_id):
     name = f"{secret_id}/versions/latest"
     response = client.access_secret_version(request={"name": name})
     return response.payload.data.decode("UTF-8")
+
+def get_bubble_api_url(request_override=None):
+    """優先度: リクエストパラメータ > Secret Manager > env var"""
+    if request_override:
+        return request_override
+    if BUBBLE_API_URL_SECRET_ID:
+        try:
+            return get_secret(BUBBLE_API_URL_SECRET_ID)
+        except Exception as e:
+            logger.warning(f"Secret ManagerからのURL取得に失敗、env varにフォールバック: {e}")
+    return BUBBLE_API_URL
 
 def ensure_state_table(bq_client, dataset_id, table_name):
     """状態管理テーブルが存在することを確認し、なければ作成する"""
@@ -79,7 +91,7 @@ def export_schedules(request):
         from_date      = request_json.get("from_date")
         to_date        = request_json.get("to_date")
         force_resend   = request_json.get("force_resend", False)
-        bubble_api_url = request_json.get("bubble_api_url") or BUBBLE_API_URL
+        bubble_api_url = get_bubble_api_url(request_json.get("bubble_api_url"))
         enable_bubble  = force_resend or ENABLE_BUBBLE_API
 
         # force_resend モード: 日付範囲指定 + 差分検知スキップ + SSE ストリーム
