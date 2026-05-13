@@ -76,10 +76,11 @@ def export_races(request):
 
         # リクエストパラメータ解析
         request_json = request.get_json(silent=True) or {}
-        from_date    = request_json.get("from_date")
-        to_date      = request_json.get("to_date")
-        force_resend = request_json.get("force_resend", False)
-        enable_bubble = force_resend or ENABLE_BUBBLE_API
+        from_date      = request_json.get("from_date")
+        to_date        = request_json.get("to_date")
+        force_resend   = request_json.get("force_resend", False)
+        bubble_api_url = request_json.get("bubble_api_url") or BUBBLE_API_URL
+        enable_bubble  = force_resend or ENABLE_BUBBLE_API
 
         # force_resend モード: 日付範囲指定 + 差分検知スキップ + SSE ストリーム
         if force_resend and from_date and to_date:
@@ -140,12 +141,12 @@ def export_races(request):
                             ftp.storbinary(f"STOR {filename}", io.BytesIO(csv_buf.getvalue().encode("utf-8")))
                             logger.info(f"{filename} のアップロード完了")
 
-                            if enable_bubble and BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
+                            if enable_bubble and bubble_api_url and BUBBLE_API_KEY_SECRET_ID:
                                 dir_path = ftp_dir.strip("/") if ftp_dir else None
                                 csv_url = f"{CSV_BASE_URL}/{dir_path}/{filename}" if dir_path else f"{CSV_BASE_URL}/{filename}"
                                 api_key = get_secret(BUBBLE_API_KEY_SECRET_ID)
                                 resp = requests.post(
-                                    BUBBLE_API_URL,
+                                    bubble_api_url,
                                     json={"csv_url": csv_url},
                                     headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
                                 )
@@ -350,7 +351,7 @@ def export_races(request):
                     logger.info(f"{filename} のアップロードに成功しました。")
 
                     # Bubble APIへの通知
-                    if enable_bubble and BUBBLE_API_URL and BUBBLE_API_KEY_SECRET_ID:
+                    if enable_bubble and bubble_api_url and BUBBLE_API_KEY_SECRET_ID:
                         try:
                             if ftp_directory:
                                 dir_path = ftp_directory.strip("/")
@@ -367,8 +368,8 @@ def export_races(request):
                             payload = {
                                 "csv_url": csv_url
                             }
-                            logger.info(f"Bubble APIへリクエストを送信します: URL={BUBBLE_API_URL}")
-                            response = requests.post(BUBBLE_API_URL, json=payload, headers=headers)
+                            logger.info(f"Bubble APIへリクエストを送信します: URL={bubble_api_url}")
+                            response = requests.post(bubble_api_url, json=payload, headers=headers)
 
                             # エラーレスポンスでもJSONが含まれている可能性があるため、まずデコードを試みる
                             resp_json = None

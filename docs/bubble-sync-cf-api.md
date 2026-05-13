@@ -41,6 +41,7 @@ Authorization: Bearer {OIDC_TOKEN}
 | `from_date` | string | force_resend時は必須 | 対象期間の開始日（YYYY-MM-DD） |
 | `to_date` | string | force_resend時は必須 | 対象期間の終了日（YYYY-MM-DD） |
 | `force_resend` | bool | いいえ | `true` のとき差分検知をスキップして全件送信 + SSEストリームで進捗を返す |
+| `bubble_api_url` | string | いいえ | Bubble APIエンドポイントURLを上書き。省略時は環境変数 `BUBBLE_API_URL` を使用 |
 
 **パラメータをすべて省略した場合**は既存の自動フロー（差分検知）として動作し、JSONレスポンスを返します（後方互換）。
 
