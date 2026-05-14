@@ -241,9 +241,11 @@ config {
     corner3_juni: "3角順位",
     corner3_juni_label: "corner3_juniをもとに対応 01〜28 40以上の場合は40を差し引く",
     corner3_juni_furi: "corner3_juniをもとに対応 31:落馬 32:中止 40以上:不利",
+    corner3_juni_furi_zensou: "3角における不利情報 前走",
     corner4_juni: "4角順位",
     corner4_juni_label: "corner4_juniをもとに対応 01〜28 40以上の場合は40を差し引く",
     corner4_juni_furi: "corner4_juniをもとに対応 31:落馬 32:中止 40以上:不利",
+    corner4_juni_furi_zensou: "4角における不利情報 前走",
     corner4_ichidori: "4角位置取り",
     corner4_ichidori_label: "4角位置取り(ラベル)",
     comment_kishu_kyusha: "騎手厩舎コメント",
@@ -962,6 +964,24 @@ WITH
           ELSE NULL
         END, 1
       ) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS corner4_ichidori_label_zensou,
+
+      LAG(
+        CASE
+          WHEN SAFE_CAST(corner3_juni AS INT64) = 31 THEN '落馬'
+          WHEN SAFE_CAST(corner3_juni AS INT64) = 32 THEN '中止'
+          WHEN SAFE_CAST(corner3_juni AS INT64) >= 40 THEN '不利'
+          ELSE NULL
+        END, 1
+      ) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS corner3_juni_furi_zensou,
+
+      LAG(
+        CASE
+          WHEN SAFE_CAST(corner4_juni AS INT64) = 31 THEN '落馬'
+          WHEN SAFE_CAST(corner4_juni AS INT64) = 32 THEN '中止'
+          WHEN SAFE_CAST(corner4_juni AS INT64) >= 40 THEN '不利'
+          ELSE NULL
+        END, 1
+      ) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS corner4_juni_furi_zensou,
 
       -- 前走間隔
       CASE
@@ -1952,7 +1972,9 @@ SELECT
   z.kyori_zensou,
   z.kakutei_tansho_ninkijun_num_zensou,
   z.corner3_juni_label_zensou,
+  z.corner3_juni_furi_zensou,
   z.corner4_juni_label_zensou,
+  z.corner4_juni_furi_zensou,
   z.corner4_ichidori_label_zensou,
   z.comment_kishu_kyusha,
   z.comment_next,
