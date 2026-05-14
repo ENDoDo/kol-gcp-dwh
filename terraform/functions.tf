@@ -77,7 +77,8 @@ resource "google_cloudfunctions2_function" "export_schedules" {
       BUBBLE_API_URL_SECRET_ID = terraform.workspace == "prd" ? "projects/56638639323/secrets/kol_bubble_schedule_api_url" : "projects/56638639323/secrets/kol_bubble_schedule_api_url_stg"
       BUBBLE_API_KEY_SECRET_ID = "projects/56638639323/secrets/kol_bubble_workflow_api_key"
       CSV_BASE_URL             = "https://kol-bi.jp/umasiri.dev"
-      ENABLE_BUBBLE_API        = var.enable_bubble_api
+      ENABLE_BUBBLE_API           = "false"
+      ENABLE_BUBBLE_API_SECRET_ID = terraform.workspace == "prd" ? "projects/56638639323/secrets/kol_bubble_api_enabled" : "projects/56638639323/secrets/kol_bubble_api_enabled_stg"
     }
     service_account_email = google_service_account.export_schedules_sa.email
   }
@@ -174,7 +175,8 @@ resource "google_cloudfunctions2_function" "export_race_uma_detail_bubble" {
       BUBBLE_API_URL_SECRET_ID = terraform.workspace == "prd" ? "projects/56638639323/secrets/kol_bubble_race_uma_detail_api_url" : "projects/56638639323/secrets/kol_bubble_race_uma_detail_api_url_stg"
       BUBBLE_API_KEY_SECRET_ID = "projects/56638639323/secrets/kol_bubble_workflow_api_key"
       CSV_BASE_URL             = "https://kol-bi.jp/umasiri.dev"
-      ENABLE_BUBBLE_API        = var.enable_bubble_api
+      ENABLE_BUBBLE_API           = "false"
+      ENABLE_BUBBLE_API_SECRET_ID = terraform.workspace == "prd" ? "projects/56638639323/secrets/kol_bubble_api_enabled" : "projects/56638639323/secrets/kol_bubble_api_enabled_stg"
     }
     service_account_email = google_service_account.export_race_uma_detail_bubble_sa.email
   }
@@ -249,7 +251,8 @@ resource "google_cloudfunctions2_function" "export_races" {
       BUBBLE_API_URL_SECRET_ID = terraform.workspace == "prd" ? "projects/56638639323/secrets/kol_bubble_races_api_url" : "projects/56638639323/secrets/kol_bubble_races_api_url_stg"
       BUBBLE_API_KEY_SECRET_ID = "projects/56638639323/secrets/kol_bubble_workflow_api_key"
       CSV_BASE_URL             = "https://kol-bi.jp/umasiri.dev"
-      ENABLE_BUBBLE_API        = var.enable_bubble_api
+      ENABLE_BUBBLE_API           = "false"
+      ENABLE_BUBBLE_API_SECRET_ID = terraform.workspace == "prd" ? "projects/56638639323/secrets/kol_bubble_api_enabled" : "projects/56638639323/secrets/kol_bubble_api_enabled_stg"
     }
     service_account_email = google_service_account.export_schedules_sa.email # 同じSAを使用
   }

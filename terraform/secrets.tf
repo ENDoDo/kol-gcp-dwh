@@ -165,3 +165,60 @@ resource "google_secret_manager_secret_iam_member" "bubble_race_uma_detail_url_a
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.export_race_uma_detail_bubble_sa.email}"
 }
+
+# -----------------------------------------------------------------------------
+# Bubble API ON/OFF シークレット（管理画面から動的切り替え用）
+# "true" / "false" の文字列を格納する。取得失敗時は env var ENABLE_BUBBLE_API = "false" にフォールバック
+# -----------------------------------------------------------------------------
+
+resource "google_secret_manager_secret" "bubble_api_enabled" {
+  count     = terraform.workspace == "prd" ? 1 : 0
+  project   = var.project_id
+  secret_id = "kol_bubble_api_enabled"
+  replication {
+    auto {}
+  }
+  depends_on = [google_project_service.secretmanager]
+}
+
+resource "google_secret_manager_secret" "bubble_api_enabled_stg" {
+  count     = terraform.workspace != "prd" ? 1 : 0
+  project   = var.project_id
+  secret_id = "kol_bubble_api_enabled_stg"
+  replication {
+    auto {}
+  }
+  depends_on = [google_project_service.secretmanager]
+}
+
+resource "google_secret_manager_secret_iam_member" "bubble_api_enabled_accessor_schedules" {
+  count     = terraform.workspace == "prd" ? 1 : 0
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.bubble_api_enabled[0].secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.export_schedules_sa.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "bubble_api_enabled_accessor_schedules_stg" {
+  count     = terraform.workspace != "prd" ? 1 : 0
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.bubble_api_enabled_stg[0].secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.export_schedules_sa.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "bubble_api_enabled_accessor_race_uma" {
+  count     = terraform.workspace == "prd" ? 1 : 0
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.bubble_api_enabled[0].secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.export_race_uma_detail_bubble_sa.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "bubble_api_enabled_accessor_race_uma_stg" {
+  count     = terraform.workspace != "prd" ? 1 : 0
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.bubble_api_enabled_stg[0].secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.export_race_uma_detail_bubble_sa.email}"
+}

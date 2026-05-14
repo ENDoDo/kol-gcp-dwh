@@ -47,13 +47,6 @@ variable "stg_schema" {
   default     = "kolbi_analysis_stg"
 }
 
-# Bubble APIを有効にするかどうか。
-variable "enable_bubble_api" {
-  description = "Enable calling Bubble API."
-  type        = bool
-  default     = true
-}
-
 # GCSバケットへのアップロードを許可するユーザーのメールアドレスリスト
 variable "client_upload_users" {
   description = "List of user email addresses granted upload access to the GCS bucket."
