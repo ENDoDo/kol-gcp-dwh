@@ -191,6 +191,26 @@ resource "google_secret_manager_secret" "bubble_api_enabled_stg" {
   depends_on = [google_project_service.secretmanager]
 }
 
+resource "google_secret_manager_secret_version" "bubble_api_enabled_default" {
+  count       = terraform.workspace == "prd" ? 1 : 0
+  secret      = google_secret_manager_secret.bubble_api_enabled[0].id
+  secret_data = "false"
+
+  lifecycle {
+    ignore_changes = [secret_data]
+  }
+}
+
+resource "google_secret_manager_secret_version" "bubble_api_enabled_stg_default" {
+  count       = terraform.workspace != "prd" ? 1 : 0
+  secret      = google_secret_manager_secret.bubble_api_enabled_stg[0].id
+  secret_data = "false"
+
+  lifecycle {
+    ignore_changes = [secret_data]
+  }
+}
+
 resource "google_secret_manager_secret_iam_member" "bubble_api_enabled_accessor_schedules" {
   count     = terraform.workspace == "prd" ? 1 : 0
   project   = var.project_id
