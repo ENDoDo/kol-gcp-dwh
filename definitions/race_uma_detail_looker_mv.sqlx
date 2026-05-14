@@ -1,20 +1,15 @@
--- =================================================================
--- race_uma_detail_looker_mv.sqlx
--- 説明: race_uma_detail_lookerと同内容のBigQuery Materialized View。
---       Looker StudioからのキャッシュヒットによるBQ読み取りコスト削減を目的とする。
---       このファイルはDataformワークフローでは実行されない（included_targets外）。
---       MVはBigQuery APIで直接管理（CREATE OR REPLACE MATERIALIZED VIEW）。
--- =================================================================
-
 config {
   type: "operations",
-  dependencies: [ "race", "race_uma" ],
-  description: "race_uma_detail_lookerと同内容のBigQuery Materialized View。(Looker Studio用キャッシュ)"
+  dependencies: ["race_uma_detail_looker"],
+  description: "race_uma_detail_lookerと同内容のBigQuery Materialized View。(Looker Studio用キャッシュ) Dataformが毎回 DROP → CREATE で自動再作成する。"
 }
 
--- BigQuery Materialized View (BigQuery APIで直接管理。Dataformワークフローでは実行されない)
--- DDL: CREATE OR REPLACE MATERIALIZED VIEW `<project>.<dataset>.race_uma_detail_looker_mv`
---      PARTITION BY schedule_date
---      OPTIONS (enable_refresh = true, refresh_interval_minutes = 30)
---      AS <race_uma_detail_looker.query>
-SELECT 1
+-- Dataform実行のたびにrace_uma_detail_lookerが再作成されMVが無効化されるため、
+-- dependenciesでrace_uma_detail_looker完了後に自動でDROP → CREATEする。
+DROP MATERIALIZED VIEW IF EXISTS `${database()}.${schema()}.race_uma_detail_looker_mv`;
+
+CREATE MATERIALIZED VIEW `${database()}.${schema()}.race_uma_detail_looker_mv`
+PARTITION BY schedule_date
+OPTIONS (enable_refresh = true, refresh_interval_minutes = 30)
+AS
+SELECT * FROM ${ref("race_uma_detail_looker")}

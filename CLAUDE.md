@@ -53,7 +53,7 @@ KOLデータ(ZIP)
 │   ├── cross_ketto_f_*.sqlx    # 父馬軸クロス集計テーブル群
 │   ├── race_uma_detail_bubble.sqlx  # Bubble向け詳細ビュー
 │   ├── race_uma_detail_looker.sqlx  # Looker向け詳細テーブル（Dataform管理）
-│   └── race_uma_detail_looker_mv.sqlx  # Looker向けMVのドキュメント用（Dataform実行対象外）
+│   └── race_uma_detail_looker_mv.sqlx  # Looker向けMV（Dataform operations で自動再作成）
 ├── includes/             # 共通ロジック（JavaScript）
 │   ├── race_uma_detail_bubble.js
 │   └── race_uma_detail_looker.js
@@ -195,8 +195,8 @@ KOLデータ(ZIP)
 - **調教騎乗者の日付切り替え**: `kaisai_nengappi <= '20251219'`かどうかで変換ロジックが変わる（KOL仕様変更対応）。
 - **ポリトラック判定**: `chokyo_course = 'Ｐ'`（全角P）で判定。半角Pではないことに注意。
 - **`race_uma_detail_bubble.sqlx` と `race_uma_detail_looker.sqlx`**: ロジック本体はそれぞれ`includes/`の対応JSファイルに分離済み。
-- **`race_uma_detail_looker_mv`**: `race_uma_detail_looker` と同内容の BigQuery Materialized View（STG・PRD 両環境に存在）。Dataform 管理外で BigQuery API により直接作成・管理。`race` または `race_uma` テーブルが Dataform により再作成された場合、MV が無効化されるため **DROP → CREATE** で再作成が必要（`CREATE OR REPLACE` では不十分）。
-- **Dataform MV非対応**: Dataform 3.0.x は BigQuery Materialized View をネイティブサポートしない（`type: "view"` + `bigquery: { materialized: true }` はコンパイルエラー）。MV が必要な場合は BigQuery API で直接管理し、Dataform の `included_targets` から除外すること。
+- **`race_uma_detail_looker_mv`**: `race_uma_detail_looker` と同内容の BigQuery Materialized View（STG・PRD 両環境に存在）。`type: "operations"` として `included_targets` に含め、Dataform が `race_uma_detail_looker` 再作成後に自動で **DROP → CREATE** する（`CREATE OR REPLACE` では MV が無効状態のままになるため不十分）。`AS SELECT * FROM race_uma_detail_looker` でフルクエリ重複を避けている。
+- **Dataform MV非対応**: Dataform 3.0.x は BigQuery Materialized View をネイティブサポートしない（`type: "view"` + `bigquery: { materialized: true }` はコンパイルエラー）。MV が必要な場合は `type: "operations"` で DROP → CREATE DDL を記述し、`included_targets` に追加して Dataform に管理させること。
 - **状態管理テーブル**: Export CF群は差分検知のためBigQuery上に`*_export_state`テーブルを維持している（初回実行時に自動作成）。
 - **ラップタイム単位**: KOLソース（`kol_sei1.lap_time*`）は0.1秒単位の整数格納 → `race_kekka_time.sqlx` で `/10.0` して秒単位に変換している。
 - **全角文字のTRANSLATE変換**: `race_kekka_keika` の `keika_sort_label` では `TRANSLATE` 関数で全角数字・全角Ｆを半角に変換（`０～９Ｆ` → `0～9F`）。他テーブルで同種の変換が必要な場合も同パターンを使用する。

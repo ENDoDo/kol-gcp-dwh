@@ -168,6 +168,11 @@ resource "google_dataform_repository_workflow_config" "workflow_stg" {
     included_targets {
       database = var.project_id
       schema   = var.stg_schema
+      name     = "race_uma_detail_looker_mv"
+    }
+    included_targets {
+      database = var.project_id
+      schema   = var.stg_schema
       name     = "schedule"
     }
     included_targets {
@@ -279,6 +284,11 @@ resource "google_dataform_repository_workflow_config" "workflow_prd" {
       database = var.project_id
       schema   = var.prd_schema
       name     = "race_uma_detail_looker"
+    }
+    included_targets {
+      database = var.project_id
+      schema   = var.prd_schema
+      name     = "race_uma_detail_looker_mv"
     }
     included_targets {
       database = var.project_id
