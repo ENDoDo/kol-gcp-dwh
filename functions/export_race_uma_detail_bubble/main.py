@@ -29,7 +29,8 @@ BUBBLE_API_URL = os.environ.get("BUBBLE_API_URL")
 BUBBLE_API_URL_SECRET_ID = os.environ.get("BUBBLE_API_URL_SECRET_ID")
 BUBBLE_API_KEY_SECRET_ID = os.environ.get("BUBBLE_API_KEY_SECRET_ID")
 CSV_BASE_URL = os.environ.get("CSV_BASE_URL", "https://kol-bi.jp/umasiri.dev")
-ENABLE_BUBBLE_API = str(os.environ.get("ENABLE_BUBBLE_API", "true")).lower() == "true"
+ENABLE_BUBBLE_API = str(os.environ.get("ENABLE_BUBBLE_API", "false")).lower() == "true"
+ENABLE_BUBBLE_API_SECRET_ID = os.environ.get("ENABLE_BUBBLE_API_SECRET_ID")
 
 def get_secret(secret_id):
     """Secret Managerからシークレット値を取得する"""
@@ -48,6 +49,16 @@ def get_bubble_api_url(request_override=None):
         except Exception as e:
             logger.warning(f"Secret ManagerからのURL取得に失敗、env varにフォールバック: {e}")
     return BUBBLE_API_URL
+
+def get_enable_bubble_api():
+    """優先度: Secret Manager > env var フォールバック（失敗時は false）"""
+    if ENABLE_BUBBLE_API_SECRET_ID:
+        try:
+            val = get_secret(ENABLE_BUBBLE_API_SECRET_ID)
+            return val.strip().lower() == "true"
+        except Exception as e:
+            logger.warning(f"Secret ManagerからのENABLE_BUBBLE_API取得失敗、env varにフォールバック: {e}")
+    return ENABLE_BUBBLE_API
 
 def ensure_state_table(bq_client, dataset_id, table_name):
     """状態管理テーブルが存在することを確認し、なければ作成する"""
@@ -88,7 +99,7 @@ def export_race_uma_detail_bubble(request):
         to_date        = request_json.get("to_date")
         force_resend   = request_json.get("force_resend", False)
         bubble_api_url = get_bubble_api_url(request_json.get("bubble_api_url"))
-        enable_bubble  = force_resend or ENABLE_BUBBLE_API
+        enable_bubble  = force_resend or get_enable_bubble_api()
 
         # テーブルスキーマから出力用フィールドを自動取得（両パスで共通）
         CHUNK_SIZE = 1000
