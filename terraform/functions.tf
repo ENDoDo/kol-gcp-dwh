@@ -53,7 +53,7 @@ resource "google_cloudfunctions2_function" "export_schedules" {
   project     = var.project_id
 
   build_config {
-    runtime     = "python311"
+    runtime     = "python312"
     entry_point = "export_schedules" # main.py 内の関数名と一致させる必要があります
     source {
       storage_source {
@@ -149,7 +149,7 @@ resource "google_cloudfunctions2_function" "export_race_uma_detail_bubble" {
   project     = var.project_id
 
   build_config {
-    runtime     = "python311"
+    runtime     = "python312"
     entry_point = "export_race_uma_detail_bubble"
     source {
       storage_source {
@@ -227,7 +227,7 @@ resource "google_cloudfunctions2_function" "export_races" {
   project     = var.project_id
 
   build_config {
-    runtime     = "python311"
+    runtime     = "python312"
     entry_point = "export_races"
     source {
       storage_source {
