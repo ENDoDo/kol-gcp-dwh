@@ -53,7 +53,7 @@ resource "google_cloudfunctions2_function" "dispatcher_function" {
   project     = var.project_id
 
   build_config {
-    runtime     = "python311"
+    runtime     = "python312"
     entry_point = "dispatch_workflow"
     source {
       storage_source {
