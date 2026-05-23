@@ -30,7 +30,7 @@ config {
     ketto_toroku_bango_kol: "KOL仕様 血統登録番号(馬コード)",
     seibetsu_code_label: "性別 牡/牝/せん",
     futan_juryo_float: "負担重量 小数点第一位まで",
-    blinker_shiyo_kubun_label: "blinker_shiyo_kubunをもとに対応 はい/いいえ",
+    blinker_shiyo_kubun_label: "ブリンカー使用 「はい」/該当しない場合はnull",
     ketto1_f_hanshoku_toroku_bango: "血統情報1 父 繁殖登録番号",
     ketto1_f_bamei: "血統情報1 父 馬名",
     ketto2_m_hanshoku_toroku_bango: "血統情報2 母 繁殖登録番号",
@@ -176,7 +176,7 @@ SELECT
   SAFE_CAST(futan_juryo AS FLOAT64) / 10 AS futan_juryo_float,
   CASE
     WHEN blinker_shiyo_kubun = '1' THEN 'はい'
-    ELSE 'いいえ'
+    ELSE NULL
   END AS blinker_shiyo_kubun_label,
   ketto1_f_hanshoku_toroku_bango,
   ketto1_f_bamei,

@@ -64,11 +64,11 @@ config {
     pace_kekka: "ペース(結果)",
     pace_kekka_label: "ペース(結果) ラベル (H, M, S)",
     race_tanpyo: "レース短評",
-    juryo_handicap_flag: "重量種別が別定または馬齢の場合に「はい」",
-    keibajo_komawari_curve4_flag: "競馬場が札幌/函館/福島/小倉かつ距離が1700m以上の場合に「はい」",
-    keibajo_omawari_curve4_flag: "指定された競馬場、トラック、距離の組み合わせ条件を満たす場合に「はい」",
-    keibajo_straight_short_flag: "指定された競馬場、トラックの組み合わせ条件を満たす場合に「はい」",
-    keibajo_straight_long_flag: "東京芝、阪神芝外回り、新潟芝外回りの場合に「はい」",
+    juryo_handicap_flag: "重量種別が別定または馬齢の場合「はい」該当しない場合はnull",
+    keibajo_komawari_curve4_flag: "競馬場が札幌/函館/福島/小倉かつ距離が1700m以上の場合「はい」該当しない場合はnull",
+    keibajo_omawari_curve4_flag: "指定された競馬場、トラック、距離の組み合わせ条件を満たす場合「はい」該当しない場合はnull",
+    keibajo_straight_short_flag: "指定された競馬場、トラックの組み合わせ条件を満たす場合「はい」該当しない場合はnull",
+    keibajo_straight_long_flag: "東京芝、阪神芝外回り、新潟芝外回りの場合「はい」該当しない場合はnull",
     created: "データ作成日時",
     modified: "データ更新日時"
   },
@@ -323,12 +323,12 @@ SELECT
   CASE
     WHEN bettei_barei_handicap_summary_code IN ('00', '01')
     THEN 'はい'
-    ELSE 'いいえ'
+    ELSE NULL
   END AS juryo_handicap_flag,
   CASE
     WHEN keibajo_code IN ('08', '09', '06', '03') AND SAFE_CAST(kyori AS INT64) >= 1700
     THEN 'はい'
-    ELSE 'いいえ'
+    ELSE NULL
   END AS keibajo_komawari_curve4_flag,
   CASE
     WHEN
@@ -341,7 +341,7 @@ SELECT
       (keibajo_code = '07' AND track_code1_dirtsiba = '0' AND SAFE_CAST(kyori AS INT64) >= 1800) OR
       (keibajo_code = '07' AND track_code1_dirtsiba = '1' AND SAFE_CAST(kyori AS INT64) >= 2000)
     THEN 'はい'
-    ELSE 'いいえ'
+    ELSE NULL
   END AS keibajo_omawari_curve4_flag,
   CASE
     WHEN
@@ -350,7 +350,7 @@ SELECT
       -- その他競馬場の条件
       (keibajo_code IN ('05', '03', '06', '08', '09'))
     THEN 'はい'
-    ELSE 'いいえ'
+    ELSE NULL
   END AS keibajo_straight_short_flag,
   CASE
     WHEN
@@ -358,7 +358,7 @@ SELECT
       (keibajo_code = '01' AND track_code1_dirtsiba = '1' AND track_code3_inout = '1') OR -- 阪神・芝・外
       (keibajo_code = '07' AND track_code1_dirtsiba = '1' AND track_code3_inout = '1') -- 新潟・芝・外
     THEN 'はい'
-    ELSE 'いいえ'
+    ELSE NULL
   END AS keibajo_straight_long_flag,
   CURRENT_TIMESTAMP() AS created,
   CURRENT_TIMESTAMP() AS modified
