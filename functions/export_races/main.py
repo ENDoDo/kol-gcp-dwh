@@ -136,6 +136,8 @@ def export_races(request):
             def generate_sse():
                 state_upd = []
                 processed = 0
+                duplicate_detected = False
+                duplicate_message = ""
                 try:
                     with ftplib.FTP(FTP_HOST) as ftp:
                         ftp.login(user=ftp_user, passwd=ftp_pass)
@@ -191,6 +193,8 @@ def export_races(request):
                                         error_text = resp_data.get("error_text") or resp_data.get("error text", "Unknown error")
                                         if "短時間で同じファイルの取り込みを検知したため中止" in error_text:
                                             logger.warning(f"Bubble API Warning (Duplicate): {error_text}")
+                                            duplicate_detected = True
+                                            duplicate_message = error_text
                                         else:
                                             raise Exception(f"Bubble Import Failed: {error_text}")
 
@@ -234,7 +238,10 @@ def export_races(request):
                         bq_client.delete_table(temp_table_id, not_found_ok=True)
                         logger.info("状態管理テーブルが更新されました。")
 
-                    yield f"event: result\ndata: {json.dumps({'status': 'success', 'records': processed})}\n\n"
+                    if duplicate_detected:
+                        yield f"event: result\ndata: {json.dumps({'status': 'error', 'records': processed, 'message': duplicate_message})}\n\n"
+                    else:
+                        yield f"event: result\ndata: {json.dumps({'status': 'success', 'records': processed})}\n\n"
 
                 except Exception as e:
                     logger.exception("force_resend 処理中にエラー")

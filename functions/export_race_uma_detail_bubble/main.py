@@ -108,9 +108,9 @@ def export_race_uma_detail_bubble(request):
         ftp_directory = os.environ.get("FTP_DIRECTORY")
 
         def upload_chunk(ftp_conn, chunk, current_part_num):
-            """チャンクデータをFTPにアップロードする内部関数"""
+            """チャンクデータをFTPにアップロードする内部関数。(duplicate_detected, error_text) を返す"""
             if not chunk:
-                return
+                return (False, "")
 
             # 日付範囲の特定
             chunk_dates = []
@@ -196,9 +196,10 @@ def export_race_uma_detail_bubble(request):
                                 if error_text is None:
                                     error_text = resp_data.get("error text", "Unknown error")
 
-                                # 特例処理: 短時間重複エラーの場合は例外を投げない
+                                # 特例処理: 短時間重複エラーの場合は例外を投げず呼び出し元に通知
                                 if "短時間で同じファイルの取り込みを検知したため中止" in error_text:
                                     logger.warning(f"Bubble API Warning (Duplicate): {error_text}")
+                                    return (True, error_text)
                                 else:
                                     logger.error(f"Bubble Import Failed ({filename}): {error_text}")
                                     raise Exception(f"Bubble Import Failed: {error_text}")
@@ -216,6 +217,7 @@ def export_race_uma_detail_bubble(request):
             except Exception as e:
                 logger.error(f"FTPアップロードエラー: {filename}, {e}")
                 raise e
+            return (False, "")
 
         # force_resend モード: 日付範囲指定 + 差分検知スキップ + SSE ストリーム
         if force_resend and from_date and to_date:
@@ -251,6 +253,8 @@ def export_race_uma_detail_bubble(request):
             def generate_sse():
                 state_upd = {}
                 processed = 0
+                duplicate_detected = False
+                duplicate_message = ""
                 try:
                     force_rows_iter = bq_client.query(
                         force_query,
@@ -280,7 +284,10 @@ def export_race_uma_detail_bubble(request):
                             }
 
                             if len(updates_chunk) >= CHUNK_SIZE:
-                                upload_chunk(ftp_conn, updates_chunk, part_num)
+                                is_dup, dup_msg = upload_chunk(ftp_conn, updates_chunk, part_num)
+                                if is_dup:
+                                    duplicate_detected = True
+                                    duplicate_message = dup_msg
                                 processed += len(updates_chunk)
                                 current_date = str(max(r["schedule_date"] for r in updates_chunk))
                                 pct = int(processed / total * 100) if total > 0 else 100
@@ -289,7 +296,10 @@ def export_race_uma_detail_bubble(request):
                                 part_num += 1
 
                         if updates_chunk:
-                            upload_chunk(ftp_conn, updates_chunk, part_num)
+                            is_dup, dup_msg = upload_chunk(ftp_conn, updates_chunk, part_num)
+                            if is_dup:
+                                duplicate_detected = True
+                                duplicate_message = dup_msg
                             processed += len(updates_chunk)
 
                     if state_upd:
@@ -327,7 +337,10 @@ def export_race_uma_detail_bubble(request):
                         bq_client.delete_table(temp_table_id, not_found_ok=True)
                         logger.info("状態管理テーブルが更新されました。")
 
-                    yield f"event: result\ndata: {json.dumps({'status': 'success', 'records': processed})}\n\n"
+                    if duplicate_detected:
+                        yield f"event: result\ndata: {json.dumps({'status': 'error', 'records': processed, 'message': duplicate_message})}\n\n"
+                    else:
+                        yield f"event: result\ndata: {json.dumps({'status': 'success', 'records': processed})}\n\n"
 
                 except Exception as e:
                     logger.exception("force_resend 処理中にエラー")
