@@ -29,7 +29,7 @@ const columns = {
 
     futan_juryo_float: "負担重量 小数点第一位まで",
     blinker_shiyo_kubun: "ブリンカー使用区分",
-    blinker_shiyo_kubun_label: "ブリンカー使用 はい/いいえ",
+    blinker_shiyo_kubun_label: "ブリンカー使用 「はい」/該当しない場合はnull",
 
     rating_float: "レイティング 小数点第一位まで",
     rating_rank: "レイティング順位。最高値が1位、同値は同じ順位で次をスキップ",
@@ -119,7 +119,7 @@ const columns = {
 
     chokyo_den_oikiri_reigai: "調教例外",
     chokyo_den_oikiri_kijosha_kubun: "調教1～3追い切り 調教騎乗者区分",
-    chokyo_den_oikiri_kijosha_equal_kishumei_flag: "調教1～3追い切り 調教騎乗騎手がレースでも騎乗フラグ",
+    chokyo_den_oikiri_kijosha_equal_kishumei_flag: "調教1～3追い切り 調教騎乗騎手がレースでも騎乗する場合「はい」該当しない場合はnull",
     // スピード指数・ローテーション
     // 調教 (sei2由来)
     chokyo_sei_kijosha: "競走成績出走馬データ  追い切り 調教騎乗者",
