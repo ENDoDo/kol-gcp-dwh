@@ -15,6 +15,9 @@ config {
     keibajo_name: "競馬場名",
     race_bango_num: "レース番号 整数型",
     race_name: "レース名 (競走名15文字)",
+    kyoso_joken_kubun_label: "競走条件区分ラベル 新馬/未出走/未勝利/1勝クラス/2勝クラス/3勝クラス/オープン",
+    kyoso_hiraba_tokubetsu_kubun: "平場・特別区分 kyosomei_15mojiがNOT NULLなら特別、NULLなら平場",
+    kyosomei_15moji: "競走名15文字",
     yosou_shirushi: "予想印 (例: ◎-△)",
     kensyu_kubun: "券種 (単勝, 複勝, 普通馬連, 馬単, ワイド, 3連複, 3連単)",
     umaban_kumiban: "組番 (例: 10, 3-5)",
@@ -112,7 +115,19 @@ WITH
               ELSE ''
             END
           )
-      END AS race_name
+      END AS race_name,
+      kyosomei_15moji,
+      CASE kyoso_joken_kubun
+        WHEN '00001' THEN '新馬'
+        WHEN '00002' THEN '未出走'
+        WHEN '00003' THEN '未勝利'
+        WHEN '05000' THEN '1勝クラス'
+        WHEN '10000' THEN '2勝クラス'
+        WHEN '16000' THEN '3勝クラス'
+        WHEN '00004' THEN 'オープン'
+        ELSE NULL
+      END AS kyoso_joken_kubun_label,
+      IF(kyosomei_15moji IS NOT NULL, '特別', '平場') AS kyoso_hiraba_tokubetsu_kubun
     FROM ${ref("kol_den1")}
   ),
 
@@ -304,6 +319,9 @@ SELECT
   r.keibajo_name,
   r.race_bango_num,
   d.race_name,
+  d.kyoso_joken_kubun_label,
+  d.kyoso_hiraba_tokubetsu_kubun,
+  d.kyosomei_15moji,
   j.kensyu_kubun,
   j.formatted_kumiban AS umaban_kumiban, -- Use formatted version
   j.haitou,
