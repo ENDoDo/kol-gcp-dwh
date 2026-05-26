@@ -1593,6 +1593,9 @@ SELECT
              AND pl.kyoso_joken_rank_int = z.kyoso_joken_rank_int
              AND SAFE_CAST(pl.barei AS INT64) >= SAFE_CAST(z.barei AS INT64)
         THEN '同格'
+        -- 格下：相手のクラスが自分より下（年齢条件なし）
+        WHEN pl.kyoso_joken_rank_int < z.kyoso_joken_rank_int
+        THEN '格下'
         ELSE NULL
       END
     ELSE NULL
