@@ -30,6 +30,7 @@ const columns = {
     futan_juryo_float: "負担重量 小数点第一位まで",
     blinker_shiyo_kubun: "ブリンカー使用区分",
     blinker_shiyo_kubun_label: "ブリンカー使用 「はい」/該当しない場合はnull",
+    blinker_shiyo_first_flag: "初ブリンカー(競走馬に初めてブリンカー着用)の場合は「はい」該当しない場合はnull。デビュー時からのデータが揃っている馬のみ対象（データ範囲2018年以降のため、馬の最小馬齢が2歳の場合のみ判定）",
 
     rating_float: "レイティング 小数点第一位まで",
     rating_rank: "レイティング順位。最高値が1位、同値は同じ順位で次をスキップ",
@@ -340,6 +341,7 @@ SELECT
   ru.futan_juryo_float,
   ru.blinker_shiyo_kubun,
   ru.blinker_shiyo_kubun_label,
+  ru.blinker_shiyo_first_flag,
   ru.kyuyo_riyu,
   ru.banushimei,
   ru.banushimei_ryakusho,
