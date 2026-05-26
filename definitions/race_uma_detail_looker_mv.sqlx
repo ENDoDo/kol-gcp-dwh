@@ -1,7 +1,7 @@
 config {
   type: "operations",
   dependencies: ["race_uma_detail_looker"],
-  description: "race_uma_detail_lookerと同内容のBigQuery Materialized View。(Looker Studio用キャッシュ) Dataformが毎回 DROP → CREATE で自動再作成する。"
+  description: "race_uma_detail_lookerから必要カラム114件のみ選択したBigQuery Materialized View。(Looker Studio用キャッシュ) Dataformが毎回 DROP → CREATE で自動再作成する。"
 }
 
 -- Dataform実行のたびにrace_uma_detail_lookerが再作成されMVが無効化されるため、
@@ -12,4 +12,133 @@ CREATE MATERIALIZED VIEW `${database()}.${schema()}.race_uma_detail_looker_mv`
 PARTITION BY schedule_date
 OPTIONS (enable_refresh = true, refresh_interval_minutes = 30)
 AS
-SELECT * FROM ${ref("race_uma_detail_looker")}
+SELECT
+  -- ID
+  race_code_uma_jvd,
+  race_code_uma_jvd_zensou,
+  schedule_date,
+  race_bango_num,
+  wakuban,
+  umaban_num,
+  -- 馬情報
+  bamei,
+  barei_num,
+  seibetsu_code_label,
+  futan_juryo_float,
+  blinker_shiyo_kubun_label,
+  kyuyo_riyu,
+  rating_float,
+  rating_rank,
+  -- 馬主・血統
+  banushimei,
+  ketto1_f_bamei,
+  ketto2_m_bamei,
+  ketto5_mf_bamei,
+  -- 騎手
+  kishumei,
+  kishumei_zensou,
+  kishu_norikawari_kubun_label,
+  -- 調教師
+  chokyoshimei,
+  chokyoshi_tracen_kubun_label,
+  -- 調教 sei由来
+  chokyo_sei_kijosha,
+  chokyo_sei_kijosha_kubun,
+  chokyo_sei_kijosha_equal_kishumei_flag,
+  chokyo_sei_nengappi_date,
+  chokyo_sei_basho_course_label,
+  chokyo_sei_basho_course_label_zensou,
+  chokyo_sei_babajotai,
+  chokyo_sei_8f_float,
+  chokyo_sei_7f_float,
+  chokyo_sei_6f_float,
+  chokyo_sei_5f_float,
+  chokyo_sei_4f_float,
+  chokyo_sei_3f_float,
+  chokyo_sei_2f_float,
+  chokyo_sei_1f_float,
+  chokyo_sei_lap_8f,
+  chokyo_sei_lap_7f,
+  chokyo_sei_lap_6f,
+  chokyo_sei_lap_5f,
+  chokyo_sei_lap_4f,
+  chokyo_sei_lap_3f,
+  chokyo_sei_lap_2f,
+  chokyo_sei_lap_group,
+  chokyo_sei_lap_group_zensou,
+  chokyo_sei_naka1week_fight_flag,
+  chokyo_sei_batsugun_flag,
+  chokyo_sei_ichidori,
+  chokyo_sei_ashiiro_label,
+  chokyo_sei_yajirushi_label,
+  chokyo_sei_check_time_wood_4f_5f_flag,
+  chokyo_sei_check_time_wood_4f_5f_flag_zensou,
+  chokyo_sei_check_time_wood_1f_2f_flag,
+  chokyo_sei_check_time_wood_1f_2f_flag_zensou,
+  -- 調教 den由来
+  chokyo_den_awase_uma_kakuue_win_flag,
+  chokyo_den_awase_kubun,
+  chokyo_den_tanpyo,
+  -- 展開予想
+  tenkai_kyakushitsu_kubun,
+  tenkai_position,
+  tenkai_ittai_flag,
+  tenkai_order,
+  -- ローテーション・前走比較
+  zensou_kankaku,
+  zensou_kankaku_num,
+  bataiju,
+  bataiju_zensou,
+  kyori_zensou,
+  kyori_kubun_zensou,
+  track_code1_label_dirtsiba_zensou,
+  -- オッズ
+  yosou_tansho_ninkijun_num,
+  yosou_tansho_odds_float,
+  yosou_tansho_odds_kubun,
+  kakutei_tansho_ninkijun_num,
+  kakutei_tansho_ninkijun_num_zensou,
+  kakutei_tansho_odds_float,
+  -- 成績
+  kakutei_chakujun_num,
+  kakutei_chakujun_num_zensou,
+  tansho_haraimodoshi_num,
+  fukusho_haraimodoshi_num,
+  shirushi_shirushi_label,
+  -- コーナー
+  corner1_juni_label,
+  corner1_juni_furi,
+  corner2_juni_label,
+  corner2_juni_furi,
+  corner3_juni_label,
+  corner3_juni_label_zensou,
+  corner3_juni_furi,
+  corner3_juni_furi_zensou,
+  corner4_juni_label,
+  corner4_juni_label_zensou,
+  corner4_juni_furi,
+  corner4_juni_furi_zensou,
+  corner4_ichidori,
+  corner4_ichidori_label,
+  corner4_ichidori_label_zensou,
+  -- コメント
+  comment_kishu_kyusha,
+  comment_next,
+  -- raceテーブル由来
+  race_name,
+  kyori_kubun,
+  keibajo_name,
+  kyori,
+  grade_code_label,
+  bettei_barei_handicap_summary_code_label,
+  kyoso_joken_kubun_label,
+  kyoso_hiraba_tokubetsu_kubun,
+  heichi_shogai_kubun_label,
+  track_code1_dirtsiba_label,
+  tenko_code_label,
+  babajotai_code_label,
+  pace_yosou_label,
+  pace_kekka_label,
+  race_tanpyo,
+  juryo_handicap_flag
+FROM ${ref("race_uma_detail_looker")}
