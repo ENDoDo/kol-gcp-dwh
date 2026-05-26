@@ -1,7 +1,7 @@
 config {
   type: "operations",
   dependencies: ["race_uma_detail_looker"],
-  description: "race_uma_detail_lookerから必要カラム114件のみ選択したBigQuery Materialized View。(Looker Studio用キャッシュ) Dataformが毎回 DROP → CREATE で自動再作成する。"
+  description: "race_uma_detail_lookerから必要カラム119件のみ選択したBigQuery Materialized View。(Looker Studio用キャッシュ) Dataformが毎回 DROP → CREATE で自動再作成する。"
 }
 
 -- Dataform実行のたびにrace_uma_detail_lookerが再作成されMVが無効化されるため、
@@ -79,6 +79,7 @@ SELECT
   chokyo_den_awase_uma_kakuue_win_flag,
   chokyo_den_awase_kubun,
   chokyo_den_tanpyo,
+  chokyo_den_ichidori_furi_win_flag,
   -- 展開予想
   tenkai_kyakushitsu_kubun,
   tenkai_position,
@@ -105,6 +106,10 @@ SELECT
   tansho_haraimodoshi_num,
   fukusho_haraimodoshi_num,
   shirushi_shirushi_label,
+  soha_time_label,
+  time_sa_float,
+  zenhan_3f_float,
+  kohan_3f_float,
   -- コーナー
   corner1_juni_label,
   corner1_juni_furi,
