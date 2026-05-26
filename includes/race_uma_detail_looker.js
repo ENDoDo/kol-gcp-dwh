@@ -341,6 +341,7 @@ SELECT
   ru.futan_juryo_float,
   ru.blinker_shiyo_kubun,
   ru.blinker_shiyo_kubun_label,
+  ru.blinker_shiyo_first_flag,
   ru.kyuyo_riyu,
   ru.banushimei,
   ru.banushimei_ryakusho,
