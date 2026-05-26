@@ -40,6 +40,7 @@ config {
     futan_juryo_float: "負担重量 小数点第一位まで",
     blinker_shiyo_kubun: "ブリンカー使用区分",
     blinker_shiyo_kubun_label: "ブリンカー使用 「はい」/該当しない場合はnull",
+    blinker_shiyo_first_flag: "初ブリンカー(競走馬に初めてブリンカー着用)の場合は「はい」該当しない場合はnull。デビュー時からのデータが揃っている馬のみ対象（データ範囲2018年以降のため、馬の最小馬齢が2歳の場合のみ判定）",
 
     rating_float: "レイティング 小数点第一位まで",
     rating_rank: "レイティング順位。最高値が1位、同値は同じ順位で次をスキップ",
@@ -1016,6 +1017,8 @@ WITH
 
       -- テン乗り判定用: 馬×騎手の出走順（1=初騎乗）
       ROW_NUMBER() OVER (PARTITION BY ketto_toroku_bango, kishu_code ORDER BY hasso_date, race_code_kol) AS kishu_uma_rn,
+      -- 初ブリンカー判定用: 馬ごとのブリンカー着用順（1=初着用）
+      ROW_NUMBER() OVER (PARTITION BY ketto_toroku_bango, blinker_shiyo_kubun ORDER BY hasso_date, race_code_kol) AS blinker_uma_rn,
       -- テン乗り判定用: データ内でこの馬が初めて出走した時の馬齢（2=デビューからデータあり）
       MIN(SAFE_CAST(barei AS INT64)) OVER (PARTITION BY ketto_toroku_bango) AS uma_min_barei
     FROM
@@ -1366,6 +1369,10 @@ SELECT
     WHEN z.blinker_shiyo_kubun = '1' THEN 'はい'
     ELSE NULL
   END AS blinker_shiyo_kubun_label,
+  CASE
+    WHEN z.blinker_uma_rn = 1 AND z.blinker_shiyo_kubun = '1' AND z.uma_min_barei = 2 THEN 'はい'
+    ELSE NULL
+  END AS blinker_shiyo_first_flag,
   z.kyuyo_riyu,
   z.banushimei,
   z.banushimei_ryakusho,
