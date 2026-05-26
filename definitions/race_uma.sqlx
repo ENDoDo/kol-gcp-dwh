@@ -63,6 +63,7 @@ config {
     kishu_minarai_code_label: "騎手見習",
     kishu_norikawari_kubun: "騎手乗り替わり区分",
     kishu_norikawari_kubun_label: "騎手乗り替わり 該当する場合「はい」該当しない場合はnull",
+    kishu_tennori_flag: "テン乗り(騎手がこの馬に初めて騎乗)の場合は「はい」該当しない場合はnull。デビュー時からのデータが揃っている馬のみ対象（データ範囲2018年以降のため、馬の最小馬齢が2歳の場合のみ判定）",
     kishu_shozokubasho_code: "騎手所属場所コード",
     kishu_shozokubasho_code_label: "騎手所属場所",
     kishu_shozoku_chokyoshi_code: "騎手が所属する調教師コード",
@@ -1011,7 +1012,12 @@ WITH
       CASE
         WHEN LAG(DATE(hasso_date)) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) IS NULL THEN 0
         ELSE CAST(CEIL(DATE_DIFF(DATE(hasso_date), LAG(DATE(hasso_date)) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date), DAY) / 7.0) AS INT64)
-      END AS zensou_kankaku_num
+      END AS zensou_kankaku_num,
+
+      -- テン乗り判定用: 馬×騎手の出走順（1=初騎乗）
+      ROW_NUMBER() OVER (PARTITION BY ketto_toroku_bango, kishu_code ORDER BY hasso_date, race_code_kol) AS kishu_uma_rn,
+      -- テン乗り判定用: データ内でこの馬が初めて出走した時の馬齢（2=デビューからデータあり）
+      MIN(SAFE_CAST(barei AS INT64)) OVER (PARTITION BY ketto_toroku_bango) AS uma_min_barei
     FROM
       with_lap_groups
   ),
@@ -1401,6 +1407,10 @@ SELECT
     WHEN z.kishu_norikawari_kubun = '1' THEN 'はい'
     ELSE NULL
   END AS kishu_norikawari_kubun_label,
+  CASE
+    WHEN z.kishu_uma_rn = 1 AND z.uma_min_barei = 2 THEN 'はい'
+    ELSE NULL
+  END AS kishu_tennori_flag,
   z.chokyoshi_code,
   z.chokyoshimei,
   z.chokyoshi_shozokubasho_code,

@@ -53,6 +53,7 @@ const columns = {
     kishu_minarai_code_label: "騎手見習",
     kishu_norikawari_kubun: "騎手乗り替わり区分",
     kishu_norikawari_kubun_label: "騎手乗り替わり 該当する場合「はい」該当しない場合はnull",
+    kishu_tennori_flag: "テン乗り(騎手がこの馬に初めて騎乗)の場合は「はい」該当しない場合はnull。デビュー時からのデータが揃っている馬のみ対象（データ範囲2018年以降のため、馬の最小馬齢が2歳の場合のみ判定）",
     kishu_shozokubasho_code: "騎手所属場所コード",
     kishu_shozokubasho_code_label: "騎手所属場所",
     kishu_shozoku_chokyoshi_code: "騎手が所属する調教師コード",
