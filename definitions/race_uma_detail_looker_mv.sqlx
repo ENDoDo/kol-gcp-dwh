@@ -26,6 +26,7 @@ SELECT
   seibetsu_code_label,
   futan_juryo_float,
   blinker_shiyo_kubun_label,
+  blinker_shiyo_first_flag,
   kyuyo_riyu,
   rating_float,
   rating_rank,
