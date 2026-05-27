@@ -29,3 +29,6 @@ functions/export_race_uma_detail_looker.zip
 
 # Session logs
 sessions/
+
+# Claude Code local settings
+.claude/settings.local.json
