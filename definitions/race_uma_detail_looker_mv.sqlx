@@ -1,7 +1,7 @@
 config {
   type: "operations",
   dependencies: ["race_uma_detail_looker"],
-  description: "race_uma_detail_lookerから必要カラム119件のみ選択したBigQuery Materialized View。(Looker Studio用キャッシュ) Dataformが毎回 DROP → CREATE で自動再作成する。"
+  description: "race_uma_detail_lookerから必要カラム117件のみ選択したBigQuery Materialized View。(Looker Studio用キャッシュ) Dataformが毎回 DROP → CREATE で自動再作成する。"
 }
 
 -- Dataform実行のたびにrace_uma_detail_lookerが再作成されMVが無効化されるため、
@@ -47,6 +47,7 @@ SELECT
   chokyo_sei_kijosha_kubun,
   chokyo_sei_kijosha_equal_kishumei_flag,
   chokyo_sei_nengappi_date,
+  chokyo_sei_course_kubun,
   chokyo_sei_basho_course_label,
   chokyo_sei_basho_course_label_zensou,
   chokyo_sei_babajotai,
@@ -77,6 +78,7 @@ SELECT
   chokyo_sei_check_time_wood_1f_2f_flag,
   chokyo_sei_check_time_wood_1f_2f_flag_zensou,
   -- 調教 den由来
+  chokyo_den_awase,
   chokyo_den_awase_uma_kakuue_win_flag,
   chokyo_den_awase_kubun,
   chokyo_den_tanpyo,
@@ -87,7 +89,6 @@ SELECT
   tenkai_ittai_flag,
   tenkai_order,
   -- ローテーション・前走比較
-  zensou_kankaku,
   zensou_kankaku_num,
   bataiju,
   bataiju_zensou,
@@ -112,10 +113,6 @@ SELECT
   zenhan_3f_float,
   kohan_3f_float,
   -- コーナー
-  corner1_juni_label,
-  corner1_juni_furi,
-  corner2_juni_label,
-  corner2_juni_furi,
   corner3_juni_label,
   corner3_juni_label_zensou,
   corner3_juni_furi,
@@ -124,16 +121,17 @@ SELECT
   corner4_juni_label_zensou,
   corner4_juni_furi,
   corner4_juni_furi_zensou,
-  corner4_ichidori,
   corner4_ichidori_label,
   corner4_ichidori_label_zensou,
   -- コメント
   comment_kishu_kyusha,
   comment_next,
+  comment_last,
   -- raceテーブル由来
   race_name,
   kyori_kubun,
   keibajo_name,
+  kyosomei_15moji,
   kyori,
   grade_code_label,
   bettei_barei_handicap_summary_code_label,
@@ -145,7 +143,6 @@ SELECT
   babajotai_code_label,
   pace_yosou_label,
   pace_kekka_label,
-  race_tanpyo,
-  juryo_handicap_flag
+  race_tanpyo
 FROM ${ref("race_uma_detail_looker")}
 WHERE kakutei_chakujun_num >= 1
