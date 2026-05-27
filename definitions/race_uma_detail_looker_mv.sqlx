@@ -26,6 +26,7 @@ SELECT
   seibetsu_code_label,
   futan_juryo_float,
   blinker_shiyo_kubun_label,
+  blinker_shiyo_first_flag,
   kyuyo_riyu,
   rating_float,
   rating_rank,
@@ -147,3 +148,4 @@ SELECT
   race_tanpyo,
   juryo_handicap_flag
 FROM ${ref("race_uma_detail_looker")}
+WHERE kakutei_chakujun_num >= 1
