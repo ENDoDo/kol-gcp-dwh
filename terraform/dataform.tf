@@ -14,6 +14,10 @@ locals {
   # Dataformのソーススキーマを環境によって切り替える
   # prdの場合は "kolbi_keiba" を、それ以外(stg)の場合は "kolbi_keiba_stg" を使用する
   dataform_source_schema = terraform.workspace == "prd" ? "kolbi_keiba" : "kolbi_keiba_stg"
+
+  # Developer Connect が自動生成・管理する GitHub OAuth トークンのシークレット名
+  # 接続を再作成するとサフィックスが変わるため、ここで一元管理する
+  devconnect_oauth_secret_id = "kol-dataform-github-oauthtoken-89081c"
 }
 
 # --- API Services ---
@@ -92,7 +96,7 @@ resource "google_dataform_repository" "repository_stg" {
     # Developer Connect が管理する GitHub OAuth トークンを使用（手動 PAT ではない）
     # Developer Connect がトークンをローテーションすると新バージョンが作成され、
     # versions/latest で常に有効なトークンを参照できる
-    authentication_token_secret_version = "projects/${data.google_project.project.number}/secrets/kol-dataform-github-oauthtoken-89081c/versions/latest"
+    authentication_token_secret_version = "projects/${data.google_project.project.number}/secrets/${local.devconnect_oauth_secret_id}/versions/latest"
   }
 
   depends_on = [
@@ -216,7 +220,7 @@ resource "google_dataform_repository" "repository_prd" {
     url            = "https://github.com/ENDoDo/kol-gcp-dwh.git"
     default_branch = "main"
     # Developer Connect が管理する GitHub OAuth トークンを使用（手動 PAT ではない）
-    authentication_token_secret_version = "projects/${data.google_project.project.number}/secrets/kol-dataform-github-oauthtoken-89081c/versions/latest"
+    authentication_token_secret_version = "projects/${data.google_project.project.number}/secrets/${local.devconnect_oauth_secret_id}/versions/latest"
   }
 
   depends_on = [

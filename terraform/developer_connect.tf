@@ -13,7 +13,8 @@ resource "google_project_service_identity" "devconnect_p4sa" {
 }
 
 # P4SA に Secret Manager Admin 権限を付与
-# Developer Connect が OAuth トークンを Secret Manager に保存するために必要
+# Developer Connect がシークレットを動的に作成・管理するため roles/secretmanager.admin が必要。
+# シークレット作成前は特定シークレットにスコープできないため、プロジェクト全体への付与は GCP の要件。
 resource "google_project_iam_member" "devconnect_secret_admin" {
   project = var.project_id
   role    = "roles/secretmanager.admin"
@@ -86,7 +87,7 @@ resource "google_developer_connect_git_repository_link" "kol_dataform_repo" {
 # これにより Dataform が Developer Connect 管理の GitHub OAuth トークンで認証できる
 resource "google_secret_manager_secret_iam_member" "dataform_devconnect_oauth_accessor" {
   project   = var.project_id
-  secret_id = "kol-dataform-github-oauthtoken-89081c"
+  secret_id = local.devconnect_oauth_secret_id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-dataform.iam.gserviceaccount.com"
 
