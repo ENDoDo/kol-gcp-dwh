@@ -40,7 +40,7 @@ config {
     futan_juryo_float: "負担重量 小数点第一位まで",
     blinker_shiyo_kubun: "ブリンカー使用区分",
     blinker_shiyo_kubun_label: "ブリンカー使用 「はい」/該当しない場合はnull",
-    blinker_shiyo_first_flag: "初ブリンカー(競走馬に初めてブリンカー着用)の場合は「はい」、該当しない場合はnull。取消・除外等の確定着順なしレースはカウントせず、確定着順1以上の実走のみを着用回数に含める",
+    blinker_shiyo_first_flag: "初ブリンカー(競走馬に初めてブリンカー着用)の場合は「はい」、該当しない場合はnull。取消・除外等の確定着順なしレースはカウントせず、確定着順1以上の実走のみを着用回数に含める。最新 schedule_date のレースは確定着順が null（未走）でも判定する",
 
     rating_float: "レイティング 小数点第一位まで",
     rating_rank: "レイティング順位。最高値が1位、同値は同じ順位で次をスキップ",
@@ -64,7 +64,7 @@ config {
     kishu_minarai_code_label: "騎手見習",
     kishu_norikawari_kubun: "騎手乗り替わり区分",
     kishu_norikawari_kubun_label: "騎手乗り替わり 該当する場合「はい」該当しない場合はnull",
-    kishu_tennori_flag: "テン乗り(騎手がこの馬に初めて騎乗)の場合は「はい」、該当しない場合はnull。取消・除外等の確定着順なしレースはカウントせず、確定着順1以上の実走のみを騎乗回数に含める",
+    kishu_tennori_flag: "テン乗り(騎手がこの馬に初めて騎乗)の場合は「はい」、該当しない場合はnull。取消・除外等の確定着順なしレースはカウントせず、確定着順1以上の実走のみを騎乗回数に含める。最新 schedule_date のレースは確定着順が null（未走）でも判定する",
     kishu_shozokubasho_code: "騎手所属場所コード",
     kishu_shozokubasho_code_label: "騎手所属場所",
     kishu_shozoku_chokyoshi_code: "騎手が所属する調教師コード",
@@ -1300,6 +1300,12 @@ WITH
         ELSE NULL
       END AS tenkai_ittai_flag
     FROM with_tenkai_data
+  ),
+
+  -- 最新 schedule_date を取得（当日レースの確定着順 NULL 許容判定に使用）
+  max_schedule_date AS (
+    SELECT MAX(DATE(hasso_date)) AS max_date
+    FROM with_tenkai_mapped
   )
 
 -- Final Step: 全ての情報を結合し、最終的なカラムを生成
@@ -1365,6 +1371,7 @@ SELECT
   END AS blinker_shiyo_kubun_label,
   CASE
     WHEN z.blinker_uma_rn = 1 AND z.blinker_shiyo_kubun = '1' AND SAFE_CAST(z.kakutei_chakujun AS INT64) >= 1 THEN 'はい'
+    WHEN z.blinker_uma_rn = 0 AND z.blinker_shiyo_kubun = '1' AND DATE(z.hasso_date) = msd.max_date THEN 'はい'
     ELSE NULL
   END AS blinker_shiyo_first_flag,
   z.kyuyo_riyu,
@@ -1410,6 +1417,7 @@ SELECT
   END AS kishu_norikawari_kubun_label,
   CASE
     WHEN z.kishu_uma_rn = 1 AND SAFE_CAST(z.kakutei_chakujun AS INT64) >= 1 THEN 'はい'
+    WHEN z.kishu_uma_rn = 0 AND DATE(z.hasso_date) = msd.max_date THEN 'はい'
     ELSE NULL
   END AS kishu_tennori_flag,
   z.chokyoshi_code,
@@ -2120,6 +2128,7 @@ SELECT
   CURRENT_TIMESTAMP() AS modified
 FROM
   with_tenkai_mapped AS z
+CROSS JOIN max_schedule_date AS msd
 LEFT JOIN
   partner_lookup AS pl
   ON z.race_code_uma_kol = pl.race_code_uma_kol
