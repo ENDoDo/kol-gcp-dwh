@@ -1017,8 +1017,8 @@ WITH
 
       -- テン乗り判定用: 馬×騎手の実走回数（取消・除外等の確定着順なしはカウントしない）
       SUM(CASE WHEN SAFE_CAST(kakutei_chakujun AS INT64) >= 1 THEN 1 ELSE 0 END) OVER (PARTITION BY ketto_toroku_bango, kishu_code ORDER BY hasso_date, race_code_kol ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS kishu_uma_rn,
-      -- 初ブリンカー判定用: 馬ごとのブリンカー着用順（1=初着用）
-      ROW_NUMBER() OVER (PARTITION BY ketto_toroku_bango, blinker_shiyo_kubun ORDER BY hasso_date, race_code_kol) AS blinker_uma_rn,
+      -- 初ブリンカー判定用: 馬ごとのブリンカー着用実走回数（取消・除外等の確定着順なしはカウントしない）
+      SUM(CASE WHEN SAFE_CAST(kakutei_chakujun AS INT64) >= 1 THEN 1 ELSE 0 END) OVER (PARTITION BY ketto_toroku_bango, blinker_shiyo_kubun ORDER BY hasso_date, race_code_kol ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS blinker_uma_rn,
       -- テン乗り判定用: データ内でこの馬が初めて出走した時の馬齢（2=デビューからデータあり）
       MIN(SAFE_CAST(barei AS INT64)) OVER (PARTITION BY ketto_toroku_bango) AS uma_min_barei
     FROM
