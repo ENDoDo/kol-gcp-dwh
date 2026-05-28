@@ -15,7 +15,6 @@ resource "google_project_service_identity" "devconnect_p4sa" {
 # P4SA に Secret Manager Admin 権限を付与
 # Developer Connect が OAuth トークンを Secret Manager に保存するために必要
 resource "google_project_iam_member" "devconnect_secret_admin" {
-  count   = terraform.workspace != "prd" ? 1 : 0
   project = var.project_id
   role    = "roles/secretmanager.admin"
   member  = google_project_service_identity.devconnect_p4sa.member
@@ -23,7 +22,6 @@ resource "google_project_iam_member" "devconnect_secret_admin" {
 
 # Dataform サービスエージェントに Developer Connect トークン読み取り権限を付与
 resource "google_project_iam_member" "dataform_devconnect_token_accessor" {
-  count   = terraform.workspace != "prd" ? 1 : 0
   project = var.project_id
   role    = "roles/developerconnect.tokenAccessor"
   member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-dataform.iam.gserviceaccount.com"
@@ -31,7 +29,6 @@ resource "google_project_iam_member" "dataform_devconnect_token_accessor" {
 
 # Dataform サービスエージェントに Developer Connect Git プロキシ使用権限を付与
 resource "google_project_iam_member" "dataform_devconnect_git_proxy_user" {
-  count   = terraform.workspace != "prd" ? 1 : 0
   project = var.project_id
   role    = "roles/developerconnect.gitProxyUser"
   member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-dataform.iam.gserviceaccount.com"
@@ -88,7 +85,6 @@ resource "google_developer_connect_git_repository_link" "kol_dataform_repo" {
 # Dataform サービスエージェントに Developer Connect OAuth トークンシークレットの読み取り権限を付与
 # これにより Dataform が Developer Connect 管理の GitHub OAuth トークンで認証できる
 resource "google_secret_manager_secret_iam_member" "dataform_devconnect_oauth_accessor" {
-  count     = terraform.workspace != "prd" ? 1 : 0
   project   = var.project_id
   secret_id = "kol-dataform-github-oauthtoken-89081c"
   role      = "roles/secretmanager.secretAccessor"

@@ -223,6 +223,7 @@ resource "google_dataform_repository" "repository_prd" {
     google_project_iam_member.dataform_bigquery_data_editor,
     google_project_iam_member.dataform_bigquery_job_user,
     google_project_service.dataform,
+    google_secret_manager_secret_iam_member.dataform_devconnect_oauth_accessor,
   ]
 }
 
