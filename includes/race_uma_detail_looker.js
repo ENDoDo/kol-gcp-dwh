@@ -30,7 +30,7 @@ const columns = {
     futan_juryo_float: "負担重量 小数点第一位まで",
     blinker_shiyo_kubun: "ブリンカー使用区分",
     blinker_shiyo_kubun_label: "ブリンカー使用 「はい」/該当しない場合はnull",
-    blinker_shiyo_first_flag: "初ブリンカー(競走馬に初めてブリンカー着用)の場合は「はい」、該当しない場合はnull。取消・除外等の確定着順なしレースはカウントせず、確定着順1以上の実走のみを着用回数に含める。最新 schedule_date のレースは確定着順が null（未走）でも判定する",
+    blinker_shiyo_first_flag: "初ブリンカー(競走馬に初めてブリンカー着用)の場合は「はい」、該当しない場合はnull。取消・除外等の確定着順なしレースはカウントせず、確定着順1以上28以下の実走のみを着用回数に含める。最新 schedule_date のレースは確定着順が null（未走）でも判定する",
 
     rating_float: "レイティング 小数点第一位まで",
     rating_rank: "レイティング順位。最高値が1位、同値は同じ順位で次をスキップ",
@@ -54,7 +54,7 @@ const columns = {
     kishu_minarai_code_label: "騎手見習",
     kishu_norikawari_kubun: "騎手乗り替わり区分",
     kishu_norikawari_kubun_label: "騎手乗り替わり 該当する場合「はい」該当しない場合はnull",
-    kishu_tennori_flag: "テン乗り(騎手がこの馬に初めて騎乗)の場合は「はい」、該当しない場合はnull。取消・除外等の確定着順なしレースはカウントせず、確定着順1以上の実走のみを騎乗回数に含める。最新 schedule_date のレースは確定着順が null（未走）でも判定する",
+    kishu_tennori_flag: "テン乗り(騎手がこの馬に初めて騎乗)の場合は「はい」、該当しない場合はnull。取消・除外等の確定着順なしレースはカウントせず、確定着順1以上28以下の実走のみを騎乗回数に含める。最新 schedule_date のレースは確定着順が null（未走）でも判定する",
     kishu_shozokubasho_code: "騎手所属場所コード",
     kishu_shozokubasho_code_label: "騎手所属場所",
     kishu_shozoku_chokyoshi_code: "騎手が所属する調教師コード",

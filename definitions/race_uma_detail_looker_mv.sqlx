@@ -145,4 +145,4 @@ SELECT
   pace_kekka_label,
   race_tanpyo
 FROM ${ref("race_uma_detail_looker")}
-WHERE kakutei_chakujun_num >= 1
+WHERE kakutei_chakujun_num BETWEEN 1 AND 28
