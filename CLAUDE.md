@@ -180,7 +180,7 @@ KOLデータ(ZIP)
 
 | シークレット名 | 用途 |
 |-------------|------|
-| `github-token` | DataformのGitHub連携用 |
+| `kol-dataform-github-oauthtoken-89081c` | Developer Connect が管理する GitHub OAuth トークン（Dataform の GitHub 連携用）。手動 PAT は廃止。 |
 | `kol_ftp_bubble_username` | FTP認証ユーザー名 |
 | `kol_ftp_bubble_password` | FTP認証パスワード |
 | `kol_bubble_workflow_api_key` | Bubble API Token |

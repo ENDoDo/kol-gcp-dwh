@@ -14,6 +14,10 @@ locals {
   # Dataformのソーススキーマを環境によって切り替える
   # prdの場合は "kolbi_keiba" を、それ以外(stg)の場合は "kolbi_keiba_stg" を使用する
   dataform_source_schema = terraform.workspace == "prd" ? "kolbi_keiba" : "kolbi_keiba_stg"
+
+  # Developer Connect が自動生成・管理する GitHub OAuth トークンのシークレット名
+  # 接続を再作成するとサフィックスが変わるため、ここで一元管理する
+  devconnect_oauth_secret_id = "kol-dataform-github-oauthtoken-89081c"
 }
 
 # --- API Services ---
@@ -77,24 +81,6 @@ resource "google_bigquery_dataset_iam_member" "stg_runner_prd_metadata_viewer" {
   member     = "serviceAccount:${google_service_account.dataform.email}"
 }
 
-# --- Git Authentication Secret ---
-resource "google_secret_manager_secret" "dataform_git_token" {
-  provider  = google-beta.beta
-  secret_id = "${var.dataform_repository_id}-git-token${local.env_suffix}"
-  replication {
-    auto {}
-  }
-  depends_on = [
-    google_project_service.secretmanager
-  ]
-}
-
-resource "google_secret_manager_secret_version" "dataform_git_token_version" {
-  provider    = google-beta.beta
-  secret      = google_secret_manager_secret.dataform_git_token.id
-  secret_data = "placeholder-replace-this-with-a-real-git-token"
-}
-
 # --- Dataform Repository and Configurations ---
 # --- Dataform Repository and Configurations (Staging) ---
 resource "google_dataform_repository" "repository_stg" {
@@ -105,14 +91,20 @@ resource "google_dataform_repository" "repository_stg" {
   name     = "${var.dataform_repository_id}-stg"
 
   git_remote_settings {
-    url                                 = "https://github.com/ENDoDo/kol-gcp-dataform.git"
-    default_branch                      = "main"
-    authentication_token_secret_version = "projects/56638639323/secrets/github-token/versions/latest"
+    url            = "https://github.com/ENDoDo/kol-gcp-dwh.git"
+    default_branch = "main"
+    # Developer Connect が管理する GitHub OAuth トークンを使用（手動 PAT ではない）
+    # Developer Connect がトークンをローテーションすると新バージョンが作成され、
+    # versions/latest で常に有効なトークンを参照できる
+    authentication_token_secret_version = "projects/${data.google_project.project.number}/secrets/${local.devconnect_oauth_secret_id}/versions/latest"
   }
+
   depends_on = [
     google_project_iam_member.dataform_bigquery_data_editor,
     google_project_iam_member.dataform_bigquery_job_user,
     google_project_service.dataform,
+    google_developer_connect_git_repository_link.kol_dataform_repo,
+    google_secret_manager_secret_iam_member.dataform_devconnect_oauth_accessor,
   ]
 }
 
@@ -225,14 +217,17 @@ resource "google_dataform_repository" "repository_prd" {
   name     = var.dataform_repository_id # kol-dataform-repo
 
   git_remote_settings {
-    url                                 = "https://github.com/ENDoDo/kol-gcp-dataform.git"
-    default_branch                      = "main"
-    authentication_token_secret_version = "projects/56638639323/secrets/github-token/versions/latest"
+    url            = "https://github.com/ENDoDo/kol-gcp-dwh.git"
+    default_branch = "main"
+    # Developer Connect が管理する GitHub OAuth トークンを使用（手動 PAT ではない）
+    authentication_token_secret_version = "projects/${data.google_project.project.number}/secrets/${local.devconnect_oauth_secret_id}/versions/latest"
   }
+
   depends_on = [
     google_project_iam_member.dataform_bigquery_data_editor,
     google_project_iam_member.dataform_bigquery_job_user,
     google_project_service.dataform,
+    google_secret_manager_secret_iam_member.dataform_devconnect_oauth_accessor,
   ]
 }
 
