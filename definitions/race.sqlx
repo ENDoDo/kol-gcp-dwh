@@ -33,7 +33,7 @@ config {
     jpn_flag: "Jpnフラグ",
     jpn_flag_label: "grade_codeの有無をもとに対応 国際格付けレース（G）/それ以外の重賞（Jpn）",
     bettei_barei_handicap_summary_code: "重量種別コード(別定馬齢ハンデ概要コード)",
-    bettei_barei_handicap_summary_code_label: "bettei_barei_handicap_summary_codeをもとに対応 別定/馬齢/ハンデ/定量/規定(道営のみ)",
+    bettei_barei_handicap_summary_code_label: "bettei_barei_handicap_summary_codeをもとに対応 別定/馬齢/ハンデ/定量/規定(道営のみ)/重量区分なし",
     bettei_barei_handicap_detail: "別定/馬齢/ハンデ/定量/規定（道営のみ）/牡 55 K/牝 53 K/牝2K減",
     kyoso_joken_cut: "条件カット",
     kyoso_joken_cut_label: "kyoso_joken_cutをもとに判定 2歳/3歳/3歳以上/4歳以上",
@@ -142,7 +142,7 @@ WITH
         WHEN '02' THEN 'ハンデ'
         WHEN '03' THEN '定量'
         WHEN '90' THEN '規定(道営のみ)'
-        ELSE NULL
+        ELSE '重量区分なし'
       END AS bettei_barei_handicap_summary_code_label,
       CASE d1.kyoso_joken_age_limit
         WHEN '0' THEN '2歳'

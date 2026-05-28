@@ -5,6 +5,24 @@ description: Use when manually triggering a Dataform workflow run for this proje
 
 # Dataform 手動実行スキル
 
+## ⚠️ 実行前の必須チェック（BLOCKING）
+
+**Dataform は main ブランチのコードを実行する。feature ブランチのままでは変更が反映されない。**
+
+Dataform を実行する前に必ず以下を確認すること：
+
+```bash
+git branch --show-current
+git log --oneline origin/main..HEAD
+```
+
+- **現在のブランチが `main` 以外** → まず PR を作成してマージしてから実行する
+- **`origin/main` より先にコミットがある** → まず PR をマージしてから実行する
+
+どちらかに該当する場合は **STOP**。ユーザーにマージを依頼し、確認が取れてから実行に進む。
+
+---
+
 ## 概要
 
 このプロジェクトの Dataform ワークフローは `gcloud` に `dataform` サブコマンドがないため、**Python + REST API** で実行する。ADC（Application Default Credentials）から OAuth2 トークンを取得し、Dataform API と BigQuery API を直接呼び出す。
@@ -135,3 +153,5 @@ def run_bq(query):
 - BigQuery ジョブのリージョンは `asia-northeast1`（US ではない）→ `location` パラメータを必ず指定する
 - STG → PRD の順番で実行し、両環境で検証してから Notion を更新する
 - Dataform 実行は通常 30 秒以内に SUCCEEDED になる
+- **compilationResult の鮮度**: `workflowConfig` 経由の実行は `releaseConfig.releaseCompilationResult` が古い場合、マージ直後でも旧コードで動く。SUCCEEDED でも期待する変更が反映されていない可能性がある。実行後は検証クエリで実際の変更が反映されていることを確認すること。
+- **ADC トークン期限切れ**: RAPT エラー（`invalid_rapt`）が出た場合は `gcloud auth application-default login` で再認証が必要

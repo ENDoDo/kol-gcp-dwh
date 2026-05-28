@@ -272,7 +272,7 @@ const columns = {
     jpn_flag: "Jpnフラグ",
     jpn_flag_label: "grade_codeの有無をもとに対応 国際格付けレース（G）/それ以外の重賞（Jpn）",
     bettei_barei_handicap_summary_code: "重量種別コード(別定馬齢ハンデ概要コード)",
-    bettei_barei_handicap_summary_code_label: "bettei_barei_handicap_summary_codeをもとに対応 別定/馬齢/ハンデ/定量/規定(道営のみ)",
+    bettei_barei_handicap_summary_code_label: "bettei_barei_handicap_summary_codeをもとに対応 別定/馬齢/ハンデ/定量/規定(道営のみ)/重量区分なし",
     bettei_barei_handicap_detail: "別定/馬齢/ハンデ/定量/規定（道営のみ）/牡 55 K/牝 53 K/牝2K減",
     kyoso_joken_age_limit: "競走種別コード2 条件年齢制限",
     kyoso_joken_age_limit_label: "kyoso_joken_age_limitをもとに対応 2歳/3歳/4歳/3,4,5歳/4,5,6歳/3歳以上/4歳以上/3,4歳/4,5歳",
