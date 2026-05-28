@@ -62,17 +62,78 @@ def get_token():
 
 ## Dataform ワークフロー実行
 
+**必ず以下の手順で実行すること。workflowConfig 経由は compilationResult が古い場合があるため、常に新規 compilationResult を作成して使う。**
+
 ```python
+import subprocess
+
 # ENV: 'stg' or 'prd'
 ENV = 'stg'
 REPO = 'kol-dataform-repo-stg' if ENV == 'stg' else 'kol-dataform-repo'
 WF   = 'daily-race-table-update-stg' if ENV == 'stg' else 'daily-race-table-update'
 LOC  = 'asia-northeast1'
 
-body = json.dumps({
-    "workflowConfig": f"projects/smartkeiba/locations/{LOC}/repositories/{REPO}/workflowConfigs/{WF}"
-}).encode()
+# 環境ごとの codeCompilationConfig
+COMPILE_CONFIG = {
+    'stg': {
+        "defaultDatabase": "smartkeiba",
+        "defaultSchema": "kolbi_analysis_stg",
+        "vars": {"source_schema": "kolbi_keiba_stg"}
+    },
+    'prd': {
+        "defaultDatabase": "smartkeiba",
+        "defaultSchema": "kolbi_analysis",
+        "vars": {"source_schema": "kolbi_keiba"}
+    }
+}
 
+# Step 1: 現在の main SHA を取得
+sha = subprocess.check_output(
+    ['git', 'rev-parse', 'main'],
+    cwd='/Users/endodo/Source/kol-gcp-dwh'
+).decode().strip()
+print(f"main SHA: {sha}")
+
+# Step 2: 新規 compilationResult を作成（環境固有の config を指定）
+body = json.dumps({
+    "gitCommitish": sha,
+    "codeCompilationConfig": COMPILE_CONFIG[ENV]
+}).encode()
+req = urllib.request.Request(
+    f'https://dataform.googleapis.com/v1beta1/projects/smartkeiba/locations/{LOC}/repositories/{REPO}/compilationResults',
+    data=body, method='POST',
+    headers={'Authorization': f'Bearer {get_token()}', 'Content-Type': 'application/json'}
+)
+with urllib.request.urlopen(req) as resp:
+    comp = json.load(resp)
+comp_name = comp['name']
+resolved_sha = comp.get('resolvedGitCommitSha', sha)
+print(f"compilationResult: {comp_name}")
+print(f"resolvedGitCommitSha: {resolved_sha}")
+
+# SHA の一致を確認（不一致の場合は STOP してユーザーに報告）
+if resolved_sha != sha:
+    print(f"⚠️ SHA mismatch! Expected {sha}, got {resolved_sha}. STOP.")
+    exit(1)
+if comp.get('compilationErrors'):
+    print(f"⚠️ compilationErrors: {comp['compilationErrors']}")
+    exit(1)
+print("✓ compilationResult is fresh and matches main")
+
+# Step 3: workflowConfig の invocationConfig を取得
+req = urllib.request.Request(
+    f'https://dataform.googleapis.com/v1beta1/projects/smartkeiba/locations/{LOC}/repositories/{REPO}/workflowConfigs/{WF}',
+    headers={'Authorization': f'Bearer {get_token()}'}
+)
+with urllib.request.urlopen(req) as resp:
+    wf_config = json.load(resp)
+invocation_config = wf_config['invocationConfig']
+
+# Step 4: 新規 compilationResult + workflowConfig の invocationConfig で実行
+body = json.dumps({
+    "compilationResult": comp_name,
+    "invocationConfig": invocation_config
+}).encode()
 req = urllib.request.Request(
     f'https://dataform.googleapis.com/v1beta1/projects/smartkeiba/locations/{LOC}/repositories/{REPO}/workflowInvocations',
     data=body, method='POST',
@@ -153,5 +214,5 @@ def run_bq(query):
 - BigQuery ジョブのリージョンは `asia-northeast1`（US ではない）→ `location` パラメータを必ず指定する
 - STG → PRD の順番で実行し、両環境で検証してから Notion を更新する
 - Dataform 実行は通常 30 秒以内に SUCCEEDED になる
-- **compilationResult の鮮度**: `workflowConfig` 経由の実行は `releaseConfig.releaseCompilationResult` が古い場合、マージ直後でも旧コードで動く。SUCCEEDED でも期待する変更が反映されていない可能性がある。実行後は検証クエリで実際の変更が反映されていることを確認すること。
+- **compilationResult の鮮度**: `workflowConfig` のみを指定する実行は `releaseConfig` が古い compilationResult を使う場合があり、マージ直後でも旧コードで動く。上記の手順では常に最新 main SHA から compilationResult を新規作成するため、この問題を回避できる。SHA の不一致が検出された場合は STOP すること。
 - **ADC トークン期限切れ**: RAPT エラー（`invalid_rapt`）が出た場合は `gcloud auth application-default login` で再認証が必要

@@ -1364,7 +1364,7 @@ SELECT
     ELSE NULL
   END AS blinker_shiyo_kubun_label,
   CASE
-    WHEN z.blinker_uma_rn = 1 AND z.blinker_shiyo_kubun = '1' AND z.uma_min_barei <= 3 THEN 'はい'
+    WHEN z.blinker_uma_rn = 1 AND z.blinker_shiyo_kubun = '1' AND SAFE_CAST(z.kakutei_chakujun AS INT64) >= 1 THEN 'はい'
     ELSE NULL
   END AS blinker_shiyo_first_flag,
   z.kyuyo_riyu,
@@ -1409,7 +1409,7 @@ SELECT
     ELSE NULL
   END AS kishu_norikawari_kubun_label,
   CASE
-    WHEN z.kishu_uma_rn = 1 AND (z.kyoso_joken_kubun = '00001' OR z.uma_min_barei <= 3) THEN 'はい'
+    WHEN z.kishu_uma_rn = 1 AND SAFE_CAST(z.kakutei_chakujun AS INT64) >= 1 THEN 'はい'
     ELSE NULL
   END AS kishu_tennori_flag,
   z.chokyoshi_code,
