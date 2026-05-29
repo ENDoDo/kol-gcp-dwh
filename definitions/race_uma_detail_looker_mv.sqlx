@@ -113,6 +113,8 @@ SELECT
   zenhan_3f_float,
   kohan_3f_float,
   -- コーナー
+  corner1_juni_label,
+  corner2_juni_label,
   corner3_juni_label,
   corner3_juni_label_zensou,
   corner3_juni_furi,
