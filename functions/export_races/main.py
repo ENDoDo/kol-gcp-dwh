@@ -31,6 +31,9 @@ BUBBLE_API_KEY_SECRET_ID = os.environ.get("BUBBLE_API_KEY_SECRET_ID")
 CSV_BASE_URL = os.environ.get("CSV_BASE_URL", "https://kol-bi.jp/umasiri.dev")
 ENABLE_BUBBLE_API = str(os.environ.get("ENABLE_BUBBLE_API", "false")).lower() == "true"
 ENABLE_BUBBLE_API_SECRET_ID = os.environ.get("ENABLE_BUBBLE_API_SECRET_ID")
+DISCORD_WEBHOOK_URL_SECRET_ID = os.environ.get("DISCORD_WEBHOOK_URL_SECRET_ID")
+DISCORD_NOTIFICATION_TABLE = "discord_notification_state"
+DISCORD_API_NAME = "レース情報同期"
 
 def get_secret(secret_id):
     """Secret Managerからシークレット値を取得する"""
@@ -82,6 +85,51 @@ def calculate_hash(row):
     row_str = json.dumps(dict(row), sort_keys=True, default=str)
     return hashlib.sha256(row_str.encode('utf-8')).hexdigest()
 
+def ensure_discord_notification_table(bq_client, dataset_id):
+    schema = [
+        bigquery.SchemaField("api_name", "STRING", mode="REQUIRED"),
+        bigquery.SchemaField("last_called_at", "TIMESTAMP", mode="REQUIRED"),
+    ]
+    table_ref = f"{PROJECT_ID}.{dataset_id}.{DISCORD_NOTIFICATION_TABLE}"
+    bq_client.create_table(bigquery.Table(table_ref, schema=schema), exists_ok=True)
+
+def maybe_send_discord_notification(bq_client, dataset_id):
+    """Bubble API 呼び出し成功後に呼ぶ。前回呼び出しから10分未満の場合は通知しない。通知有無に関わらず last_called_at を更新する。"""
+    if not DISCORD_WEBHOOK_URL_SECRET_ID:
+        return
+    try:
+        rows = list(bq_client.query(f"""
+            SELECT last_called_at
+            FROM `{PROJECT_ID}.{dataset_id}.{DISCORD_NOTIFICATION_TABLE}`
+            WHERE api_name = '{DISCORD_API_NAME}'
+        """).result())
+
+        should_notify = True
+        if rows:
+            elapsed = datetime.datetime.now(datetime.timezone.utc) - rows[0].last_called_at
+            if elapsed < datetime.timedelta(minutes=10):
+                logger.info(f"Discord通知スキップ（前回呼び出しから{elapsed.seconds // 60}分経過）: {DISCORD_API_NAME}")
+                should_notify = False
+
+        if should_notify:
+            webhook_url = get_secret(DISCORD_WEBHOOK_URL_SECRET_ID)
+            env_label = "PRD" if dataset_id == "kolbi_analysis" else "STG"
+            now_str = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+            requests.post(webhook_url, json={
+                "content": f"**[{env_label}] Bubble API 実行**\nAPI: **{DISCORD_API_NAME}**\n実行時刻: {now_str}"
+            }, timeout=10).raise_for_status()
+            logger.info(f"Discord通知を送信しました: {DISCORD_API_NAME}")
+
+        bq_client.query(f"""
+            MERGE `{PROJECT_ID}.{dataset_id}.{DISCORD_NOTIFICATION_TABLE}` T
+            USING (SELECT '{DISCORD_API_NAME}' AS api_name, CURRENT_TIMESTAMP() AS last_called_at) S
+            ON T.api_name = S.api_name
+            WHEN MATCHED THEN UPDATE SET T.last_called_at = S.last_called_at
+            WHEN NOT MATCHED THEN INSERT (api_name, last_called_at) VALUES (S.api_name, S.last_called_at)
+        """).result()
+    except Exception as e:
+        logger.warning(f"Discord通知処理に失敗しました（スキップ）: {e}")
+
 @functions_framework.http
 def export_races(request):
     """更新されたレース情報をFTPにエクスポートするHTTP Cloud Function"""
@@ -96,6 +144,7 @@ def export_races(request):
 
         # 3. 状態管理テーブルの確認
         ensure_state_table(bq_client, DATASET_ID, STATE_TABLE_NAME)
+        ensure_discord_notification_table(bq_client, DATASET_ID)
 
         # リクエストパラメータ解析
         request_json = request.get_json(silent=True) or {}
@@ -138,6 +187,7 @@ def export_races(request):
                 processed = 0
                 duplicate_detected = False
                 duplicate_message = ""
+                bubble_api_called = False
                 try:
                     with ftplib.FTP(FTP_HOST) as ftp:
                         ftp.login(user=ftp_user, passwd=ftp_pass)
@@ -197,6 +247,7 @@ def export_races(request):
                                             duplicate_message = error_text
                                         else:
                                             raise Exception(f"Bubble Import Failed: {error_text}")
+                                bubble_api_called = True
 
                             processed += len(chunk)
                             current_date = str(max(r["hasso_date_utc"] for r in chunk))[:10]
@@ -237,6 +288,9 @@ def export_races(request):
                         """).result()
                         bq_client.delete_table(temp_table_id, not_found_ok=True)
                         logger.info("状態管理テーブルが更新されました。")
+
+                    if bubble_api_called:
+                        maybe_send_discord_notification(bq_client, DATASET_ID)
 
                     if duplicate_detected:
                         yield f"event: result\ndata: {json.dumps({'status': 'error', 'records': processed, 'message': duplicate_message})}\n\n"
@@ -335,6 +389,7 @@ def export_races(request):
 
         logger.info(f"FTPホスト {FTP_HOST} へアップロード中... (合計 {len(updates)} 件 - {total_parts} ファイル)")
 
+        bubble_api_called = False
         try:
             with ftplib.FTP(FTP_HOST) as ftp:
                 ftp.login(user=ftp_user, passwd=ftp_pass)
@@ -439,6 +494,7 @@ def export_races(request):
                                     else:
                                         logger.error(f"Bubble Import Failed ({filename}): {error_text}")
                                         raise Exception(f"Bubble Import Failed: {error_text}")
+                            bubble_api_called = True
 
                         except Exception as e:
                             logger.error(f"Bubble APIへの通知に失敗しました ({filename}): {e}")
@@ -500,6 +556,9 @@ def export_races(request):
 
             # 一時テーブルの削除
             bq_client.delete_table(temp_table_id, not_found_ok=True)
+
+        if bubble_api_called:
+            maybe_send_discord_notification(bq_client, DATASET_ID)
 
         return f"成功。 {len(updates)} 行をエクスポートしました。", 200
 

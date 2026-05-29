@@ -79,6 +79,7 @@ resource "google_cloudfunctions2_function" "export_schedules" {
       CSV_BASE_URL             = "https://kol-bi.jp/umasiri.dev"
       ENABLE_BUBBLE_API           = "false"
       ENABLE_BUBBLE_API_SECRET_ID = terraform.workspace == "prd" ? "projects/56638639323/secrets/kol_bubble_api_enabled" : "projects/56638639323/secrets/kol_bubble_api_enabled_stg"
+      DISCORD_WEBHOOK_URL_SECRET_ID = "projects/56638639323/secrets/kol_discord_webhook_url"
     }
     service_account_email = google_service_account.export_schedules_sa.email
   }
@@ -177,6 +178,7 @@ resource "google_cloudfunctions2_function" "export_race_uma_detail_bubble" {
       CSV_BASE_URL             = "https://kol-bi.jp/umasiri.dev"
       ENABLE_BUBBLE_API           = "false"
       ENABLE_BUBBLE_API_SECRET_ID = terraform.workspace == "prd" ? "projects/56638639323/secrets/kol_bubble_api_enabled" : "projects/56638639323/secrets/kol_bubble_api_enabled_stg"
+      DISCORD_WEBHOOK_URL_SECRET_ID = "projects/56638639323/secrets/kol_discord_webhook_url"
     }
     service_account_email = google_service_account.export_race_uma_detail_bubble_sa.email
   }
@@ -253,6 +255,7 @@ resource "google_cloudfunctions2_function" "export_races" {
       CSV_BASE_URL             = "https://kol-bi.jp/umasiri.dev"
       ENABLE_BUBBLE_API           = "false"
       ENABLE_BUBBLE_API_SECRET_ID = terraform.workspace == "prd" ? "projects/56638639323/secrets/kol_bubble_api_enabled" : "projects/56638639323/secrets/kol_bubble_api_enabled_stg"
+      DISCORD_WEBHOOK_URL_SECRET_ID = "projects/56638639323/secrets/kol_discord_webhook_url"
     }
     service_account_email = google_service_account.export_schedules_sa.email # 同じSAを使用
   }

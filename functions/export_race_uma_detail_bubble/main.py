@@ -31,6 +31,9 @@ BUBBLE_API_KEY_SECRET_ID = os.environ.get("BUBBLE_API_KEY_SECRET_ID")
 CSV_BASE_URL = os.environ.get("CSV_BASE_URL", "https://kol-bi.jp/umasiri.dev")
 ENABLE_BUBBLE_API = str(os.environ.get("ENABLE_BUBBLE_API", "false")).lower() == "true"
 ENABLE_BUBBLE_API_SECRET_ID = os.environ.get("ENABLE_BUBBLE_API_SECRET_ID")
+DISCORD_WEBHOOK_URL_SECRET_ID = os.environ.get("DISCORD_WEBHOOK_URL_SECRET_ID")
+DISCORD_NOTIFICATION_TABLE = "discord_notification_state"
+DISCORD_API_NAME = "馬詳細同期"
 
 def get_secret(secret_id):
     """Secret Managerからシークレット値を取得する"""
@@ -77,6 +80,50 @@ def ensure_state_table(bq_client, dataset_id, table_name):
         bq_client.create_table(table)
         logger.info(f"テーブル {table_ref} を作成しました。")
 
+def ensure_discord_notification_table(bq_client, dataset_id):
+    schema = [
+        bigquery.SchemaField("api_name", "STRING", mode="REQUIRED"),
+        bigquery.SchemaField("last_called_at", "TIMESTAMP", mode="REQUIRED"),
+    ]
+    table_ref = f"{PROJECT_ID}.{dataset_id}.{DISCORD_NOTIFICATION_TABLE}"
+    bq_client.create_table(bigquery.Table(table_ref, schema=schema), exists_ok=True)
+
+def maybe_send_discord_notification(bq_client, dataset_id):
+    """Bubble API 呼び出し成功後に呼ぶ。前回呼び出しから10分未満の場合は通知しない。通知有無に関わらず last_called_at を更新する。"""
+    if not DISCORD_WEBHOOK_URL_SECRET_ID:
+        return
+    try:
+        rows = list(bq_client.query(f"""
+            SELECT last_called_at
+            FROM `{PROJECT_ID}.{dataset_id}.{DISCORD_NOTIFICATION_TABLE}`
+            WHERE api_name = '{DISCORD_API_NAME}'
+        """).result())
+
+        should_notify = True
+        if rows:
+            elapsed = datetime.datetime.now(datetime.timezone.utc) - rows[0].last_called_at
+            if elapsed < datetime.timedelta(minutes=10):
+                logger.info(f"Discord通知スキップ（前回呼び出しから{elapsed.seconds // 60}分経過）: {DISCORD_API_NAME}")
+                should_notify = False
+
+        if should_notify:
+            webhook_url = get_secret(DISCORD_WEBHOOK_URL_SECRET_ID)
+            env_label = "PRD" if dataset_id == "kolbi_analysis" else "STG"
+            now_str = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+            requests.post(webhook_url, json={
+                "content": f"**[{env_label}] Bubble API 実行**\nAPI: **{DISCORD_API_NAME}**\n実行時刻: {now_str}"
+            }, timeout=10).raise_for_status()
+            logger.info(f"Discord通知を送信しました: {DISCORD_API_NAME}")
+
+        bq_client.query(f"""
+            MERGE `{PROJECT_ID}.{dataset_id}.{DISCORD_NOTIFICATION_TABLE}` T
+            USING (SELECT '{DISCORD_API_NAME}' AS api_name, CURRENT_TIMESTAMP() AS last_called_at) S
+            ON T.api_name = S.api_name
+            WHEN MATCHED THEN UPDATE SET T.last_called_at = S.last_called_at
+            WHEN NOT MATCHED THEN INSERT (api_name, last_called_at) VALUES (S.api_name, S.last_called_at)
+        """).result()
+    except Exception as e:
+        logger.warning(f"Discord通知処理に失敗しました（スキップ）: {e}")
 
 @functions_framework.http
 def export_race_uma_detail_bubble(request):
@@ -92,6 +139,7 @@ def export_race_uma_detail_bubble(request):
 
         # 3. 状態管理テーブルの確認
         ensure_state_table(bq_client, DATASET_ID, STATE_TABLE_NAME)
+        ensure_discord_notification_table(bq_client, DATASET_ID)
 
         # リクエストパラメータ解析
         request_json = request.get_json(silent=True) or {}
@@ -337,6 +385,9 @@ def export_race_uma_detail_bubble(request):
                         bq_client.delete_table(temp_table_id, not_found_ok=True)
                         logger.info("状態管理テーブルが更新されました。")
 
+                    if processed > 0 and enable_bubble and bubble_api_url and BUBBLE_API_KEY_SECRET_ID:
+                        maybe_send_discord_notification(bq_client, DATASET_ID)
+
                     if duplicate_detected:
                         yield f"event: result\ndata: {json.dumps({'status': 'error', 'records': processed, 'message': duplicate_message})}\n\n"
                     else:
@@ -493,6 +544,9 @@ def export_race_uma_detail_bubble(request):
 
             # 一時テーブルの削除
             bq_client.delete_table(temp_table_id, not_found_ok=True)
+
+        if processed_count > 0 and enable_bubble and bubble_api_url and BUBBLE_API_KEY_SECRET_ID:
+            maybe_send_discord_notification(bq_client, DATASET_ID)
 
         return f"成功。 {processed_count} 行をエクスポートしました。", 200
 
