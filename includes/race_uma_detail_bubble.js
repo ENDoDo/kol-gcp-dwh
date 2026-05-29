@@ -17,7 +17,7 @@ const columns = {
 
     race_bango_num: "レース番号 整数型",
     waku_kubun: "枠番区分",
-    wakuban: "枠番",
+    wakuban: "枠番 整数型",
     umaban: "馬番 2桁",
     umaban_num: "馬番 整数型",
     // 馬情報

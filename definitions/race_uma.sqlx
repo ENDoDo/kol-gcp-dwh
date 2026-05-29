@@ -27,7 +27,7 @@ config {
 
     race_bango_num: "レース番号 整数型",
     waku_kubun: "枠番区分",
-    wakuban: "枠番",
+    wakuban: "枠番 整数型",
     umaban: "馬番 2桁",
     umaban_num: "馬番 整数型",
     // 馬情報
@@ -284,7 +284,7 @@ WITH
       d2.ketto_toroku_bango,
       PARSE_DATETIME('%Y%m%d%H%M', d2.kaisai_nengappi || REPLACE(d1.hasso_jikoku, ':', '')) AS hasso_date,
       DATETIME_ADD(PARSE_DATETIME('%Y%m%d%H%M', d2.kaisai_nengappi || REPLACE(d1.hasso_jikoku, ':', '')), INTERVAL -9 HOUR) AS hasso_date_utc,
-      d2.wakuban,
+      SAFE_CAST(d2.wakuban AS INT64) AS wakuban,
       d2.bamei,
       d2.seibetsu_code,
       d2.barei,
@@ -1815,8 +1815,8 @@ SELECT
   z.zensou_kankaku_num,
   CASE
     WHEN z.toroku_tosu_num <= 8 THEN '中'
-    WHEN z.wakuban = '1' THEN '内枠'
-    WHEN z.wakuban = '8' THEN '外枠'
+    WHEN z.wakuban = 1 THEN '内枠'
+    WHEN z.wakuban = 8 THEN '外枠'
     ELSE '中'
   END AS waku_kubun,
   z.bataiju,
