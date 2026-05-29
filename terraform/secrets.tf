@@ -242,3 +242,21 @@ resource "google_secret_manager_secret_iam_member" "bubble_api_enabled_accessor_
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.export_race_uma_detail_bubble_sa.email}"
 }
+
+# -----------------------------------------------------------------------------
+# Discord Webhook URL シークレット（全エクスポート関数で共通使用）
+# -----------------------------------------------------------------------------
+
+resource "google_secret_manager_secret_iam_member" "discord_webhook_accessor_schedules" {
+  project   = var.project_id
+  secret_id = "kol_discord_webhook_url"
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.export_schedules_sa.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "discord_webhook_accessor_race_uma" {
+  project   = var.project_id
+  secret_id = "kol_discord_webhook_url"
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.export_race_uma_detail_bubble_sa.email}"
+}
