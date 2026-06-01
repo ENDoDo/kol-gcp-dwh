@@ -26,19 +26,15 @@ config {
     nichiji: "開催日次",
 
     race_bango_num: "レース番号 整数型",
-    waku_kubun: "枠番区分",
     wakuban: "枠番 整数型",
-    umaban: "馬番 2桁",
     umaban_num: "馬番 整数型",
     // 馬情報
     bamei: "馬名",
-    seibetsu_code: "性別コード",
     seibetsu_code_label: "性別 牡/牝/せん",
 
     barei_num: "馬齢 整数型",
 
     futan_juryo_float: "負担重量 小数点第一位まで",
-    blinker_shiyo_kubun: "ブリンカー使用区分",
     blinker_shiyo_kubun_label: "ブリンカー使用 「はい」/該当しない場合はnull",
     blinker_shiyo_first_flag: "初ブリンカー(競走馬に初めてブリンカー着用)の場合は「はい」、該当しない場合はnull。取消・除外等の確定着順なしレースはカウントせず、確定着順1以上の実走のみを着用回数に含める。最新 schedule_date のレースは確定着順が null（未走）でも判定する",
 
@@ -103,7 +99,6 @@ config {
     chokyo_den_oikiri_yajirushi_label: "調教矢印(ラベル)",
     chokyo_den_ichidori_furi_win_flag: "併せ馬が存在し、かつchokyo_ichidoriが6～9(大外周り)かつ併せ先着の場合「はい」該当しない場合はnull",
     chokyo_den_awase: "出馬表出走馬データ 調教併せ",
-    chokyo_den_awase_uma_bamei: "出馬表出走馬データ 調教併せ 馬名",
     chokyo_den_awase_uma_class: "出馬表出走馬データ 調教併せ馬 併せ当時のkyoso_joken_kubun_labelをもとに対応",
     chokyo_den_awase_uma_kaku_kubun: "出馬表出走馬データ 調教併せ馬 併せ当時の馬のクラスとの比較区分 格上/同格/格下",
     chokyo_den_awase_uma_kakuue_win_flag: "出馬表出走馬データ 調教併せ馬 格上に対して先着した場合は「はい」該当しない場合はnull",
@@ -176,7 +171,6 @@ config {
     // 馬体重・前走比較
     bataiju: "馬体重(kg)",
     bataiju_zensou: "前走 馬体重kg",
-    kyori_kubun_zensou: "前走 距離区分",
     kyori_zensou: "距離 前走",
     kishu_code_zensou: "騎手コード 前走",
     kishumei_zensou: "騎手名 前走",
@@ -188,20 +182,15 @@ config {
     corner3_juni_label_zensou: "3角順位 前走",
     corner4_juni_label_zensou: "4角順位 前走",
     corner4_ichidori_label_zensou: "4角位置取り 前走",
-    kyori_extension_flag: "距離延長フラグ",
-    kyori_shortening_flag: "距離短縮フラグ",
     ensei_kansai_to_kantou_flag: "遠征 関西→関東",
     ensei_kantou_to_kansai_flag: "遠征 関東→関西",
     track_code1_label_dirtsiba_zensou: "前走 ダ/芝",
-    siba_to_dirt_flag: "芝→ダ替わりフラグ",
-    dirt_to_siba_flag: "ダ→芝替わりフラグ",
     // 成績 (sei2)
     record_shisu: "レコード指数",
 
     zogen_sa_num: "増減差(整数)",
     yosou_tansho_ninkijun_num: "予想オッズ 単勝人気順",
     yosou_tansho_odds_float: "予想オッズ 小数点第一位まで",
-    yosou_tansho_odds_kubun: "yosou_tansho_odds_floatを元に判定 1.0〜1.4/1.5〜1.9/2.0〜2.9/3.0〜3.9/4.0〜4.9/5.0〜6.9/7.0〜9.9/10.0〜14.9/15.0〜19.9/20.0〜29.9/30.0〜49.9/50以上",
     // 印（Shirushi）カラム
     shirushi_shirushi_label: "予想印ラベル",
     shirushi_shirushi_num: "予想印数値",
@@ -214,11 +203,7 @@ config {
     tansho_haraimodoshi_num: "単勝払戻(整数)",
     fukusho_haraimodoshi_num: "複勝払戻(整数)",
     ijo_kubun_code1: "異常区分コード1",
-    ijo_kubun_code1_label: "異常区分コード1(ラベル)",
     ijo_kubun_code2: "異常区分コード2",
-    ijo_kubun_code2_label: "異常区分コード2(ラベル)",
-    nyusen_juni: "入線順位",
-    nyusen_juni_num: "入線順位(整数)",
     record_flag: "レコードフラグ",
 
     soha_time_float: "走破タイム(秒換算)",
@@ -226,9 +211,6 @@ config {
 
     chakusa_code1_num: "着差コード1(整数)",
     chakusa_code2: "着差コード2",
-    chakusa_code2_label: "着差コード2(ラベル)",
-    chakusa_label: "着差(ラベル)",
-
     time_sa_float: "タイム差(小数点)",
 
     zenhan_3f_float: "前半3F(小数点)",
@@ -1340,7 +1322,6 @@ SELECT
   z.wakuban,
 
   SAFE_CAST(z.race_num AS INT64) AS race_bango_num,
-  z.umaban,
   SAFE_CAST(z.umaban AS INT64) AS umaban_num,
   z.bamei,
 
@@ -1353,7 +1334,6 @@ SELECT
     ),
     NULL
   ) AS rating_rank,
-  z.seibetsu_code,
   CASE z.seibetsu_code
     WHEN '0' THEN '牡'
     WHEN '1' THEN '牝'
@@ -1364,7 +1344,6 @@ SELECT
   SAFE_CAST(z.barei AS INT64) AS barei_num,
 
   SAFE_CAST(z.futan_juryo AS FLOAT64) / 10 AS futan_juryo_float,
-  z.blinker_shiyo_kubun,
   CASE
     WHEN z.blinker_shiyo_kubun = '1' THEN 'はい'
     ELSE NULL
@@ -1597,7 +1576,6 @@ SELECT
   END AS chokyo_den_ichidori_furi_win_flag,
 
   z.chokyo_den_oikiri_awase AS chokyo_den_awase,
-  z.chokyo_den_oikiri_awase_uma_bamei AS chokyo_den_awase_uma_bamei,
   CASE WHEN z.chokyo_den_oikiri_awase IS NOT NULL THEN pl.kyoso_joken_kubun_label ELSE NULL END AS chokyo_den_awase_uma_class,
   CASE
     WHEN z.chokyo_den_oikiri_awase IS NOT NULL THEN
@@ -1813,23 +1791,8 @@ SELECT
 
   z.zensou_kankaku,
   z.zensou_kankaku_num,
-  CASE
-    WHEN z.toroku_tosu_num <= 8 THEN '中'
-    WHEN z.wakuban = 1 THEN '内枠'
-    WHEN z.wakuban = 8 THEN '外枠'
-    ELSE '中'
-  END AS waku_kubun,
   z.bataiju,
   z.bataiju_zensou,
-  z.kyori_kubun_zensou,
-  CASE
-    WHEN z.kyori > z.kyori_zensou THEN 'はい'
-    ELSE 'いいえ'
-  END AS kyori_extension_flag,
-  CASE
-    WHEN z.kyori < z.kyori_zensou THEN 'はい'
-    ELSE 'いいえ'
-  END AS kyori_shortening_flag,
   CASE
     WHEN (z.chokyoshi_tracen_kubun = '1' AND z.keibajo_code IN ('04', '05', '07', '06')) THEN 'はい'
     ELSE 'いいえ'
@@ -1839,15 +1802,6 @@ SELECT
     ELSE 'いいえ'
   END AS ensei_kantou_to_kansai_flag,
   z.track_code1_label_dirtsiba_zensou,
-  CASE
-    WHEN z.track_code1_label_dirtsiba_zensou = '芝' AND z.track_code1_dirtsiba_label = 'ダ' THEN 'はい'
-    ELSE 'いいえ'
-  END AS siba_to_dirt_flag,
-  CASE
-    WHEN z.track_code1_label_dirtsiba_zensou = 'ダ' AND z.track_code1_dirtsiba_label = '芝' THEN 'はい'
-    ELSE 'いいえ'
-  END AS dirt_to_siba_flag,
-
 
   SAFE_CAST(z.zogen_sa AS INT64) AS zogen_sa_num,
 
@@ -1882,28 +1836,7 @@ SELECT
     END
   AS INT64) AS fukusho_haraimodoshi_num,
   z.ijo_kubun_code1,
-  CASE z.ijo_kubun_code1
-    WHEN '1' THEN '落馬'
-    WHEN '2' THEN '失格'
-    WHEN '3' THEN '中止'
-    WHEN '4' THEN '取消'
-    WHEN '5' THEN '除外'
-    WHEN '6' THEN '降着'
-    WHEN '7' THEN '繰上げ'
-    ELSE NULL
-  END AS ijo_kubun_code1_label,
   z.ijo_kubun_code2,
-  CASE z.ijo_kubun_code2
-    WHEN '01' THEN '出走取消'
-    WHEN '02' THEN '出走除外'
-    WHEN '03' THEN '競走除外'
-    WHEN '04' THEN '競走中止'
-    WHEN '05' THEN '放馬'
-    WHEN '06' THEN '発走除外'
-    ELSE NULL
-  END AS ijo_kubun_code2_label,
-  z.nyusen_juni,
-  SAFE_CAST(z.nyusen_juni AS INT64) AS nyusen_juni_num,
 
 
 
@@ -1912,35 +1845,6 @@ SELECT
 
   SAFE_CAST(z.chakusa_code1 AS INT64) AS chakusa_code1_num,
   z.chakusa_code2,
-  CASE z.chakusa_code2
-    WHEN '0' THEN 'ハナ'
-    WHEN '1' THEN 'アタマ'
-    WHEN '2' THEN 'クビ'
-    WHEN '3' THEN '1/2'
-    WHEN '4' THEN '1/4'
-    WHEN '5' THEN '3/4'
-    WHEN '7' THEN '大差'
-    WHEN '8' THEN '同着'
-    ELSE NULL
-  END AS chakusa_code2_label,
-  NULLIF(
-    CASE
-      WHEN z.chakusa_code1 IS NOT NULL AND z.chakusa_code1 != ' '
-      THEN CAST(SAFE_CAST(z.chakusa_code1 AS INT64) AS STRING) || '馬身'
-      ELSE ''
-    END ||
-    CASE z.chakusa_code2
-      WHEN '0' THEN 'ハナ'
-      WHEN '1' THEN 'アタマ'
-      WHEN '2' THEN 'クビ'
-      WHEN '3' THEN '1/2'
-      WHEN '4' THEN '1/4'
-      WHEN '5' THEN '3/4'
-      WHEN '7' THEN '大差'
-      WHEN '8' THEN '同着'
-      ELSE ''
-    END,
-  '') AS chakusa_label,
 
   SAFE_CAST(z.time_sa AS FLOAT64) / 10 AS time_sa_float,
 
@@ -2033,21 +1937,6 @@ SELECT
     ELSE NULL
   END AS yosou_tansho_ninkijun_num,
   z.yosou_tansho_odds_float_raw AS yosou_tansho_odds_float,
-  CASE
-    WHEN z.yosou_tansho_odds_float_raw IS NULL THEN NULL
-    WHEN z.yosou_tansho_odds_float_raw < 1.5 THEN '1.0〜1.4'
-    WHEN z.yosou_tansho_odds_float_raw < 2.0 THEN '1.5〜1.9'
-    WHEN z.yosou_tansho_odds_float_raw < 3.0 THEN '2.0〜2.9'
-    WHEN z.yosou_tansho_odds_float_raw < 4.0 THEN '3.0〜3.9'
-    WHEN z.yosou_tansho_odds_float_raw < 5.0 THEN '4.0〜4.9'
-    WHEN z.yosou_tansho_odds_float_raw < 7.0 THEN '5.0〜6.9'
-    WHEN z.yosou_tansho_odds_float_raw < 10.0 THEN '7.0〜9.9'
-    WHEN z.yosou_tansho_odds_float_raw < 15.0 THEN '10.0〜14.9'
-    WHEN z.yosou_tansho_odds_float_raw < 20.0 THEN '15.0〜19.9'
-    WHEN z.yosou_tansho_odds_float_raw < 30.0 THEN '20.0〜29.9'
-    WHEN z.yosou_tansho_odds_float_raw < 50.0 THEN '30.0〜49.9'
-    ELSE '50以上'
-  END AS yosou_tansho_odds_kubun,
   sc.shirushi_shirushi_label,
   sc.shirushi_shirushi_num,
   CASE

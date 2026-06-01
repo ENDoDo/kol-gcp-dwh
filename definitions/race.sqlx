@@ -24,21 +24,14 @@ config {
     keibajo_code_jvd: "JRA-VAN仕様競馬場コード",
     keibajo_code_kol: "KOL仕様競馬場コード",
     keibajo_name: "札幌/函館/福島/新潟/東京/中山/中京/京都/阪神/小倉",
-    chuo_chiho_kubun: "中央･地方･外国 区分",
-    chuo_chiho_kubun_label: "chuo_chiho_kubunをもとに対応 中央/南関東/その他の公営/道営/外国",
     kyosomei_15moji: "競走名15文字",
     kyosomei_7moji: "競走名7文字",
     grade_code: "グレードコード",
     grade_code_label: "grade_codeをもとに対応 GⅠ/GⅡ/GⅢ/JGⅠ/JGⅡ/JGⅢ",
-    jpn_flag: "Jpnフラグ",
-    jpn_flag_label: "grade_codeの有無をもとに対応 国際格付けレース（G）/それ以外の重賞（Jpn）",
     bettei_barei_handicap_summary_code: "重量種別コード(別定馬齢ハンデ概要コード)",
     bettei_barei_handicap_summary_code_label: "bettei_barei_handicap_summary_codeをもとに対応 別定/馬齢/ハンデ/定量/規定(道営のみ)/重量区分なし",
-    bettei_barei_handicap_detail: "別定/馬齢/ハンデ/定量/規定（道営のみ）/牡 55 K/牝 53 K/牝2K減",
     kyoso_joken_cut: "条件カット",
-    kyoso_joken_cut_label: "kyoso_joken_cutをもとに判定 2歳/3歳/3歳以上/4歳以上",
     kyoso_joken_age_limit: "競走種別コード2 条件年齢制限",
-    kyoso_joken_age_limit_label: "kyoso_joken_age_limitをもとに対応 2歳/3歳/4歳/3,4,5歳/4,5,6歳/3歳以上/4歳以上/3,4歳/4,5歳",
     kyoso_joken_kubun: "競走条件コード1 競走条件区分",
     kyoso_joken_kubun_label: "kyoso_joken_kubunをもとに対応 新馬/未出走/未勝利/1勝クラス/2勝クラス/3勝クラス/オープン",
     kyoso_hiraba_tokubetsu_kubun: "kyosomei_15mojiに値がある場合は特別、そうでない場合は平場",
@@ -47,28 +40,18 @@ config {
     track_code1_dirtsiba: "トラックコード ダ･芝",
     track_code1_dirtsiba_label: "track_code1をもとに対応 ダ/芝",
     track_code2_LRS: "トラックコード 右･左",
-    track_code2_LRS_label: "track_code2をもとに対応 右/左/直線",
     track_code3_inout: "トラックコード 内･外",
-    track_code3_inout_label: "track_code3をもとに対応 内/外/外→内/タスキ/大障害/内２週/内→外",
     course_kubun: "コース区分",
-    course_kubun_label: "course_kubunをもとに対応 A/B/C/D/A1/A2/E",
     kyori: "距離",
     toroku_tosu_num: "登録頭数 整数型",
     torikeshi_tosu_num: "取消頭数 整数型",
     tenko_code: "天候コード",
-    tenko_code_label: "天候コードラベル (晴, 曇, 雨...)",
     babajotai_code: "馬場状態コード",
-    babajotai_code_label: "馬場状態ラベル (良, 稍, 重, 不良)",
     pace_yosou: "ペース(予想)",
     pace_yosou_label: "ペース(予想) ラベル (H, M, S)",
     pace_kekka: "ペース(結果)",
     pace_kekka_label: "ペース(結果) ラベル (H, M, S)",
     race_tanpyo: "レース短評",
-    juryo_handicap_flag: "重量種別が別定または馬齢の場合「はい」該当しない場合はnull",
-    keibajo_komawari_curve4_flag: "競馬場が札幌/函館/福島/小倉かつ距離が1700m以上の場合「はい」該当しない場合はnull",
-    keibajo_omawari_curve4_flag: "指定された競馬場、トラック、距離の組み合わせ条件を満たす場合「はい」該当しない場合はnull",
-    keibajo_straight_short_flag: "指定された競馬場、トラックの組み合わせ条件を満たす場合「はい」該当しない場合はnull",
-    keibajo_straight_long_flag: "東京芝、阪神芝外回り、新潟芝外回りの場合「はい」該当しない場合はnull",
     created: "データ作成日時",
     modified: "データ更新日時"
   },
@@ -119,14 +102,6 @@ WITH
         WHEN '10' THEN '小倉'
         ELSE NULL
       END AS keibajo_name,
-      CASE d1.chuo_chiho_kubun
-        WHEN '0' THEN '中央'
-        WHEN '1' THEN '南関東'
-        WHEN '2' THEN 'その他の公営'
-        WHEN '3' THEN '道営'
-        WHEN '4' THEN '外国'
-        ELSE NULL
-      END AS chuo_chiho_kubun_label,
       CASE d1.grade_code
         WHEN '0' THEN 'GⅠ'
         WHEN '1' THEN 'GⅡ'
@@ -225,24 +200,14 @@ SELECT
   keibajo_code_jvd_from_kol AS keibajo_code_jvd,
   keibajo_code AS keibajo_code_kol,
   keibajo_name,
-  chuo_chiho_kubun,
-  chuo_chiho_kubun_label,
   kyosomei_15moji,
   kyosomei_7moji,
   grade_code,
   grade_code_label,
-  jpn_flag,
-  CASE
-    WHEN grade_code IS NOT NULL THEN '国際格付けレース(G)'
-    ELSE 'それ以外の重賞(Jpn)'
-  END AS jpn_flag_label,
   bettei_barei_handicap_summary_code,
   bettei_barei_handicap_summary_code_label,
-  bettei_barei_handicap_detail,
   kyoso_joken_cut,
-  kyoso_joken_cut_label,
   kyoso_joken_age_limit,
-  kyoso_joken_age_limit_label,
   kyoso_joken_kubun,
   kyoso_joken_kubun_label,
   kyoso_hiraba_tokubetsu_kubun,
@@ -255,56 +220,13 @@ SELECT
     ELSE NULL
   END AS track_code1_dirtsiba_label,
   track_code2_LRS,
-  CASE track_code2_LRS
-    WHEN '0' THEN '右'
-    WHEN '1' THEN '左'
-    WHEN '2' THEN '直線'
-    ELSE NULL
-  END AS track_code2_LRS_label,
   track_code3_inout,
-  CASE track_code3_inout
-    WHEN '0' THEN '内'
-    WHEN '1' THEN '外'
-    WHEN '2' THEN '外→内'
-    WHEN '3' THEN 'タスキ'
-    WHEN '4' THEN '大障害'
-    WHEN '5' THEN '内２週'
-    WHEN '6' THEN '内→外'
-    ELSE NULL
-  END AS track_code3_inout_label,
   course_kubun,
-  CASE course_kubun
-    WHEN '0' THEN 'A'
-    WHEN '1' THEN 'B'
-    WHEN '2' THEN 'C'
-    WHEN '3' THEN 'D'
-    WHEN '4' THEN 'A1'
-    WHEN '5' THEN 'A2'
-    WHEN '6' THEN 'E'
-    ELSE NULL
-  END AS course_kubun_label,
   SAFE_CAST(kyori AS INT64) AS kyori,
   SAFE_CAST(toroku_tosu AS INT64) AS toroku_tosu_num,
   SAFE_CAST(torikeshi_tosu AS INT64) AS torikeshi_tosu_num,
   tenko_code,
-  CASE tenko_code
-    WHEN '0' THEN '晴'
-    WHEN '1' THEN '曇'
-    WHEN '2' THEN '雨'
-    WHEN '3' THEN '小雨'
-    WHEN '4' THEN '雪'
-    WHEN '5' THEN '風'
-    WHEN '6' THEN '小雪'
-    ELSE NULL
-  END AS tenko_code_label,
   babajotai_code,
-  CASE babajotai_code
-    WHEN '0' THEN '良'
-    WHEN '1' THEN '稍'
-    WHEN '2' THEN '重'
-    WHEN '3' THEN '不良'
-    ELSE NULL
-  END AS babajotai_code_label,
   pace AS pace_yosou,
   CASE pace
     WHEN '0' THEN 'H'
@@ -320,46 +242,6 @@ SELECT
     ELSE NULL
   END AS pace_kekka_label,
   race_tanpyo,
-  CASE
-    WHEN bettei_barei_handicap_summary_code IN ('00', '01')
-    THEN 'はい'
-    ELSE NULL
-  END AS juryo_handicap_flag,
-  CASE
-    WHEN keibajo_code IN ('08', '09', '06', '03') AND SAFE_CAST(kyori AS INT64) >= 1700
-    THEN 'はい'
-    ELSE NULL
-  END AS keibajo_komawari_curve4_flag,
-  CASE
-    WHEN
-      (keibajo_code = '04' AND SAFE_CAST(kyori AS INT64) >= 2100) OR
-      (keibajo_code = '01' AND track_code1_dirtsiba = '0' AND SAFE_CAST(kyori AS INT64) >= 1800) OR
-      (keibajo_code = '01' AND track_code1_dirtsiba = '1' AND SAFE_CAST(kyori AS INT64) >= 2000) OR
-      (keibajo_code = '00' AND track_code1_dirtsiba = '0' AND SAFE_CAST(kyori AS INT64) >= 1800) OR
-      (keibajo_code = '00' AND track_code1_dirtsiba = '1' AND SAFE_CAST(kyori AS INT64) >= 2000) OR
-      (keibajo_code = '02' AND SAFE_CAST(kyori AS INT64) >= 1800) OR
-      (keibajo_code = '07' AND track_code1_dirtsiba = '0' AND SAFE_CAST(kyori AS INT64) >= 1800) OR
-      (keibajo_code = '07' AND track_code1_dirtsiba = '1' AND SAFE_CAST(kyori AS INT64) >= 2000)
-    THEN 'はい'
-    ELSE NULL
-  END AS keibajo_omawari_curve4_flag,
-  CASE
-    WHEN
-      -- 阪神・京都・新潟の条件
-      (keibajo_code IN ('01', '00', '07') AND (track_code1_dirtsiba = '0' OR track_code3_inout = '0')) OR
-      -- その他競馬場の条件
-      (keibajo_code IN ('05', '03', '06', '08', '09'))
-    THEN 'はい'
-    ELSE NULL
-  END AS keibajo_straight_short_flag,
-  CASE
-    WHEN
-      (keibajo_code = '04' AND track_code1_dirtsiba = '1') OR -- 東京・芝
-      (keibajo_code = '01' AND track_code1_dirtsiba = '1' AND track_code3_inout = '1') OR -- 阪神・芝・外
-      (keibajo_code = '07' AND track_code1_dirtsiba = '1' AND track_code3_inout = '1') -- 新潟・芝・外
-    THEN 'はい'
-    ELSE NULL
-  END AS keibajo_straight_long_flag,
   CURRENT_TIMESTAMP() AS created,
   CURRENT_TIMESTAMP() AS modified
 FROM
