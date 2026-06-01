@@ -51,7 +51,7 @@ const columns = {
     kishu_tozai_shozoku_code: "騎手東西所属区分",
     kishu_tozai_shozoku_code_label: "騎手東西所属 西/東/招待",
     kishu_minarai_code: "騎手見習コード",
-    kishu_minarai_code_label: "騎手見習",
+    kishu_minarai_code_label: "騎手見習ラベル 1kg減/2kg減/3kg減/4kg減/女性2kg減/見習い区分なし",
     kishu_norikawari_kubun: "騎手乗り替わり区分",
     kishu_norikawari_kubun_label: "騎手乗り替わり 該当する場合「はい」該当しない場合はnull",
     kishu_tennori_flag: "テン乗り(騎手がこの馬に初めて騎乗)の場合は「はい」、該当しない場合はnull。取消・除外等の確定着順なしレースはカウントせず、確定着順1以上28以下の実走のみを騎乗回数に含める。最新 schedule_date のレースは確定着順が null（未走）でも判定する",
