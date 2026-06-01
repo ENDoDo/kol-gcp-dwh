@@ -93,12 +93,10 @@ SELECT
   bataiju,
   bataiju_zensou,
   kyori_zensou,
-  kyori_kubun_zensou,
   track_code1_label_dirtsiba_zensou,
   -- オッズ
   yosou_tansho_ninkijun_num,
   yosou_tansho_odds_float,
-  yosou_tansho_odds_kubun,
   kakutei_tansho_ninkijun_num,
   kakutei_tansho_ninkijun_num_zensou,
   kakutei_tansho_odds_float,
@@ -141,8 +139,6 @@ SELECT
   kyoso_hiraba_tokubetsu_kubun,
   heichi_shogai_kubun_label,
   track_code1_dirtsiba_label,
-  tenko_code_label,
-  babajotai_code_label,
   pace_yosou_label,
   pace_kekka_label,
   race_tanpyo
