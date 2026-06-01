@@ -938,9 +938,9 @@ WITH
       LAG(
         CASE
           WHEN SAFE_CAST(corner3_juni AS INT64) BETWEEN 1 AND 28
-            THEN CAST(SAFE_CAST(corner3_juni AS INT64) AS STRING)
+            THEN SAFE_CAST(corner3_juni AS INT64)
           WHEN SAFE_CAST(corner3_juni AS INT64) >= 40
-            THEN CAST(SAFE_CAST(corner3_juni AS INT64) - 40 AS STRING)
+            THEN SAFE_CAST(corner3_juni AS INT64) - 40
           ELSE NULL
         END, 1
       ) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS corner3_juni_label_zensou,
@@ -948,9 +948,9 @@ WITH
       LAG(
         CASE
           WHEN SAFE_CAST(corner4_juni AS INT64) BETWEEN 1 AND 28
-            THEN CAST(SAFE_CAST(corner4_juni AS INT64) AS STRING)
+            THEN SAFE_CAST(corner4_juni AS INT64)
           WHEN SAFE_CAST(corner4_juni AS INT64) >= 40
-            THEN CAST(SAFE_CAST(corner4_juni AS INT64) - 40 AS STRING)
+            THEN SAFE_CAST(corner4_juni AS INT64) - 40
           ELSE NULL
         END, 1
       ) OVER (PARTITION BY ketto_toroku_bango ORDER BY hasso_date) AS corner4_juni_label_zensou,
@@ -1950,9 +1950,9 @@ SELECT
   z.corner1_juni,
   CASE
     WHEN SAFE_CAST(z.corner1_juni AS INT64) BETWEEN 1 AND 28
-      THEN CAST(SAFE_CAST(z.corner1_juni AS INT64) AS STRING)
+      THEN SAFE_CAST(z.corner1_juni AS INT64)
     WHEN SAFE_CAST(z.corner1_juni AS INT64) >= 40
-      THEN CAST(SAFE_CAST(z.corner1_juni AS INT64) - 40 AS STRING)
+      THEN SAFE_CAST(z.corner1_juni AS INT64) - 40
     ELSE NULL
   END AS corner1_juni_label,
   CASE
@@ -1964,9 +1964,9 @@ SELECT
   z.corner2_juni,
   CASE
     WHEN SAFE_CAST(z.corner2_juni AS INT64) BETWEEN 1 AND 28
-      THEN CAST(SAFE_CAST(z.corner2_juni AS INT64) AS STRING)
+      THEN SAFE_CAST(z.corner2_juni AS INT64)
     WHEN SAFE_CAST(z.corner2_juni AS INT64) >= 40
-      THEN CAST(SAFE_CAST(z.corner2_juni AS INT64) - 40 AS STRING)
+      THEN SAFE_CAST(z.corner2_juni AS INT64) - 40
     ELSE NULL
   END AS corner2_juni_label,
   CASE
@@ -1978,9 +1978,9 @@ SELECT
   z.corner3_juni,
   CASE
     WHEN SAFE_CAST(z.corner3_juni AS INT64) BETWEEN 1 AND 28
-      THEN CAST(SAFE_CAST(z.corner3_juni AS INT64) AS STRING)
+      THEN SAFE_CAST(z.corner3_juni AS INT64)
     WHEN SAFE_CAST(z.corner3_juni AS INT64) >= 40
-      THEN CAST(SAFE_CAST(z.corner3_juni AS INT64) - 40 AS STRING)
+      THEN SAFE_CAST(z.corner3_juni AS INT64) - 40
     ELSE NULL
   END AS corner3_juni_label,
   CASE
@@ -1992,9 +1992,9 @@ SELECT
   z.corner4_juni,
   CASE
     WHEN SAFE_CAST(z.corner4_juni AS INT64) BETWEEN 1 AND 28
-      THEN CAST(SAFE_CAST(z.corner4_juni AS INT64) AS STRING)
+      THEN SAFE_CAST(z.corner4_juni AS INT64)
     WHEN SAFE_CAST(z.corner4_juni AS INT64) >= 40
-      THEN CAST(SAFE_CAST(z.corner4_juni AS INT64) - 40 AS STRING)
+      THEN SAFE_CAST(z.corner4_juni AS INT64) - 40
     ELSE NULL
   END AS corner4_juni_label,
   CASE
