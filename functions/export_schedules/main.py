@@ -231,6 +231,7 @@ def export_schedules(request):
                                 except Exception:
                                     pass
                                 if not resp.ok:
+                                    logger.error(f"Bubble API エラーレスポンス ({resp.status_code}): {resp.text[:500]}")
                                     if resp_json and "message" in resp_json:
                                         raise Exception(f"Bubble API Error ({resp.status_code}): {resp_json['message']}")
                                     resp.raise_for_status()
