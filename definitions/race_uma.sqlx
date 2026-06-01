@@ -1399,8 +1399,8 @@ SELECT
     WHEN '2' THEN '2kg減'
     WHEN '3' THEN '3kg減'
     WHEN '4' THEN '4kg減'
-    WHEN '5' THEN '女性2kg減'
-    ELSE NULL
+    WHEN '9' THEN '女性2kg減'
+    ELSE '見習い区分なし'
   END AS kishu_minarai_code_label,
   z.kishu_shozokubasho_code,
   CASE z.kishu_shozokubasho_code
