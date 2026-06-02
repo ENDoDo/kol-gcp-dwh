@@ -1,7 +1,7 @@
 config {
   type: "operations",
   dependencies: ["race_uma_detail_looker"],
-  description: "race_uma_detail_lookerから必要カラム117件のみ選択したBigQuery Materialized View。(Looker Studio用キャッシュ) Dataformが毎回 DROP → CREATE で自動再作成する。"
+  description: "race_uma_detail_lookerから必要カラム118件のみ選択したBigQuery Materialized View。(Looker Studio用キャッシュ) Dataformが毎回 DROP → CREATE で自動再作成する。"
 }
 
 -- Dataform実行のたびにrace_uma_detail_lookerが再作成されMVが無効化されるため、
@@ -39,6 +39,7 @@ SELECT
   kishumei,
   kishumei_zensou,
   kishu_norikawari_kubun_label,
+  kishu_minarai_code_label,
   -- 調教師
   chokyoshimei,
   chokyoshi_tracen_kubun_label,
