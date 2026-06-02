@@ -57,7 +57,7 @@ WITH
       END AS keibajo_name,
       race_bango_num,
       -- Get Shirushi info
-      umaban,
+      umaban_num,
       shirushi_shirushi_label
     FROM ${ref("race_uma")}
   ),
@@ -266,7 +266,7 @@ WITH
     CROSS JOIN UNNEST(r.umaban_list) AS u WITH OFFSET AS offset
     LEFT JOIN race_info ru
       ON r.race_code_kol = ru.race_code_kol
-      AND SAFE_CAST(ru.umaban AS INT64) = SAFE_CAST(u AS INT64)
+      AND ru.umaban_num = SAFE_CAST(u AS INT64)
     GROUP BY 1, 2, 3, 4, 5
   ),
 
