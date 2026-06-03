@@ -1074,25 +1074,8 @@ WITH
     WHERE
       z.chokyo_den_oikiri_awase_uma_bamei IS NOT NULL
       AND z.chokyo_den_oikiri_awase_uma_bamei != ''
-      AND (
-        -- 土曜日開催の場合
-        (
-          EXTRACT(DAYOFWEEK FROM PARSE_DATE('%Y%m%d', z.kaisai_nengappi)) = 7
-          AND (
-            p.kaisai_nengappi = z.kaisai_nengappi
-            OR p.kaisai_nengappi = FORMAT_DATE('%Y%m%d', DATE_ADD(PARSE_DATE('%Y%m%d', z.kaisai_nengappi), INTERVAL 1 DAY))
-          )
-        )
-        OR
-        -- 日曜日開催の場合
-        (
-          EXTRACT(DAYOFWEEK FROM PARSE_DATE('%Y%m%d', z.kaisai_nengappi)) = 1
-          AND (
-            p.kaisai_nengappi = z.kaisai_nengappi
-            OR p.kaisai_nengappi = FORMAT_DATE('%Y%m%d', DATE_SUB(PARSE_DATE('%Y%m%d', z.kaisai_nengappi), INTERVAL 1 DAY))
-          )
-        )
-      )
+      AND DATE_TRUNC(PARSE_DATE('%Y%m%d', z.kaisai_nengappi), WEEK(SATURDAY))
+        = DATE_TRUNC(PARSE_DATE('%Y%m%d', p.kaisai_nengappi), WEEK(SATURDAY))
     QUALIFY
       ROW_NUMBER() OVER (PARTITION BY z.race_code_uma_kol ORDER BY p.kaisai_nengappi ASC, p.race_num ASC) = 1
   ),
