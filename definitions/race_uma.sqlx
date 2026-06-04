@@ -102,7 +102,10 @@ config {
     chokyo_den_awase_uma_class: "出馬表出走馬データ 調教併せ馬 併せ当時のkyoso_joken_kubun_labelをもとに対応",
     chokyo_den_awase_uma_kaku_kubun: "出馬表出走馬データ 調教併せ馬 併せ当時の馬のクラスとの比較区分 格上/同格/格下",
     chokyo_den_awase_uma_kakuue_win_flag: "出馬表出走馬データ 調教併せ馬 格上に対して先着した場合は「はい」該当しない場合はnull",
-    chokyo_den_awase_uma_this_week_race_code_uma_jvd: "出馬表出走馬データ 調教併せ馬 今週出走する場合のrace_code_uma_jvd（土曜開催：当日または翌日、日曜開催：当日または前日）今週出走しない場合はnull",
+    chokyo_den_awase_uma_this_week_race_code_uma_jvd_sokuhou: "出馬表出走馬データ 調教併せ馬 今週出走する場合のrace_code_uma_jvd（速報：kol_den2ベース、配信時点の出走馬）今週出走しない場合はnull",
+    chokyo_den_awase_uma_this_week_race_code_uma_jvd_kakutei: "出馬表出走馬データ 調教併せ馬 今週出走する場合のrace_code_uma_jvd（確定：kol_sei2ベース、レース結果確定済み）今週出走しない場合はnull",
+    chokyo_den_awase_uma_this_week_flag_sokuhou: "出馬表出走馬データ 調教併せ馬 今週出走（速報）する場合は「はい」 該当しない場合はnull",
+    chokyo_den_awase_uma_this_week_flag_kakutei: "出馬表出走馬データ 調教併せ馬 今週出走（確定）した場合は「はい」 該当しない場合はnull",
     chokyo_den_awase_time_sa_float: "出馬表出走馬データ 調教併せのテキストからタイム差を抽出(「秒」は除く)",
     chokyo_den_awase_kubun: "出馬表出走馬データ 調教併せ区分",
     chokyo_den_awase_flag: "出馬表出走馬データ 調教併せフラグ",
@@ -1055,7 +1058,7 @@ WITH
       ROW_NUMBER() OVER (PARTITION BY z.race_code_uma_kol ORDER BY p.kaisai_nengappi DESC) = 1
   ),
 
-  this_week_partner_lookup AS (
+  this_week_partner_lookup_sokuhou AS (
     SELECT
       z.race_code_uma_kol,
       SUBSTR(p.race_code_uma_kol, 1, 8)
@@ -1071,6 +1074,34 @@ WITH
     INNER JOIN
       ${ref("kol_den2")} AS p
       ON z.chokyo_den_oikiri_awase_uma_bamei = p.bamei
+    WHERE
+      z.chokyo_den_oikiri_awase_uma_bamei IS NOT NULL
+      AND z.chokyo_den_oikiri_awase_uma_bamei != ''
+      AND DATE_TRUNC(PARSE_DATE('%Y%m%d', z.kaisai_nengappi), WEEK(SATURDAY))
+        = DATE_TRUNC(PARSE_DATE('%Y%m%d', p.kaisai_nengappi), WEEK(SATURDAY))
+    QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY z.race_code_uma_kol ORDER BY p.kaisai_nengappi ASC, p.race_num ASC) = 1
+  ),
+
+  this_week_partner_lookup_kakutei AS (
+    SELECT
+      z.race_code_uma_kol,
+      SUBSTR(p.race_code_uma_kol, 1, 8)
+      || CASE SUBSTR(p.race_code_uma_kol, 9, 2)
+           WHEN '08' THEN '01' WHEN '09' THEN '02' WHEN '06' THEN '03'
+           WHEN '07' THEN '04' WHEN '04' THEN '05' WHEN '05' THEN '06'
+           WHEN '02' THEN '07' WHEN '00' THEN '08' WHEN '01' THEN '09'
+           WHEN '03' THEN '10' ELSE NULL
+         END
+      || SUBSTR(p.race_code_uma_kol, 11, 8) AS this_week_race_code_uma_jvd
+    FROM
+      with_zensou_data AS z
+    INNER JOIN
+      ${ref("kol_den2")} AS p
+      ON z.chokyo_den_oikiri_awase_uma_bamei = p.bamei
+    INNER JOIN
+      ${ref("kol_sei2")} AS s2k
+      ON p.race_code_uma_kol = s2k.race_code_uma_kol
     WHERE
       z.chokyo_den_oikiri_awase_uma_bamei IS NOT NULL
       AND z.chokyo_den_oikiri_awase_uma_bamei != ''
@@ -1591,7 +1622,10 @@ SELECT
     ELSE NULL
   END AS chokyo_den_awase_uma_kakuue_win_flag,
 
-  CASE WHEN z.chokyo_den_oikiri_awase IS NOT NULL THEN twpl.this_week_race_code_uma_jvd ELSE NULL END AS chokyo_den_awase_uma_this_week_race_code_uma_jvd,
+  CASE WHEN z.chokyo_den_oikiri_awase IS NOT NULL THEN twpl_s.this_week_race_code_uma_jvd ELSE NULL END AS chokyo_den_awase_uma_this_week_race_code_uma_jvd_sokuhou,
+  CASE WHEN z.chokyo_den_oikiri_awase IS NOT NULL THEN twpl_k.this_week_race_code_uma_jvd ELSE NULL END AS chokyo_den_awase_uma_this_week_race_code_uma_jvd_kakutei,
+  CASE WHEN z.chokyo_den_oikiri_awase IS NOT NULL AND twpl_s.this_week_race_code_uma_jvd IS NOT NULL THEN 'はい' ELSE NULL END AS chokyo_den_awase_uma_this_week_flag_sokuhou,
+  CASE WHEN z.chokyo_den_oikiri_awase IS NOT NULL AND twpl_k.this_week_race_code_uma_jvd IS NOT NULL THEN 'はい' ELSE NULL END AS chokyo_den_awase_uma_this_week_flag_kakutei,
 
   REGEXP_EXTRACT(z.chokyo_den_oikiri_awase, r'([\d\.]+)秒') AS chokyo_den_awase_time_sa_float,
 
@@ -2006,8 +2040,12 @@ LEFT JOIN
   ON z.race_code_uma_kol = pl.race_code_uma_kol
 
 LEFT JOIN
-  this_week_partner_lookup AS twpl
-  ON z.race_code_uma_kol = twpl.race_code_uma_kol
+  this_week_partner_lookup_sokuhou AS twpl_s
+  ON z.race_code_uma_kol = twpl_s.race_code_uma_kol
+
+LEFT JOIN
+  this_week_partner_lookup_kakutei AS twpl_k
+  ON z.race_code_uma_kol = twpl_k.race_code_uma_kol
 
 LEFT JOIN
   shirushi_final AS sc
